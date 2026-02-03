@@ -17,6 +17,7 @@ Saved/
 *.config
 *.manifest
 *.log
+*.sln
 
 # 编辑器临时文件
 *.sln.DotSettings.user
@@ -34,3 +35,4 @@ Saved/
 # 第三方库和缓存
 */Source/ThirdParty/*
 */DerivedDataCache/*
+
