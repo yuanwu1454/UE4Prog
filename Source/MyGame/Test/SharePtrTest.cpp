@@ -3,5 +3,6 @@
 
 void SharePtrTest::Test()
 {
-	TestString();
+	// TestString();
+	TestCreateWidget();
 }
