@@ -4,6 +4,7 @@
 #include "MySlateWidget.h"
 
 #include "SlateOptMacros.h"
+#include "Widgets/Images/SImage.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -48,6 +49,40 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				// 	SNew(STextBlock)
 				// 	.Text(FText::FromString(TEXT("这是Slate按钮的悬停提示"))))
 		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Bottom)
+		.Padding(20)
+		.AutoHeight()[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)      // 垂直居上
+			.Padding(0)
+			.FillWidth(0.5)
+			[
+				SNew(SImage)
+				.ColorAndOpacity(FSlateColor(FLinearColor(1.0,0.0,0.0)))
+			]
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)      // 垂直居上
+			.Padding(0)
+			.FillWidth(0.5)
+			[
+				SNew(SImage)
+				.ColorAndOpacity(FSlateColor(FLinearColor(0.0,1.0,0.0)))
+			]
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)      // 垂直居上
+			.FillWidth(1.0)
+			.Padding(0)
+			[
+				SNew(SImage)
+				.ColorAndOpacity(FSlateColor(FLinearColor(0.0,0.0,1.0)))
+			]
+		]
 	];
 
 	// 绑定全局退出回调：游戏关闭时执行
@@ -75,6 +110,27 @@ FReply SMySlateWidget::OnTestButtonClicked()
 
 	// FReply::Handled() 表示处理了此次点击事件，不再向下传递
 	return FReply::Handled();
+}
+
+void SMySlateWidget::TestCreateWidget()
+{
+	UE_LOG(LogTemp, Log, TEXT("TestCreateWidget"));
+
+	if (SMySlateWidget::GMySlateWidgetRoot.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("smyslatewidget is exists"))
+		return;
+	}
+
+	// 1. 先创建强引用的根控件（局部强引用，用于构建和挂载）
+	SMySlateWidget::GMySlateWidgetRoot = SNew(SMySlateWidget)
+		.WidgetTitle(FText::FromString(TEXT("My Create Wiget")));
+
+	// 2. 挂载到视口
+	GWorld->GetGameViewport()->AddViewportWidgetContent(
+		SNew(SWeakWidget)
+			.PossiblyNullContent(SMySlateWidget::GMySlateWidgetRoot)
+	,10);
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

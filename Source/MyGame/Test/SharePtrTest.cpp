@@ -4,5 +4,5 @@
 void SharePtrTest::Test()
 {
 	// TestString();
-	TestCreateWidget();
+	SMySlateWidget::TestCreateWidget();
 }

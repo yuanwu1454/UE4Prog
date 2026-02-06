@@ -22,6 +22,7 @@ public:
 	void Construct(const FArguments& InArgs);
 	~SMySlateWidget();
 	static TSharedPtr<SMySlateWidget> GMySlateWidgetRoot;
+	static void TestCreateWidget();
 private:
 	// 【可选】子控件句柄：保存子控件的引用，方便后续交互（如按钮点击、文本修改）
 	TSharedPtr<STextBlock> TitleText;    // 标题文本控件
@@ -32,6 +33,8 @@ private:
 
 	// 存储外部传入的标题（私有成员）
 	FText WidgetTitle;
+
+	
 };
 
 

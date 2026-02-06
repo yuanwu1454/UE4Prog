@@ -5,8 +5,6 @@
 // 引入UE4核心头文件（必加）
 #include "Engine/Engine.h"
 
-static TWeakPtr<SWidget> G_QuickSlateUI = nullptr;
-
 void TestString()
 {
 	FString Str1 = "Hello";
@@ -35,23 +33,3 @@ void TestString()
 	}
 }
 
-void TestCreateWidget()
-{
-	UE_LOG(LogTemp, Log, TEXT("TestCreateWidget"));
-
-	if (SMySlateWidget::GMySlateWidgetRoot.IsValid())
-	{
-		UE_LOG(LogTemp, Log, TEXT("smyslatewidget is exists"))
-		return;
-	}
-	
-	// 1. 先创建强引用的根控件（局部强引用，用于构建和挂载）
-	SMySlateWidget::GMySlateWidgetRoot = SNew(SMySlateWidget)
-		.WidgetTitle(FText::FromString(TEXT("My Create Wiget")));
-	
-	// 2. 挂载到视口
-	GWorld->GetGameViewport()->AddViewportWidgetContent(
-		SNew(SWeakWidget)
-			.PossiblyNullContent(SMySlateWidget::GMySlateWidgetRoot)
-	,10);
-}
