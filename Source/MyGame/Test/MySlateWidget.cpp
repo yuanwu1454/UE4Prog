@@ -4,6 +4,8 @@
 #include "MySlateWidget.h"
 
 #include "SlateOptMacros.h"
+#include "Widgets/SToolTip.h"
+#include "Widgets/SViewport.h"
 #include "Widgets/Images/SImage.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -51,13 +53,14 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 		]
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Bottom)
-		.Padding(20)
-		.AutoHeight()[
+		.VAlign(VAlign_Fill)
+		.Padding(0)
+		.FillHeight(1.0)
+		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
 			.HAlign(HAlign_Fill)
-			.VAlign(VAlign_Fill)      // 垂直居上
+			.VAlign(VAlign_Bottom)      // 垂直居上
 			.Padding(0)
 			.FillWidth(0.5)
 			[
@@ -65,22 +68,86 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				.ColorAndOpacity(FSlateColor(FLinearColor(1.0,0.0,0.0)))
 			]
 			+ SHorizontalBox::Slot()
-			.HAlign(HAlign_Fill)
+			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Fill)      // 垂直居上
 			.Padding(0)
 			.FillWidth(0.5)
 			[
 				SNew(SImage)
 				.ColorAndOpacity(FSlateColor(FLinearColor(0.0,1.0,0.0)))
+				.ToolTip(SNew(SToolTip)
+				// .Text(
+				// 	FText::FromString(
+				// 		FString::Printf(TEXT("LOL=%s"), TEXT("xzcv"))
+				// 	)
+				// )
+				
+				.Text(FText::Format(
+					FText::FromString(TEXT("LOL={0}")),
+						FText::FromString(TEXT("zxcv"))
+					)
+					)
+				
+					)
 			]
 			+ SHorizontalBox::Slot()
 			.HAlign(HAlign_Fill)
 			.VAlign(VAlign_Fill)      // 垂直居上
-			.FillWidth(1.0)
+			.FillWidth(0.5)
 			.Padding(0)
 			[
 				SNew(SImage)
 				.ColorAndOpacity(FSlateColor(FLinearColor(0.0,0.0,1.0)))
+				.ToolTip(
+					SNew(SToolTip)
+					// 可选：设置ToolTip的显示延迟（默认0.5秒，可自定义）
+					// .Text(FText::FromString(TEXT("这是SImage的悬浮提示")))
+					.Text_Lambda([]()
+					{
+						FVector2D MousePos = FSlateApplication::Get().GetCursorPos();
+						FString DebugMessage = FString::Printf(TEXT("MousePos: X=%.2f, Y=%.2f"), MousePos.X, MousePos.Y);
+						// 动态文本用FText::Format，而非直接拼接
+						return FText::FromString(DebugMessage);
+					})
+				)
+			]
+
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)      // 垂直居上
+			.FillWidth(0.5)
+			.Padding(0)
+			[
+				SNew(SImage)
+				// .ColorAndOpacity(FSlateColor(FLinearColor(1.0,0.0,1.0)))
+				.ColorAndOpacity_Lambda([]()
+				{
+					FVector2D MousePos = FSlateApplication::Get().GetCursorPos();
+					// 2. 获取屏幕分辨率（用于将鼠标位置映射到0-1范围）
+					auto ViewPort = FSlateApplication::Get().GetGameViewport();
+				    FVector2D ScreenSize = ViewPort->GetDesiredSize();
+					// 3. 防止除零错误（屏幕尺寸至少为1）
+					float ScreenWidth = FMath::Max(ScreenSize.X, 1.0f);
+					float ScreenHeight = FMath::Max(ScreenSize.Y, 1.0f);
+					        
+					// 4. 将鼠标X/Y坐标映射到0-1的RGB值范围
+					// X轴控制红色通道，Y轴控制绿色通道，固定蓝色通道为0.5
+					float Red = FMath::Clamp(MousePos.X / ScreenWidth, 0.0f, 1.0f);
+					float Green = FMath::Clamp(MousePos.Y / ScreenHeight, 0.0f, 1.0f);
+					float Blue = 0.5f; // 固定蓝色，也可改为随位置变化
+					float Alpha = 1.0f; // 不透明
+
+					// if (GEngine)
+					// {
+					// 	// 方式1：推荐 - 使用FString::Printf拼接数值
+					// 	FString DebugMessage = FString::Printf(TEXT("MousePos: X=%.2f, Y=%.2f"), MousePos.X, MousePos.Y);
+					// 	    
+					// 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, DebugMessage);
+					// }
+					//
+					// 5. 返回根据鼠标位置计算的颜色
+					return FSlateColor(FLinearColor(Red, Green, Blue, Alpha));
+				})
 			]
 		]
 	];
