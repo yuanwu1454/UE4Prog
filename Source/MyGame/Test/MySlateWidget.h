@@ -7,6 +7,14 @@
 #include "Widgets/SWeakWidget.h"
 
 
+
+
+using FunType = int32(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const;
+
+// const 修饰的函数类型不能声明普通指针
+// using FunPtrType = FunType*;
+using PaintFuncType = TFunction<int32(const FPaintArgs&, const FGeometry&, const FSlateRect&, 
+									 FSlateWindowElementList&, int32, const FWidgetStyle&, bool)>;
 /**
  * 
  */
@@ -35,8 +43,15 @@ private:
 
 	// 存储外部传入的标题（私有成员）
 	FText WidgetTitle;
+	int32 RenderIndex=0;
 
-	
+
+	TArray<PaintFuncType> FuncArr;
+
+	FunType CustomPaint;
+	FunType CustomPaint1;
+	PaintFuncType CustomPaintType1;
+	PaintFuncType CustomPaintType2;
 };
 
 
