@@ -132,7 +132,7 @@ int32 SMySlateWidget::CustomPaint(const FPaintArgs& Args, const FGeometry& Allot
 			AllottedGeometry.ToPaintGeometry(),
 			CirclePoints,
 			ESlateDrawEffect::None,
-			FLinearColor::Green.CopyWithNewOpacity(0.7f),
+			CircleColor.CopyWithNewOpacity(0.7f),
 			true,
 			2.0f
 		);

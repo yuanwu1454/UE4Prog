@@ -4,6 +4,7 @@
 #include "MySlateWidget.h"
 
 #include "SlateOptMacros.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Input/HittestGrid.h"
 #include "Widgets/SToolTip.h"
 #include "Widgets/SViewport.h"
@@ -247,6 +248,50 @@ int32 SMySlateWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedG
 	return NewLayerId ;
 }
 
+FReply SMySlateWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	FReply Reply = FReply::Unhandled();
+	if (IsEnabled() && (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton || MouseEvent.IsTouchEvent()))
+	{
+		auto Vector2D = MouseEvent.GetScreenSpacePosition();
+		UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times %.2f, %.2f"), Vector2D.X,Vector2D.Y));
+
+
+		auto LocalVec2D = USlateBlueprintLibrary::AbsoluteToLocal(MyGeometry, Vector2D);
+		UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times local %.2f, %.2f"), LocalVec2D.X,LocalVec2D.Y));
+
+		// auto Size = GetDesiredSize();
+		auto Size = USlateBlueprintLibrary::GetLocalSize(MyGeometry);
+		UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times Size %.2f, %.2f"), Size.X,Size.Y));
+		Reply = FReply::Handled();
+
+		// auto Size = GetDesiredSize();
+		auto AbsSize = USlateBlueprintLibrary::GetAbsoluteSize(MyGeometry);
+		UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times AbsSize %.2f, %.2f"), AbsSize.X,AbsSize.Y));
+		Reply = FReply::Handled();
+		auto CenterPos = Size/2;
+		float Distance = FVector2D::Distance(CenterPos, LocalVec2D);
+		UE_LOG(LogTemp, Log, TEXT("Distance: %s"), *FString::Printf(TEXT("Clicked Times distance %.2f"), Distance ));
+		const float CircleSize = FMath::Min(Size.X, Size.Y) * 0.25f; // 圆形直径
+		const float Radius = CircleSize / 2;
+		UE_LOG(LogTemp, Log, TEXT("Distance: %s"), *FString::Printf(TEXT("Clicked Times Radius %.2f"), Radius ));
+		if (Distance < Radius)
+		{
+			CircleColor = FLinearColor::Green;
+			UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times In Radius")));
+		}else
+		{
+			CircleColor = FLinearColor::Red;
+			UE_LOG(LogTemp, Log, TEXT("Str: %s"), *FString::Printf(TEXT("Clicked Times Out Radius")));
+		}
+		
+	}
+
+	Invalidate(EInvalidateWidget::Layout);
+
+	//return the constructed reply
+	return Reply;
+}
 
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

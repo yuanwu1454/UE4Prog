@@ -32,7 +32,7 @@ public:
 	static TSharedPtr<SMySlateWidget> GMySlateWidgetRoot;
 	static void TestCreateWidget();
 	int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
-
+	virtual FReply OnMouseButtonDown( const FGeometry& MyGeometry, const FPointerEvent& MouseEvent ) override;
 private:
 	// 【可选】子控件句柄：保存子控件的引用，方便后续交互（如按钮点击、文本修改）
 	TSharedPtr<STextBlock> TitleText;    // 标题文本控件
@@ -52,6 +52,7 @@ private:
 	FunType CustomPaint1;
 	PaintFuncType CustomPaintType1;
 	PaintFuncType CustomPaintType2;
+	FLinearColor CircleColor = FLinearColor::Green;
 };
 
 
