@@ -12,7 +12,7 @@
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
-TSharedPtr<SMySlateWidget> SMySlateWidget::GMySlateWidgetRoot = nullptr;
+TWeakPtr<SMySlateWidget> SMySlateWidget::GMySlateWidgetRoot = nullptr;
 void SMySlateWidget::Construct(const FArguments& InArgs)
 {
 	// 1. 获取外部传入的参数，赋值给私有成员
@@ -216,21 +216,40 @@ void SMySlateWidget::TestCreateWidget()
 {
 	UE_LOG(LogTemp, Log, TEXT("TestCreateWidget"));
 
-	if (SMySlateWidget::GMySlateWidgetRoot.IsValid())
+	if (GMySlateWidgetRoot.IsValid())
 	{
 		UE_LOG(LogTemp, Log, TEXT("smyslatewidget is exists"))
 		return;
 	}
 
 	// 1. 先创建强引用的根控件（局部强引用，用于构建和挂载）
-	SMySlateWidget::GMySlateWidgetRoot = SNew(SMySlateWidget)
+	TSharedPtr<SMySlateWidget> SharedPtr = SNew(SMySlateWidget)
 		.WidgetTitle(FText::FromString(TEXT("My Create Wiget")));
 
+
+	// 2. 用SBox包裹（关键！SBox会尊重子控件的DesiredSize）
+	// SNew()返回TSharedRef<SMySlateWidget>
+	TSharedPtr<SWidget> WidgetWithSizeConstraint = SNew(SBox)
+		// 让SBox的尺寸匹配子控件的期望尺寸（核心配置）
+		// .HAlign(HAlign_Center)    // 水平居中（可选，根据需求调整）
+		// .VAlign(VAlign_Center)    // 垂直居中（可选）
+		.HAlign(HAlign_Fill)    // 水平居中（可选，根据需求调整）
+		.VAlign(VAlign_Fill)    // 垂直居中（可选）
+		.Content()
+		[
+			SharedPtr.ToSharedRef()  // 放入你的自定义控件
+		];
+
+	
 	// 2. 挂载到视口
 	GWorld->GetGameViewport()->AddViewportWidgetContent(
-		SNew(SWeakWidget)
-			.PossiblyNullContent(SMySlateWidget::GMySlateWidgetRoot)
+		WidgetWithSizeConstraint.ToSharedRef()
+		// SNew(SWeakWidget)
+		// 	.PossiblyNullContent(WidgetWithSizeConstraint)
 	,10);
+
+	GMySlateWidgetRoot = SharedPtr;
+	
 }
 
 int32 SMySlateWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry,
@@ -292,6 +311,16 @@ FReply SMySlateWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPoi
 	//return the constructed reply
 	return Reply;
 }
+// 重载针对 virtual修饰的函数，
+// 如果重载非virtual修饰的函数，那就是重写，并且隐藏父类的函数。
+FVector2D SMySlateWidget::ComputeDesiredSize(float LayoutScaleMultiplier) const
+{
 
+	// 方式1：返回固定尺寸（需乘以缩放系数，适配全局布局缩放）
+	// const float Width = 1200.0f * LayoutScaleMultiplier;
+	// const float Height = 180.0f * LayoutScaleMultiplier;
+	// return FVector2D(Width, Height);
+	return SCompoundWidget::ComputeDesiredSize(LayoutScaleMultiplier);
+}
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

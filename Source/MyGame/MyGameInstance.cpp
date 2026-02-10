@@ -8,5 +8,5 @@ void UMyGameInstance::Shutdown()
 {
 	Super::Shutdown();
 
-	SMySlateWidget::GMySlateWidgetRoot.Reset();
+	// SMySlateWidget::GMySlateWidgetRoot.Reset();
 }
