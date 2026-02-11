@@ -4,6 +4,7 @@
 #include "MySlateWidget.h"
 
 #include "SlateOptMacros.h"
+#include "TriangleButton.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Input/HittestGrid.h"
 #include "Widgets/SToolTip.h"
@@ -61,6 +62,15 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				.Font(FSlateFontInfo(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"), 24)) // 字体+字号
 				.ColorAndOpacity(FLinearColor::White) // 文本颜色（白色）
 		]
+		+ SVerticalBox::Slot()
+			.HAlign(HAlign_Center)    // 水平居中
+			.VAlign(VAlign_Top)      // 垂直居上
+			.Padding(0)             // 内边距（上下左右20像素）
+			.AutoHeight()            // 高度自适应内容
+		[
+			SNew(STriangleButton)
+		]
+		
 		// 垂直布局的第2个槽位：添加测试按钮
 		+ SVerticalBox::Slot()
 			.HAlign(HAlign_Center)
