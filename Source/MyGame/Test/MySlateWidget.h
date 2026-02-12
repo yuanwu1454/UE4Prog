@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TriangleButton.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/SWeakWidget.h"
 
@@ -40,13 +41,14 @@ private:
 	// 【可选】子控件句柄：保存子控件的引用，方便后续交互（如按钮点击、文本修改）
 	TSharedPtr<STextBlock> TitleText;    // 标题文本控件
 	TSharedPtr<SButton> TestButton;      // 测试按钮控件
+	TSharedPtr<STriangleButton> TestTriangleButton;      // 测试按钮控件
 
 	// 【可选】按钮点击的回调函数
 	FReply OnTestButtonClicked();
 
 	// 存储外部传入的标题（私有成员）
 	FText WidgetTitle;
-	int32 RenderIndex=0;
+	int32 RenderIndex=1;
 
 
 	TArray<PaintFuncType> FuncArr;

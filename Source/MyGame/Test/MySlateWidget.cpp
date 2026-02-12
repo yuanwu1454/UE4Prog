@@ -18,7 +18,7 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 {
 	// 1. 获取外部传入的参数，赋值给私有成员
 	WidgetTitle = InArgs._WidgetTitle;
-	RenderIndex = 0;
+	RenderIndex = 1;
 
 	CustomPaintType1 = [this](const FPaintArgs& Args, 
 	   const FGeometry& AllottedGeometry,
@@ -62,15 +62,6 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				.Font(FSlateFontInfo(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"), 24)) // 字体+字号
 				.ColorAndOpacity(FLinearColor::White) // 文本颜色（白色）
 		]
-		+ SVerticalBox::Slot()
-			.HAlign(HAlign_Center)    // 水平居中
-			.VAlign(VAlign_Top)      // 垂直居上
-			.Padding(0)             // 内边距（上下左右20像素）
-			.AutoHeight()            // 高度自适应内容
-		[
-			SNew(STriangleButton)
-		]
-		
 		// 垂直布局的第2个槽位：添加测试按钮
 		+ SVerticalBox::Slot()
 			.HAlign(HAlign_Center)
@@ -89,6 +80,18 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				// 	SNew(STextBlock)
 				// 	.Text(FText::FromString(TEXT("这是Slate按钮的悬停提示"))))
 		]
+		+ SVerticalBox::Slot()
+			.HAlign(HAlign_Center)    // 水平居中
+			.VAlign(VAlign_Top)      // 垂直居上
+			.Padding(0)             // 内边距（上下左右20像素）
+			.AutoHeight()            // 高度自适应内容
+		[
+			SAssignNew(TestTriangleButton, STriangleButton)
+			.TriangleSize(FVector2D(90.f,90.f))
+		]
+		
+		
+
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Fill)
 		.VAlign(VAlign_Fill)
@@ -191,6 +194,8 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 	];
 
 	// 绑定全局退出回调：游戏关闭时执行
+
+	TestTriangleButton->SetButtonPtr(TestButton);
 }
 
 SMySlateWidget::~SMySlateWidget()

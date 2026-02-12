@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Input/HittestGrid.h"
 #include "Layout/ArrangedWidget.h"
 #include "Widgets/SCompoundWidget.h"
 
+// 可以直接获取的path 来处理。 SlateWindow->GetHittestGrid().GetBubblePath
 /**
- * 
+ * 测试对应的方法，增加感性认识
  */
 class MYGAME_API STriangleButton : public SButton
 {
@@ -18,18 +20,25 @@ public:
 		, _HoveredColor(FLinearColor::Gray)
 		, _PressedColor(FLinearColor::Black)
 		, _TriangleSize(FVector2D(40.f, 40.f))
+		, _ButtonPtr(nullptr)	
 	{}
 
 	SLATE_ARGUMENT(FLinearColor, TriangleColor);
 	SLATE_ARGUMENT(FLinearColor, HoveredColor);
 	SLATE_ARGUMENT(FLinearColor, PressedColor);
 	SLATE_ARGUMENT(FVector2D, TriangleSize);
+	SLATE_ARGUMENT(TWeakPtr<SButton>, ButtonPtr)
 	SLATE_END_ARGS()
 
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs);
 
 	FVector2D ComputeDesiredSize(float LayoutScaleMultiplier) const override;
+
+	void SetButtonPtr(TSharedPtr<SButton> InButtonPtr)
+	{
+		ButtonPtr = InButtonPtr;
+	}
 
 protected:
 	// 重写绘制逻辑
@@ -45,8 +54,13 @@ private:
 	// 三角形尺寸
 	TAttribute<FVector2D> TriangleSize;
 
-	FReply OnTriClicked();
+	TAttribute<TWeakPtr<SButton>>ButtonPtr;
+	// 1. 先前向声明嵌套类（核心：告诉编译器这是A的嵌套类）
 	class FCustomTriangleHitTestPath;
+	
+	FReply OnTriClicked();
+	friend class FCustomTriangleHitTestPath;
+	mutable TSharedPtr<class FCustomTriangleHitTestPath> TestPathPtr;
 };
 
 
@@ -60,7 +74,9 @@ public:
         : OwnerButton(InOwnerButton)
         , TriangleNormalVerts(InTriangleNormalVerts)
         , WidgetGeometry(InWidgetGeometry)
-    {}
+    {
+    	bPrintTriPos = true;
+    }
 
     // -------------------------- 核心：自定义命中路径（决定是否命中） --------------------------
     virtual TArray<FWidgetAndPointer> GetBubblePathAndVirtualCursors(
@@ -85,33 +101,63 @@ public:
     	
 
     	// -------------------------- 三角形命中判断（逻辑不变） --------------------------
-    	const FVector2D WidgetSize = WidgetGeometry.GetLocalSize();
+    	// const FVector2D WidgetSize = WidgetGeometry.GetLocalSize();
     	TArray<FVector2D> TrianglePixelVerts;
     	for (const FVector2D& NormalVert : TriangleNormalVerts)
     	{
-    		TrianglePixelVerts.Add(FVector2D(
-				NormalVert.X * WidgetSize.X,
-				NormalVert.Y * WidgetSize.Y
-			));
+    		TrianglePixelVerts.Add(WidgetGeometry.GetAbsolutePositionAtCoordinates(NormalVert));
     	}
 
-    	// 仅当鼠标在三角形内时，返回命中路径
-    	if (IsPointInTriangle(LocalMousePos, TrianglePixelVerts))
+        if (bPrintTriPos)
+        {
+        	for (const FVector2D& NormalVert : TrianglePixelVerts)
+        	{
+        		UE_LOG(LogTemp, Log, TEXT("NormalVert %s"), *NormalVert.ToString())    		        		
+        	}
+        	bPrintTriPos = false;
+        }
+    	
+    	if(CurrentMousePos != LastMousePos)
     	{
+    		UE_LOG(LogTemp, Log, TEXT("AbsCurrentMousePos %s LastMousePos %s"), *CurrentMousePos.ToString(), *LastMousePos.ToString())    		
+    	}
 
+
+    	// 仅当鼠标在三角形内时，返回命中路径
+    	if (IsPointInTriangle(CurrentMousePos, TrianglePixelVerts))
+    	{
+    		UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
     		// 步骤1：构造FArrangedWidget（排列后的控件，核心）
-    		FArrangedWidget ArrangedWidget(OwnerButton, WidgetGeometry);
-            
-    		// 步骤2：构造FVirtualPointerPosition（虚拟指针位置）
-    		TSharedPtr<FVirtualPointerPosition> VirtualPointer = MakeShared<FVirtualPointerPosition>();
-    		VirtualPointer->CurrentCursorPosition = CurrentMousePos; // 鼠标屏幕坐标
-    		VirtualPointer->LastCursorPosition = LastMousePos; // 桌面坐标
+		    if (OwnerButton.IsValid())
+		    {
+		    	TSharedPtr<STriangleButton> Button = OwnerButton.Pin();
+			    if (Button->ButtonPtr.IsSet())
+			    {
+			    	TSharedPtr<SButton> CButton = Button->ButtonPtr.Get().Pin();
+				    if (CButton.IsValid())
+				    {
+				    	// FArrangedWidget ArrangedWidget(CButton.ToSharedRef(), CButton->GetCachedGeometry());
+				    	FArrangedWidget ArrangedWidget(CButton.ToSharedRef(), FGeometry());
+				    	// 步骤2：构造FVirtualPointerPosition（虚拟指针位置）
+				    	TSharedPtr<FVirtualPointerPosition> VirtualPointer = MakeShared<FVirtualPointerPosition>();
+				    	// VirtualPointer->CurrentCursorPosition = CurrentMousePos; // 鼠标屏幕坐标
+				    	// VirtualPointer->LastCursorPosition = LastMousePos; // 桌面坐标
+				    	// VirtualPointer->CurrentCursorPosition = FVector2D(0,0); // 鼠标屏幕坐标
+				    	// VirtualPointer->LastCursorPosition = FVector2D(0,0); // 桌面坐标
 
-    		// 步骤3：构造FWidgetAndPointer（UE4.27 正确方式）
-    		FWidgetAndPointer WidgetAndPointer(ArrangedWidget, VirtualPointer);
+				    	
+				    	// 步骤3：构造FWidgetAndPointer（UE4.27 正确方式）
+				    	FWidgetAndPointer WidgetAndPointer(ArrangedWidget, VirtualPointer);
             
-    		// 步骤4：添加到命中路径
-    		HitPath.Add(WidgetAndPointer);
+				    	// 步骤4：添加到命中路径
+				    	HitPath.Add(WidgetAndPointer);   
+				    }
+			    }
+		    	
+		    }
+    	}else
+    	{
+    		UE_LOG(LogTemp, Log, TEXT("IsPointOutofTriangle"))    	
     	}
 
         // 未命中：返回空数组，不触发任何交互
@@ -136,9 +182,18 @@ public:
         return nullptr;
     }
 
+	void SetWidgetGeometry(const FGeometry& InWidgetGeometry)
+    {
+    	WidgetGeometry = InWidgetGeometry;
+    }
+	void SetTriangleNormalVerts(const TArray<FVector2D>& InTriangleNormalVerts)
+    {
+    	TriangleNormalVerts = InTriangleNormalVerts;
+    }
+
 private:
     // 所属按钮的引用
-    TSharedRef<STriangleButton> OwnerButton;
+    TWeakPtr<STriangleButton> OwnerButton;
     // 三角形归一化顶点（0~1）
     TArray<FVector2D> TriangleNormalVerts;
     // 控件几何信息
@@ -156,6 +211,10 @@ private:
         bool b2 = ((C.X - B.X) * (Point.Y - B.Y) - (C.Y - B.Y) * (Point.X - B.X)) < 0.0f;
         bool b3 = ((A.X - C.X) * (Point.Y - C.Y) - (A.Y - C.Y) * (Point.X - C.X)) < 0.0f;
 
+
+    	UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
+    	
         return ((b1 == b2) && (b2 == b3));
     }
+	static bool bPrintTriPos;
 };

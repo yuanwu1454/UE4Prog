@@ -8,6 +8,8 @@
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+bool STriangleButton::FCustomTriangleHitTestPath::bPrintTriPos = false;
+
 void STriangleButton::Construct(const FArguments& InArgs)
 {
 	// 绑定属性
@@ -15,6 +17,7 @@ void STriangleButton::Construct(const FArguments& InArgs)
 	HoveredColor = InArgs._HoveredColor;
 	PressedColor = InArgs._PressedColor;
 	TriangleSize = InArgs._TriangleSize;
+	ButtonPtr = InArgs._ButtonPtr;
 
 	// 调用父类构造
 	SButton::Construct(SButton::FArguments()
@@ -62,21 +65,29 @@ int32 STriangleButton::OnPaint(const FPaintArgs& Args, const FGeometry& Allotted
 		));
 	}
 
-
 	TSharedRef<const SWidget> s = this->AsShared();
 	TSharedRef<SWidget> s2 = ConstCastSharedRef<SWidget>(s);
 	TSharedRef<STriangleButton>s3 = StaticCastSharedRef<STriangleButton>(s2);
+	if(!TestPathPtr.IsValid())
+	{
+		
 
-	// OnPaint中强制转换（仅确保控件可修改时使用）
-	// 步骤1：创建自定义HitTestPath的共享指针实例（传入必要参数）
-	TSharedPtr<STriangleButton::FCustomTriangleHitTestPath> CustomHitTestPath = 
-		MakeShared<STriangleButton::FCustomTriangleHitTestPath>(
-			s3,       // 当前按钮的TSharedRef（转TSharedPtr）
-			TrianglePoints_Normal,  // 三角形归一化顶点（用于命中判断）
-			AllottedGeometry        // 控件几何信息（用于坐标转换）
-		);
-
-	TSharedRef<FCustomTriangleHitTestPath>  TriangleHitTestRef = CustomHitTestPath.ToSharedRef();
+		// OnPaint中强制转换（仅确保控件可修改时使用）
+		// 步骤1：创建自定义HitTestPath的共享指针实例（传入必要参数）
+		TSharedPtr<STriangleButton::FCustomTriangleHitTestPath> CustomHitTestPath = 
+			MakeShared<STriangleButton::FCustomTriangleHitTestPath>(
+				s3,       // 当前按钮的TSharedRef（转TSharedPtr）
+				TrianglePoints_Normal,  // 三角形归一化顶点（用于命中判断）
+				AllottedGeometry        // 控件几何信息（用于坐标转换）
+			);
+		TestPathPtr = CustomHitTestPath;
+	}else
+	{
+		TestPathPtr->SetWidgetGeometry(AllottedGeometry);
+		TestPathPtr->SetTriangleNormalVerts(TrianglePoints_Normal);
+	}
+	
+	TSharedRef<FCustomTriangleHitTestPath>  TriangleHitTestRef = TestPathPtr.ToSharedRef();
 
 	// 3. 第三步：向上转换为TSharedRef<ICustomHitTestPath>
 	// 利用多态自动向上转换，无需额外强制转换（类型兼容）
@@ -95,8 +106,8 @@ int32 STriangleButton::OnPaint(const FPaintArgs& Args, const FGeometry& Allotted
 		NewVert.TexCoords[0] =NewVert.TexCoords[1] = 0.f;
 		NewVert.TexCoords[2] = NewVert.TexCoords[3] = 1.0f;
 		NewVert.Color = CurrentColor.ToFColor(false);
-		NewVert.PixelSize[0] = 10;
-		NewVert.PixelSize[1] = 10;
+		NewVert.PixelSize[0] = 2;
+		NewVert.PixelSize[1] = 9;
 
 	}
 	Verts.AddZeroed();
@@ -106,8 +117,8 @@ int32 STriangleButton::OnPaint(const FPaintArgs& Args, const FGeometry& Allotted
 		NewVert.TexCoords[0] =NewVert.TexCoords[1] = 0.f;
 		NewVert.TexCoords[2] = NewVert.TexCoords[3] = 1.0f;
 		NewVert.Color = CurrentColor.ToFColor(false);
-		NewVert.PixelSize[0] = 10;
-		NewVert.PixelSize[1] = 10;
+		NewVert.PixelSize[0] = 3;
+		NewVert.PixelSize[1] = 8;
 
 	}
 
@@ -119,8 +130,8 @@ int32 STriangleButton::OnPaint(const FPaintArgs& Args, const FGeometry& Allotted
 		NewVert.TexCoords[0] =NewVert.TexCoords[1] = 0.f;
 		NewVert.TexCoords[2] = NewVert.TexCoords[3] = 1.0f;
 		NewVert.Color = CurrentColor.ToFColor(false);
-		NewVert.PixelSize[0] = 10;
-		NewVert.PixelSize[1] = 10;
+		NewVert.PixelSize[0] = 4;
+		NewVert.PixelSize[1] = 7;
 	}
 	
 	TArray<SlateIndex> Indexes;
@@ -193,7 +204,6 @@ FVector2D STriangleButton::ComputeDesiredSize(float LayoutScaleMultiplier) const
 	const float Width = 180.0f * LayoutScaleMultiplier;
 	const float Height = 180.0f * LayoutScaleMultiplier;
 	return FVector2D(Width, Height);
-	return SCompoundWidget::ComputeDesiredSize(LayoutScaleMultiplier);
 }
 
 
