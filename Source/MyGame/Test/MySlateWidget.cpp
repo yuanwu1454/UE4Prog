@@ -10,6 +10,9 @@
 #include "Widgets/SToolTip.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/Images/SImage.h"
+#include "Framework/Docking/TabManager.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/Docking/SDockTab.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -69,16 +72,59 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 			.Padding(20)
 			.AutoHeight()
 		[
-			// 创建按钮控件SButton，并用TSharedPtr保存引用
-			SAssignNew(TestButton, SButton)
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Center)
+			.FillWidth(20)
+			[
+				SNew(SButton)
+				.Text(FText::FromString(TEXT("SlateApplication"))) // 按钮文本
+				.HAlign(HAlign_Center)                      // 按钮内文本居中
+				.VAlign(VAlign_Center)
+				.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button")) // 按钮样式（用UE4默认样式）
+				.OnClicked_Lambda([&]()
+				{
+					// FSlateApplication::Get().SetCursorPos(FVector2D(0,0));
+					// FSlateApplication::Get().Shutdown();
+					#if WITH_EDITOR
+					{
+						// FGlobalTabmanager::Get()->TryInvokeTab(FTabId("DeviceManager"));
+						TSharedPtr<SDockTab> DeviceManagerTab = FGlobalTabmanager::Get()->FindExistingLiveTab(FTabId("DeviceManager"));
+						if (DeviceManagerTab.IsValid())
+						{
+							// DeviceManagerTab->PlaySpawnAnim();
+							// DeviceManagerTab->DrawAttention();
+							// DeviceManagerTab->FlashTab();
+							// 后台：标题后加红点标记（提示有未处理内容）
+							// FText NewTitle = FText::Format(
+							// 	NSLOCTEXT("DeviceTab", "TabTitleWithBadge", "{0} "), 
+							// 	FText::FromString(TEXT("xvzxv"))
+							// );
+							// DeviceManagerTab->SetLabel(NewTitle);
+							
+							UE_LOG(LogTemp, Log, TEXT("IsActive is %d"), DeviceManagerTab->IsActive());
+							UE_LOG(LogTemp, Log, TEXT("IsForeground is %d"), DeviceManagerTab->IsForeground());
+						}
+						StartCheckTimer();
+					}
+					#endif
+					return FReply::Unhandled();
+				})
+			]
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Center)
+			.FillWidth(20)
+			[
+				// 创建按钮控件SButton，并用TSharedPtr保存引用
+				SAssignNew(TestButton, SButton)
 				.Text(FText::FromString(TEXT("点击我测试"))) // 按钮文本
 				.HAlign(HAlign_Center)                      // 按钮内文本居中
 				.VAlign(VAlign_Center)
 				.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button")) // 按钮样式（用UE4默认样式）
 				.OnClicked(this, &SMySlateWidget::OnTestButtonClicked) // 绑定点击回调
-				// .ToolTip(
-				// 	SNew(STextBlock)
-				// 	.Text(FText::FromString(TEXT("这是Slate按钮的悬停提示"))))
+			]
 		]
 		+ SVerticalBox::Slot()
 			.HAlign(HAlign_Center)    // 水平居中
@@ -201,6 +247,12 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 SMySlateWidget::~SMySlateWidget()
 {
 	UE_LOG(LogTemp, Log, TEXT("SMySlateWidget Desctruct"));
+	
+	if (GEditor)
+	{
+		auto& TimerManager = GEditor->GetTimerManager().Get();
+		TimerManager.ClearTimer(TabStateCheckTimer);
+	}
 }
 
 // 实现按钮点击的回调函数
@@ -336,6 +388,44 @@ FVector2D SMySlateWidget::ComputeDesiredSize(float LayoutScaleMultiplier) const
 	// const float Height = 180.0f * LayoutScaleMultiplier;
 	// return FVector2D(Width, Height);
 	return SCompoundWidget::ComputeDesiredSize(LayoutScaleMultiplier);
+}
+
+void SMySlateWidget::StartCheckTimer()
+{
+#if WITH_EDITOR
+	if(TabStateCheckTimer.IsValid() && GEditor)
+	{
+		auto& TimerManager = GEditor->GetTimerManager().Get();
+		TimerManager.ClearTimer(TabStateCheckTimer);
+	}
+
+	if(GEditor)
+	{
+		auto& TimerManager = GEditor->GetTimerManager().Get();
+		TimerManager.SetTimer(TabStateCheckTimer,  FTimerDelegate::CreateRaw(this, &SMySlateWidget::CheckTabFunc), // 回调函数
+			CheckInterval,                       // 执行间隔（秒）
+			true
+			);
+		UE_LOG(LogTemp, Log, TEXT("Tab状态检查定时器已启动（间隔%.1f秒）"), CheckInterval);
+	}
+#endif
+}
+
+void SMySlateWidget::CheckTabFunc()
+{
+	TSharedPtr<SDockTab> DeviceManagerTab = FGlobalTabmanager::Get()->FindExistingLiveTab(FTabId("DeviceManager"));
+	if (DeviceManagerTab.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("IsActive is %d"), DeviceManagerTab->IsActive());
+		UE_LOG(LogTemp, Log, TEXT("IsForeground is %d"), DeviceManagerTab->IsForeground());
+	}
+
+	TSharedPtr<SDockTab> Tab =FGlobalTabmanager::Get()->GetActiveTab();
+	if(Tab.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("active Tab is %s"), *Tab->GetTabLabel().ToString())
+		
+	}
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

@@ -18,8 +18,15 @@ public class MyGame : ModuleRules
 			"SlateCore",
 			"Slate"
 		});
-
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		
+		// 关键：如果是编辑器模块，添加Editor相关依赖
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[] { 
+				"UnrealEd",    // 编辑器核心
+				"EditorStyle"  // 编辑器样式（可选，视需求）
+			});
+		}
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

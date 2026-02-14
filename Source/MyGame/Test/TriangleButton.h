@@ -119,14 +119,14 @@ public:
     	
     	if(CurrentMousePos != LastMousePos)
     	{
-    		UE_LOG(LogTemp, Log, TEXT("AbsCurrentMousePos %s LastMousePos %s"), *CurrentMousePos.ToString(), *LastMousePos.ToString())    		
+    		// UE_LOG(LogTemp, Log, TEXT("AbsCurrentMousePos %s LastMousePos %s"), *CurrentMousePos.ToString(), *LastMousePos.ToString())    		
     	}
 
 
     	// 仅当鼠标在三角形内时，返回命中路径
     	if (IsPointInTriangle(CurrentMousePos, TrianglePixelVerts))
     	{
-    		UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
+    		// UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
     		// 步骤1：构造FArrangedWidget（排列后的控件，核心）
 		    if (OwnerButton.IsValid())
 		    {
@@ -157,7 +157,7 @@ public:
 		    }
     	}else
     	{
-    		UE_LOG(LogTemp, Log, TEXT("IsPointOutofTriangle"))    	
+    		// UE_LOG(LogTemp, Log, TEXT("IsPointOutofTriangle"))    	
     	}
 
         // 未命中：返回空数组，不触发任何交互

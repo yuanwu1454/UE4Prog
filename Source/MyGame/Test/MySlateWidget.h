@@ -37,6 +37,8 @@ public:
 	
 
 	FVector2D ComputeDesiredSize(float LayoutScaleMultiplier) const override;
+	void StartCheckTimer();
+	void CheckTabFunc();
 private:
 	// 【可选】子控件句柄：保存子控件的引用，方便后续交互（如按钮点击、文本修改）
 	TSharedPtr<STextBlock> TitleText;    // 标题文本控件
@@ -58,6 +60,11 @@ private:
 	PaintFuncType CustomPaintType1;
 	PaintFuncType CustomPaintType2;
 	FLinearColor CircleColor = FLinearColor::Green;
+
+	// 定时器相关
+	FTimerHandle TabStateCheckTimer; // 定时器句柄（用于暂停/销毁）
+	float CheckInterval = 1.0f; // 检查间隔（1秒/次）
+	bool bTimerRunning = false;
 };
 
 
