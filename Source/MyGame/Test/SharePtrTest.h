@@ -3,5 +3,5 @@
 class SharePtrTest
 {
 public:
-	static void Test();
+	static void Test(UWorld* Obj);
 };

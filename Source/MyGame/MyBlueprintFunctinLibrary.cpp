@@ -4,7 +4,7 @@
 #include "MyBlueprintFunctinLibrary.h"
 #include "Test/SharePtrTest.h"
 
-void UMyBlueprintFunctinLibrary::Test()
+void UMyBlueprintFunctinLibrary::Test(UWorld* Obj)
 {
-	SharePtrTest::Test();
+	SharePtrTest::Test(Obj);
 }

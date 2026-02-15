@@ -78,3 +78,8 @@ APlayerController* UMyUserWidget::GetSafePlayerController()
 
     return PC;
 }
+
+UWorld* UMyUserWidget::GetSelfWorld()
+{
+    return GetWorld();
+}

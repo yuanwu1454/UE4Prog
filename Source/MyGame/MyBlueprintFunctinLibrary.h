@@ -15,5 +15,5 @@ class MYGAME_API UMyBlueprintFunctinLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	static void Test();
+	static void Test(UWorld* Obj);
 };

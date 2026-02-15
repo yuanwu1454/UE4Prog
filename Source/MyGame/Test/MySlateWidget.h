@@ -22,16 +22,19 @@ using PaintFuncType = TFunction<int32(const FPaintArgs&, const FGeometry&, const
 class MYGAME_API SMySlateWidget : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SMySlateWidget):_WidgetTitle(FText::FromString(TEXT("我的Slate控件")))
+	SLATE_BEGIN_ARGS(SMySlateWidget)
+	:_WidgetTitle(FText::FromString(TEXT("我的Slate控件"))),
+	_WorldObj(nullptr)
 	{}
 	SLATE_ARGUMENT(FText, WidgetTitle)
+	SLATE_ARGUMENT(UWorld*, WorldObj);
 	SLATE_END_ARGS()
 
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs);
 	~SMySlateWidget();
 	static TWeakPtr<SMySlateWidget> GMySlateWidgetRoot;
-	static void TestCreateWidget();
+	static void TestCreateWidget(UWorld* Obj);
 	int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
 	virtual FReply OnMouseButtonDown( const FGeometry& MyGeometry, const FPointerEvent& MouseEvent ) override;
 	
@@ -50,6 +53,7 @@ private:
 
 	// 存储外部传入的标题（私有成员）
 	FText WidgetTitle;
+	TWeakObjectPtr<UWorld> WorldObj;
 	int32 RenderIndex=1;
 
 

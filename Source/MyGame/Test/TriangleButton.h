@@ -212,7 +212,7 @@ private:
         bool b3 = ((A.X - C.X) * (Point.Y - C.Y) - (A.Y - C.Y) * (Point.X - C.X)) < 0.0f;
 
 
-    	UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
+    	// UE_LOG(LogTemp, Log, TEXT("IsPointInTriangle"))    	
     	
         return ((b1 == b2) && (b2 == b3));
     }

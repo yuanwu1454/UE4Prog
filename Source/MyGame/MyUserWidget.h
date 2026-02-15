@@ -34,4 +34,6 @@ private:
 	 * 避免空指针报错
 	 */
 	APlayerController* GetSafePlayerController();
+	UFUNCTION(BlueprintCallable)
+	UWorld* GetSelfWorld();
 };
