@@ -50,6 +50,7 @@ private:
 
 	// 【可选】按钮点击的回调函数
 	FReply OnTestButtonClicked();
+	FReply OnSlateApplicationTestClicked();
 
 	// 存储外部传入的标题（私有成员）
 	FText WidgetTitle;

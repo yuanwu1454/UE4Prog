@@ -16,4 +16,6 @@ class MYGAME_API UMyBlueprintFunctinLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable)
 	static void Test(UWorld* Obj);
+	UFUNCTION(BlueprintCallable)
+	static void ShowPopWindow();
 };

@@ -14,9 +14,34 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Blueprint/UserWidget.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "MyGame/MyBlueprintFunctinLibrary.h"
 #include "Widgets/SWindow.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
+
+
+// 传引用会myslateWidget进行锁住， 如果要引用，最好就不要绑定到对象上
+FReply OnClickStaticButton()
+{
+	UE_LOG(LogTemp, Log, TEXT("xzvcxv"));
+
+	// // 1. 创建通知数据
+	// FNotificationInfo NotificationInfo(FText::FromString(TEXT("操作成功！")));
+ //    
+	// // 2. 配置通知样式/行为
+	// NotificationInfo.bUseLargeFont = false; // 是否用大号字体
+	// NotificationInfo.FadeOutDuration = 2.0f; // 淡出时长（秒）
+	// NotificationInfo.bFireAndForget = true; // 自动消失（无需手动管理）
+	// NotificationInfo.ExpireDuration = 3.0f; // 显示时长（秒）
+	// NotificationInfo.Image = FCoreStyle::Get().GetBrush(TEXT("MessageLog.Info"));
+	//
+	// // 4. 显示通知
+	// FSlateNotificationManager::Get().AddNotification(NotificationInfo)->SetCompletionState(SNotificationItem::CS_Success);
+	UMyBlueprintFunctinLibrary::ShowPopWindow();
+	return FReply::Handled();
+}
 
 TWeakPtr<SMySlateWidget> SMySlateWidget::GMySlateWidgetRoot = nullptr;
 void SMySlateWidget::Construct(const FArguments& InArgs)
@@ -86,125 +111,19 @@ void SMySlateWidget::Construct(const FArguments& InArgs)
 				.HAlign(HAlign_Center)                      // 按钮内文本居中
 				.VAlign(VAlign_Center)
 				.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button")) // 按钮样式（用UE4默认样式）
-				.OnClicked_Lambda([&]()->FReply
-				{
-					// FSlateApplication::Get().SetCursorPos(FVector2D(0,0));
-					// FSlateApplication::Get().Shutdown();
-					#if WITH_EDITOR
-					{
-						// FGlobalTabmanager::Get()->TryInvokeTab(FTabId("DeviceManager"));
-						TSharedPtr<SDockTab> DeviceManagerTab = FGlobalTabmanager::Get()->FindExistingLiveTab(FTabId("DeviceManager"));
-						if (DeviceManagerTab.IsValid())
-						{
-							// DeviceManagerTab->PlaySpawnAnim();
-							// DeviceManagerTab->DrawAttention();
-							// DeviceManagerTab->FlashTab();
-							// 后台：标题后加红点标记（提示有未处理内容）
-							// FText NewTitle = FText::Format(
-							// 	NSLOCTEXT("DeviceTab", "TabTitleWithBadge", "{0} "), 
-							// 	FText::FromString(TEXT("xvzxv"))
-							// );
-							// DeviceManagerTab->SetLabel(NewTitle);
-							
-							UE_LOG(LogTemp, Log, TEXT("IsActive is %d"), DeviceManagerTab->IsActive());
-							UE_LOG(LogTemp, Log, TEXT("IsForeground is %d"), DeviceManagerTab->IsForeground());
-						}
-						UE_LOG(LogTemp, Log, TEXT("Title %s"), *FGlobalTabmanager::Get()->GetApplicationTitle().ToString());
-						auto Ptr = FGlobalTabmanager::Get()->GetRootWindow();
-						if(Ptr.IsValid())
-						{
-							UE_LOG(LogTemp, Log, TEXT("RootWindow Title %s"), *Ptr->GetTitle().ToString());
-							// Ptr->Maximize();
-							// Ptr->Resize(FVector2D(800,600));
-							// Ptr->EnableWindow(false);
-							// Ptr->Restore();
-							UE_LOG(LogTemp, Log, TEXT("RootWindow AcceptsInput %d"), Ptr->AcceptsInput());
-							// FWindowDrawAttentionParameters Parameters;
-							// Parameters.RequestType = EWindowDrawAttentionRequestType::Stop;
-							// Ptr->DrawAttention(Parameters);
-
-
-							UE_LOG(LogTemp, Log, TEXT("RootWindow ActivationPolicy %d"), static_cast<int>(Ptr->ActivationPolicy()));
-							Ptr->FlashWindow();
-							auto ContentPtr = Ptr->GetContent();
-							auto ParentPtr = ContentPtr->GetParentWidget();
-							UE_LOG(LogTemp, Log, TEXT("RootWindow ParentPtr %s"), *ParentPtr->ToString());
-							// LogTemp: RootWindow ParentPtr SVerticalBox [SWindow.cpp(537)]
-							UE_LOG(LogTemp, Log, TEXT("RootWindow ContentPtr %s"), *ContentPtr->ToString());
-							// LogTemp: RootWindow ContentPtr SDockingArea [TabManager.cpp(1552)]
-
-							auto SlateViewPortPtr = Ptr->GetViewport();
-							if (SlateViewPortPtr.IsValid())
-							{
-								UE_LOG(LogTemp, Log, TEXT("RootWindow SlateViewPort Size %s"), *SlateViewPortPtr->GetSize().ToString());
-								
-								auto WeakWidgetPtr = SlateViewPortPtr->GetWidget();
-								auto ShareWidgetPtr = WeakWidgetPtr.Pin();
-								if(ShareWidgetPtr.IsValid())
-								{
-									UE_LOG(LogTemp, Log, TEXT("RootWindow SlateViewPort Size %s"), *ShareWidgetPtr->ToString());
-									// LogTemp: RootWindow SlateViewPort Size SViewport [SEditorViewport.cpp(54)]
-								}
-							}
-
-							// Ptr->HideWindow();
-							// Ptr->SetContent();
-							// 弹出只有"OK"按钮的消息框
-							// FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("这是UE4内置的消息对话框！")));
-							//
-							// // 弹出带Yes/No按钮的对话框，并获取用户选择
-							// EAppReturnType::Type Result = FMessageDialog::Open(
-							// 	EAppMsgType::YesNo, 
-							// 	FText::FromString(TEXT("确认执行这个操作吗？"))
-							// );
-							//
-							// // 根据用户选择执行逻辑
-							// if (Result == EAppReturnType::Yes)
-							// {
-							// 	UE_LOG(LogTemp, Log, TEXT("用户点击了Yes"));
-							// }
-							// else
-							// {
-							// 	UE_LOG(LogTemp, Log, TEXT("用户点击了No"));
-							// }
-						}
-						
-						FSoftClassPath MainUISoftClass=FSoftClassPath("/Game/Maps/WindowWidgetBP.WindowWidgetBP_C");
-						
-						// 转换为UUserWidget类
-						UClass* WidgetClass = MainUISoftClass.TryLoadClass<UUserWidget>();
-						if (WidgetClass)
-						{
-							
-							// 1. 创建UMG控件实例（现成API）
-						   UUserWidget* Widget = CreateWidget<UUserWidget>(WorldObj.Get(), WidgetClass);
-						   if (Widget)
-						   {
-						   		// 2. 转换为Slate窗口并弹出（现成API）
-								TSharedRef<SWidget> SlateWidget = Widget->TakeWidget();
-														    
-								// 创建窗口（封装后的简化写法）
-								 TSharedPtr<SWindow> UMGWindow=nullptr;
-
-								 SAssignNew(UMGWindow, SWindow)
-								 .Title(FText::FromString(TEXT("UMG窗口")))
-								 .ClientSize(FVector2D(400, 300))
-								 .AutoCenter(EAutoCenter::PrimaryWorkArea)
-								 ;
-
-								 UMGWindow->SetContent(SlateWidget);
-
-								// 显示窗口（现成API）
-								FSlateApplication::Get().AddWindow(UMGWindow.ToSharedRef());
-						   }
-						}
-
-
-						// StartCheckTimer();
-					}
-					#endif
-					return FReply::Handled();
-				})
+				.OnClicked_Raw(this, &SMySlateWidget::OnSlateApplicationTestClicked)
+			]
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Center)
+			.FillWidth(20)
+			[
+				SNew(SButton)
+				.Text(FText::FromString(TEXT("StaticTest1"))) // 按钮文本
+				.HAlign(HAlign_Center)                      // 按钮内文本居中
+				.VAlign(VAlign_Center)
+				.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button")) // 按钮样式（用UE4默认样式）
+				.OnClicked_Static(&OnClickStaticButton)
 			]
 			+ SHorizontalBox::Slot()
 			.HAlign(HAlign_Fill)
@@ -373,14 +292,153 @@ FReply SMySlateWidget::OnTestButtonClicked()
 	return FReply::Handled();
 }
 
+FReply SMySlateWidget::OnSlateApplicationTestClicked()
+{
+	// FSlateApplication::Get().SetCursorPos(FVector2D(0,0));
+	// FSlateApplication::Get().Shutdown();
+	#if WITH_EDITOR
+	{
+		// FGlobalTabmanager::Get()->TryInvokeTab(FTabId("DeviceManager"));
+		TSharedPtr<SDockTab> DeviceManagerTab = FGlobalTabmanager::Get()->FindExistingLiveTab(FTabId("DeviceManager"));
+		if (DeviceManagerTab.IsValid())
+		{
+			// DeviceManagerTab->PlaySpawnAnim();
+			// DeviceManagerTab->DrawAttention();
+			// DeviceManagerTab->FlashTab();
+			// 后台：标题后加红点标记（提示有未处理内容）
+			// FText NewTitle = FText::Format(
+			// 	NSLOCTEXT("DeviceTab", "TabTitleWithBadge", "{0} "), 
+			// 	FText::FromString(TEXT("xvzxv"))
+			// );
+			// DeviceManagerTab->SetLabel(NewTitle);
+			
+			UE_LOG(LogTemp, Log, TEXT("IsActive is %d"), DeviceManagerTab->IsActive());
+			UE_LOG(LogTemp, Log, TEXT("IsForeground is %d"), DeviceManagerTab->IsForeground());
+		}
+		UE_LOG(LogTemp, Log, TEXT("Title %s"), *FGlobalTabmanager::Get()->GetApplicationTitle().ToString());
+		auto Ptr = FGlobalTabmanager::Get()->GetRootWindow();
+		if(Ptr.IsValid())
+		{
+			UE_LOG(LogTemp, Log, TEXT("RootWindow Title %s"), *Ptr->GetTitle().ToString());
+			// Ptr->Maximize();
+			// Ptr->Resize(FVector2D(800,600));
+			// Ptr->EnableWindow(false);
+			// Ptr->Restore();
+			UE_LOG(LogTemp, Log, TEXT("RootWindow AcceptsInput %d"), Ptr->AcceptsInput());
+			// FWindowDrawAttentionParameters Parameters;
+			// Parameters.RequestType = EWindowDrawAttentionRequestType::Stop;
+			// Ptr->DrawAttention(Parameters);
+
+
+			UE_LOG(LogTemp, Log, TEXT("RootWindow ActivationPolicy %d"), static_cast<int>(Ptr->ActivationPolicy()));
+			Ptr->FlashWindow();
+			auto ContentPtr = Ptr->GetContent();
+			auto ParentPtr = ContentPtr->GetParentWidget();
+			UE_LOG(LogTemp, Log, TEXT("RootWindow ParentPtr %s"), *ParentPtr->ToString());
+			// LogTemp: RootWindow ParentPtr SVerticalBox [SWindow.cpp(537)]
+			UE_LOG(LogTemp, Log, TEXT("RootWindow ContentPtr %s"), *ContentPtr->ToString());
+			// LogTemp: RootWindow ContentPtr SDockingArea [TabManager.cpp(1552)]
+
+			auto SlateViewPortPtr = Ptr->GetViewport();
+			if (SlateViewPortPtr.IsValid())
+			{
+				UE_LOG(LogTemp, Log, TEXT("RootWindow SlateViewPort Size %s"), *SlateViewPortPtr->GetSize().ToString());
+				
+				auto WeakWidgetPtr = SlateViewPortPtr->GetWidget();
+				auto ShareWidgetPtr = WeakWidgetPtr.Pin();
+				if(ShareWidgetPtr.IsValid())
+				{
+					UE_LOG(LogTemp, Log, TEXT("RootWindow SlateViewPort Size %s"), *ShareWidgetPtr->ToString());
+					// LogTemp: RootWindow SlateViewPort Size SViewport [SEditorViewport.cpp(54)]
+				}
+			}
+
+			// Ptr->HideWindow();
+			// Ptr->SetContent();
+			// 弹出只有"OK"按钮的消息框
+			// FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("这是UE4内置的消息对话框！")));
+			//
+			// // 弹出带Yes/No按钮的对话框，并获取用户选择
+			// EAppReturnType::Type Result = FMessageDialog::Open(
+			// 	EAppMsgType::YesNo, 
+			// 	FText::FromString(TEXT("确认执行这个操作吗？"))
+			// );
+			//
+			// // 根据用户选择执行逻辑
+			// if (Result == EAppReturnType::Yes)
+			// {
+			// 	UE_LOG(LogTemp, Log, TEXT("用户点击了Yes"));
+			// }
+			// else
+			// {
+			// 	UE_LOG(LogTemp, Log, TEXT("用户点击了No"));
+			// }
+		}
+		
+		FSoftClassPath MainUISoftClass=FSoftClassPath("/Game/Maps/WindowWidgetBP.WindowWidgetBP_C");
+		
+		// 转换为UUserWidget类
+		UClass* WidgetClass = MainUISoftClass.TryLoadClass<UUserWidget>();
+		if (WidgetClass)
+		{
+			
+			// 1. 创建UMG控件实例（现成API）
+		   UUserWidget* Widget = CreateWidget<UUserWidget>(WorldObj.Get(), WidgetClass);
+		   if (Widget)
+		   {
+				// 2. 转换为Slate窗口并弹出（现成API）
+				TSharedRef<SWidget> SlateWidget = Widget->TakeWidget();
+			   	// SlateWidget->SetRenderOpacity(0.2);
+				// 创建窗口（封装后的简化写法）
+				 TSharedPtr<SWindow> UMGWindow=nullptr;
+
+				 SAssignNew(UMGWindow, SWindow)
+				 .Title(FText::FromString(TEXT("UMG窗口")))
+				 .ClientSize(FVector2D(800, 300))
+ 			   	// .AutoCenter(EAutoCenter::PreferredWorkArea)
+		   		.bDragAnywhere(true)
+		   		.InitialOpacity(0.0f)
+		   		// .IsPopupWindow(true)
+		   		// .IsInitiallyMaximized(true)
+		   		.ScreenPosition(FVector2D(100,100))
+		   		;
+
+				 UMGWindow->SetContent(SlateWidget);
+
+				// 显示窗口（现成API）
+				FSlateApplication::Get().AddWindow(UMGWindow.ToSharedRef());
+
+				if (auto World = WorldObj.Get())
+				{
+					auto& TimeManager = World->GetTimerManager();
+					TimeManager.SetTimerForNextTick(FTimerDelegate::CreateLambda([ WeakPtr = TWeakPtr<SWindow>(UMGWindow)]()
+					{
+						if (TSharedPtr<SWindow> StrongWindow = WeakPtr.Pin())
+						{
+							StrongWindow->MoveWindowTo(FVector2D(100,200));
+							StrongWindow->SetRenderOpacity(0.1f);
+						}
+					}));
+				}
+
+		   }
+
+		}
+
+
+		// StartCheckTimer();
+	}
+	#endif
+	return FReply::Handled();
+}
+
 void SMySlateWidget::TestCreateWidget(UWorld* Obj)
 {
 	UE_LOG(LogTemp, Log, TEXT("TestCreateWidget"));
 
-	if (GMySlateWidgetRoot.IsValid())
+	if (GMySlateWidgetRoot.IsValid() && GMySlateWidgetRoot.Pin().Get())
 	{
 		UE_LOG(LogTemp, Log, TEXT("smyslatewidget is exists"))
-		return;
 	}
 
 	// 1. 先创建强引用的根控件（局部强引用，用于构建和挂载）
