@@ -10,7 +10,216 @@
 #include "Widgets/Input/SButton.h"
 
 static TWeakPtr<SWindow> SPopupWeakPtr;
+static TWeakPtr<SWindow> SSimpleWindowWeakPtr;
+static bool bClickeded = false;
+
 // 创建带边框/关闭按钮的 SPopupWindow
+void ShowCustomPopupWindow();
+
+class SButtonInteractionWidget : public SCompoundWidget
+{
+    SLATE_BEGIN_ARGS(SButtonInteractionWidget){}
+    SLATE_END_ARGS()
+    void Construct(const FArguments& InArgs)
+    {
+        ChildSlot[
+            SNew(SBox)
+            .VAlign(VAlign_Center)
+            .HAlign(HAlign_Center)
+            // .WidthOverride(500.f)
+            .MinDesiredWidth(500.f)
+            [
+                SNew(SVerticalBox)
+                +SVerticalBox::Slot()
+                [
+                    SAssignNew(TextBlockPtr, STextBlock)
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+                ]
+                +SVerticalBox::Slot()
+                [
+                    SAssignNew(ButtonPtr, SButton)
+                    .OnClicked(this, &SButtonInteractionWidget::OnButtonClicked)
+                ]
+                +SVerticalBox::Slot()
+                [
+                    SAssignNew(EditableTextBoxPtr, SEditableTextBox)
+                    .OnTextChanged(this, &SButtonInteractionWidget::OnEditableTextBoxChanged)
+                    .HintText(FText::FromString(TEXT("请输入内容...")))
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+                ]
+                +SVerticalBox::Slot()
+                .Padding(0,15,0,0)
+                [
+                    SAssignNew(TextBlock2Ptr, STextBlock)
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+                ]
+            ]
+        ];
+        UpdateUI();
+    }
+
+private:
+    TSharedPtr<STextBlock> TextBlockPtr;
+    TSharedPtr<SButton> ButtonPtr;
+    TSharedPtr<SEditableTextBox> EditableTextBoxPtr;
+    TSharedPtr<STextBlock> TextBlock2Ptr;
+
+    bool bClicked = false;
+    FText ClickedText = FText::FromString(TEXT("按钮已经点击"));
+    FText UnClickedText = FText::FromString(TEXT("按钮未点击"));
+    FSlateColor ClickedColor = FSlateColor(FLinearColor(0,0.8,0.0,1.0));
+    FSlateColor UnClickedColor = FSlateColor::UseForeground();
+
+    FText GetStatusText() const
+    {
+        return bClicked ? ClickedText : UnClickedText;
+    }
+    FSlateColor GetButtonColor() const
+    {
+        return bClicked ? ClickedColor : UnClickedColor;
+    }
+    
+    void UpdateUI()
+    {
+        if (TextBlockPtr&&TextBlockPtr.IsValid())
+        {
+            TextBlockPtr->SetText(GetStatusText());
+        }
+
+        if (ButtonPtr&&ButtonPtr.IsValid())
+        {
+            ButtonPtr->SetBorderBackgroundColor(GetButtonColor());
+        }
+    }
+    FReply OnButtonClicked()
+    {
+        bClicked = !bClicked;
+        UpdateUI();
+        return FReply::Handled();
+    }
+
+    void OnEditableTextBoxChanged(const FText& Text)
+    {
+        if (TextBlock2Ptr && TextBlock2Ptr.IsValid())
+        {
+            TextBlock2Ptr->SetText(Text);
+        }
+    }
+};
+
+void ShowSimpleWindow()
+{
+    if (auto Ref =SSimpleWindowWeakPtr.Pin())
+    {
+        if (Ref.IsValid())
+        {
+            UE_LOG(LogTemp, Log, TEXT("Simple Windows is Exists!"));
+            return;
+        }
+    }
+    //
+    // auto Content = SNew(SBox)
+    // .HAlign(HAlign_Center)
+    // .VAlign(VAlign_Center)
+    // [
+    //     SNew(SVerticalBox)
+    //     +SVerticalBox::Slot()
+    //     [
+    //         SNew(STextBlock).Text(FText::FromString(TEXT("Slate基础布局练习")))
+    //     ]
+    //     +SVerticalBox::Slot()
+    //     [
+    //         SNew(STextBlock).Text(FText::FromString(TEXT("点击下方按钮")))
+    //     ]
+    //     +SVerticalBox::Slot()
+    //     [
+    //         SNew(SBox)
+    //         .MinDesiredWidth(100)
+    //         .MinDesiredHeight(30)
+    //         .Content()
+    //         [
+    //             SNew(SButton)
+    //             .Content()[SNew(STextBlock).Text(FText::FromString(TEXT("确认")))]
+    //         ]
+    //     ]
+    // ];
+
+    // auto Content = SNew(SBox)
+    // .HAlign(HAlign_Center)
+    // .VAlign(VAlign_Center)
+    // .Content()
+    // [
+    //     SNew(STextBlock)
+    //     .Text(FText::FromString(TEXT("Slate 文本样式练习")))
+    //     .Font(FCoreStyle::GetDefaultFontStyle("Regular", 24))
+    //     .Justification(ETextJustify::Center)
+    //     .LineHeightPercentage(2.0f)
+    //     .WrapTextAt(600.f)
+    //     .ColorAndOpacity(FLinearColor(0,0,0.5f,1))
+    //     .ShadowOffset(FVector2D(-2,-2))
+    //     .ShadowColorAndOpacity(FLinearColor(0.8f,0.8f,0.8f,1))
+    // ];
+
+    auto Content = SNew(SBox)
+    .HAlign(HAlign_Center)
+    .VAlign(VAlign_Center)
+    .MinDesiredHeight(40.f)
+    .MinDesiredWidth(120.f)
+    .Content()
+    [
+        SNew(SButton)
+        .OnClicked_Lambda([]()
+        {
+            bClickeded = !bClickeded;
+            return FReply::Handled();
+        })
+        .ButtonColorAndOpacity_Lambda([]()
+        {
+            return bClickeded?FLinearColor(0.f,0.8f,0.f,1.0f):FLinearColor(1.f,1.f,1.f,1.0f);            
+        })
+        .Content()
+        [
+            SNew(STextBlock)
+            .Text_Lambda([]()
+            {
+                return bClickeded?FText::FromString(TEXT("按钮已经点击")):FText::FromString(TEXT("按钮未点击"));
+            })
+        ]
+    ];
+    
+    // TSharedRef<SWindow> SimpleWindow = SNew(SWindow)
+    // .Title(FText::FromString(TEXT("SimpleWindow")))
+    // .AutoCenter(EAutoCenter::PrimaryWorkArea)
+    // .ClientSize(FVector2D(600,400))
+    // .Content()[Content->AsShared()];
+
+    TSharedRef<SWindow> SimpleWindow = SNew(SWindow)
+    .Title(FText::FromString(TEXT("SimpleWindow")))
+    .ClientSize(FVector2D(800, 600)) // 窗口大小
+    .SupportsMinimize(false)
+    .SupportsMaximize(false);
+
+    SimpleWindow->SetContent(SNew(SButtonInteractionWidget));
+
+    if (FSlateApplication::IsInitialized())
+    {
+        FSlateApplication::Get().AddWindow(SimpleWindow);
+        SSimpleWindowWeakPtr = SimpleWindow;        
+    }
+}
+
+void UMyBlueprintFunctinLibrary::Test(UWorld* Obj)
+{
+	SharePtrTest::Test(Obj);
+}
+
+void UMyBlueprintFunctinLibrary::ShowPopWindow()
+{
+    // ShowCustomPopupWindow();
+    ShowSimpleWindow();
+}
+
+
 void ShowCustomPopupWindow()
 {
     if (TSharedPtr<SWindow> StrongWindow = SPopupWeakPtr.Pin())
@@ -105,14 +314,4 @@ void ShowCustomPopupWindow()
     // 3. 设置窗口内容
     SPopupWeakPtr = PopupWindow;
     PopupWindow->SetContent(PopupContent);
-}
-
-void UMyBlueprintFunctinLibrary::Test(UWorld* Obj)
-{
-	SharePtrTest::Test(Obj);
-}
-
-void UMyBlueprintFunctinLibrary::ShowPopWindow()
-{
-    ShowCustomPopupWindow();
 }
