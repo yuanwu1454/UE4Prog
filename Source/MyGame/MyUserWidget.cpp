@@ -106,82 +106,142 @@ void UMyUserWidget::OnButtonAClicked()
     // UMyBlueprintFunctinLibrary::Test(GetWorld());
 
     PrintAllWidgetVariableNames();
-    
 }
 
 void UMyUserWidget::PrintAllWidgetVariableNames()
 {
-    UE_LOG(LogTemp, Log, TEXT("======== 开始打印UserWidget控件变量名 ========"));
-
+    UE_LOG(LogTemp, Log, TEXT("======== 开始打印UserWidget属性信息 ========"));
     if (!WidgetTree)
     {
         UE_LOG(LogTemp, Warning, TEXT("WidgetTree为空，无法获取控件列表！"));
         return;
     }
 
-    // 2. 遍历WidgetTree中的所有控件
-    TArray<UWidget*> AllWidgets;
+    // ========== 第一步：打印所有UPROPERTY修饰的属性（含类型） ==========
+    UE_LOG(LogTemp, Log, TEXT("\n【1. 所有UPROPERTY属性（变量名+类型）】"));
+    UClass* WidgetClass = this->GetClass();
+    for (TFieldIterator<FProperty> PropIt(WidgetClass); PropIt; ++PropIt)
+    {
+        FProperty* Prop = *PropIt;
+        if (!Prop) continue;
 
+        // 获取属性名称 + 类型名称
+        FString PropName = Prop->GetName();
+        FString PropType = GetPropertyTypeName(Prop);
+
+        UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
+    }
+
+    // ========== 第二步：打印所有控件（实例名+绑定变量名+类型） ==========
+    UE_LOG(LogTemp, Log, TEXT("\n【2. 所有控件（实例名+绑定变量名+控件类型）】"));
+    TArray<UWidget*> AllWidgets;
     WidgetTree->GetAllWidgets(AllWidgets);
     for (UWidget* Widget : AllWidgets)
     {
         if (!Widget) continue;
 
-        // 3. 获取控件的变量名（蓝图/C++绑定的名字）
-        FString VariableName = GetWidgetVariableName(Widget);
-        // 4. 获取控件的类型名（比如UButton、UTextBlock）
-        FString WidgetTypeName = Widget->GetClass()->GetName();
+        FString WidgetInstanceName = Widget->GetName(); // 控件实例名
+        FString BoundVarName = GetWidgetVariableName(Widget); // 绑定的变量名
+        FString WidgetType = Widget->GetClass()->GetName(); // 控件类型
 
-        // 5. 打印结果：变量名 + 控件类型
-        if (!VariableName.IsEmpty())
-        {
-            UE_LOG(LogTemp, Log, TEXT("控件变量名：%s | 控件类型：%s"), *VariableName, *WidgetTypeName);
-        }
-        else
-        {
-            // 无变量名的控件（未勾选Is Variable，也未被C++绑定）
-            UE_LOG(LogTemp, Log, TEXT("无变量名控件 | 控件类型：%s | 控件实例名：%s"), 
-                *WidgetTypeName, *Widget->GetName());
-        }
+        UE_LOG(LogTemp, Log, TEXT("实例名：%-20s | 绑定变量名：%-20s | 控件类型：%s"),
+            *WidgetInstanceName, *BoundVarName, *WidgetType);
     }
 
-    UE_LOG(LogTemp, Log, TEXT("======== 打印结束 ========"));
+    UE_LOG(LogTemp, Log, TEXT("\n======== 打印结束 ========"));
 }
 
 FString UMyUserWidget::GetWidgetVariableName(UWidget* Widget)
 {
-    if (!Widget || !this) return TEXT("");
+    if (!Widget || !this) return TEXT("无绑定");
 
-    // 反射获取当前UserWidget的类信息
     UClass* WidgetClass = this->GetClass();
-    if (!WidgetClass) return TEXT("");
+    if (!WidgetClass) return TEXT("无绑定");
 
-    // 遍历UserWidget的所有属性（变量）
-    for (TFieldIterator<UProperty> PropIt(WidgetClass); PropIt; ++PropIt)
+    for (TFieldIterator<FProperty> PropIt(WidgetClass); PropIt; ++PropIt)
     {
-        UProperty* Prop = *PropIt;
-        if (!Prop) continue;
+        FProperty* Prop = *PropIt;
+        if (!Prop || !Prop->IsA<FObjectProperty>()) continue;
 
-        // 过滤：只找指向UWidget的属性（控件变量）
-        if (Prop->IsA<UObjectProperty>())
+        FObjectProperty* ObjectProp = CastField<FObjectProperty>(Prop);
+        if (!ObjectProp || !ObjectProp->PropertyClass->IsChildOf(UWidget::StaticClass())) continue;
+
+        // 整个类就是一个笔记本
+        // Prop 实际上就是一个一个的目录 记录了【变量名 变量在笔记本的位置】
+        // Prop->ContainerPtrToValuePtr<void>(this)
+        // 表示根据目录找到 变量的物理位置
+        // GetObjectPropertyValue：根据变量的物理位置 找到 读取变量 “页面” 上的内容
+        UObject* PropValue = ObjectProp->GetObjectPropertyValue(Prop->ContainerPtrToValuePtr<void>(this));
+        if (PropValue == Widget)
         {
-            UObjectProperty* ObjectProp = Cast<UObjectProperty>(Prop);
-            // 检查属性类型是否为UWidget子类（Button、TextBlock等）
-            if (ObjectProp && ObjectProp->PropertyClass->IsChildOf(UWidget::StaticClass()))
-            {
-                // 获取该属性的值（即控件指针）
-                UObject* PropValue = ObjectProp->GetObjectPropertyValue(Prop->ContainerPtrToValuePtr<void>(this));
-                // 如果属性值等于当前遍历的Widget，说明找到对应的变量名
-                if (PropValue == Widget)
-                {
-                    return Prop->GetName(); // 返回变量名（比如buttonA）
-                }
-            }
+            return Prop->GetName();
         }
     }
 
-    // 如果没找到C++绑定的变量名，检查蓝图中是否有命名（Is Variable）
-    FString WidgetName = Widget->GetName();
-    // 蓝图中勾选Is Variable的控件，名字会和变量名一致，这里直接返回
-    return WidgetName.IsEmpty() ? TEXT("") : WidgetName;
+    return TEXT("无绑定");
+}
+
+void UMyUserWidget::PrintAllProp()
+{
+    // 反射获取当前UserWidget的类信息
+    UClass* WidgetClass = this->GetClass();
+    if (!WidgetClass) return ;
+    // 关键修改1：遍历FProperty（替代UProperty）
+    for (TFieldIterator<FProperty> PropIt(WidgetClass); PropIt; ++PropIt)
+    {
+        FProperty* Prop = *PropIt;
+        if (!Prop) continue;
+
+        FString PropName = Prop->GetName();
+        FString PropType = GetPropertyTypeName(Prop);
+        UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
+    }
+}
+
+// 核心函数：获取任意FProperty的类型名称（适配所有类型）
+FString UMyUserWidget::GetPropertyTypeName(FProperty* Prop)
+{
+    if (!Prop) return TEXT("Unknown");
+
+    // 1. 基础类型（int/float/bool/FString等）
+    FString BasicType = Prop->GetCPPType(false); // false=不包含命名空间，更简洁
+    if (!BasicType.IsEmpty())
+    {
+        // 对FString做特殊优化（GetCPPType返回的是FString::CStrRef，优化为FString）
+        if (BasicType.Contains(TEXT("FString")))
+        {
+            return TEXT("FString");
+        }
+        return BasicType;
+    }
+
+    // 2. 对象类型（UObject子类：UButton/UTextBlock/Actor等）
+    if (FObjectProperty* ObjectProp = CastField<FObjectProperty>(Prop))
+    {
+        if (ObjectProp->PropertyClass)
+        {
+            return ObjectProp->PropertyClass->GetName(); // 返回具体类名（如UButton）
+        }
+        return TEXT("UObject");
+    }
+
+    // 3. 数组类型（如TArray<int32>、TArray<UButton*>）
+    if (FArrayProperty* ArrayProp = CastField<FArrayProperty>(Prop))
+    {
+        FString InnerType = GetPropertyTypeName(ArrayProp->Inner);
+        return FString::Printf(TEXT("TArray<%s>"), *InnerType);
+    }
+
+    // 4. 结构体类型（如FVector、FRotator）
+    if (FStructProperty* StructProp = CastField<FStructProperty>(Prop))
+    {
+        if (StructProp->Struct)
+        {
+            return StructProp->Struct->GetName();
+        }
+        return TEXT("UStruct");
+    }
+
+    // 5. 其他类型（枚举、委托等）
+    return Prop->GetClass()->GetName();
 }
