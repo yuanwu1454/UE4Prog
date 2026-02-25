@@ -445,6 +445,7 @@ void SMySlateWidget::TestCreateWidget(UWorld* Obj)
 	TSharedPtr<SMySlateWidget> SharedPtr = SNew(SMySlateWidget)
 		.WidgetTitle(FText::FromString(TEXT("My Create Wiget")))
 	.WorldObj(Obj)
+	.Visibility(EVisibility::SelfHitTestInvisible)
 	;
 
 

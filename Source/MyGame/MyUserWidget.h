@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "MyUserWidget.generated.h"
 
 /**
@@ -34,6 +35,18 @@ private:
 	 * 避免空指针报错
 	 */
 	APlayerController* GetSafePlayerController();
+	
+	UPROPERTY(meta=(BindWidget))
+	UButton* Button_A;  // 变量名必须和蓝图中Button的名字完全一致（buttonA）
+	
 	UFUNCTION(BlueprintCallable)
 	UWorld* GetSelfWorld();
+
+private:// 3. 按钮点击事件的回调函数（蓝图也可调用，方便扩展）
+    UFUNCTION()  // 必须加UFUNCTION()，否则绑定会失败
+    void OnButtonAClicked();
+
+
+	void PrintAllWidgetVariableNames();
+	FString GetWidgetVariableName(UWidget* Widget);
 };

@@ -64,36 +64,36 @@ int32 STriangleButton::OnPaint(const FPaintArgs& Args, const FGeometry& Allotted
 			PixelPos.Y / LocalSize.Y
 		));
 	}
+	//
+	// TSharedRef<const SWidget> s = this->AsShared();
+	// TSharedRef<SWidget> s2 = ConstCastSharedRef<SWidget>(s);
+	// TSharedRef<STriangleButton>s3 = StaticCastSharedRef<STriangleButton>(s2);
+	// if(!TestPathPtr.IsValid())
+	// {
+	// 	
+	//
+	// 	// OnPaint中强制转换（仅确保控件可修改时使用）
+	// 	// 步骤1：创建自定义HitTestPath的共享指针实例（传入必要参数）
+	// 	TSharedPtr<STriangleButton::FCustomTriangleHitTestPath> CustomHitTestPath = 
+	// 		MakeShared<STriangleButton::FCustomTriangleHitTestPath>(
+	// 			s3,       // 当前按钮的TSharedRef（转TSharedPtr）
+	// 			TrianglePoints_Normal,  // 三角形归一化顶点（用于命中判断）
+	// 			AllottedGeometry        // 控件几何信息（用于坐标转换）
+	// 		);
+	// 	TestPathPtr = CustomHitTestPath;
+	// }else
+	// {
+	// 	TestPathPtr->SetWidgetGeometry(AllottedGeometry);
+	// 	TestPathPtr->SetTriangleNormalVerts(TrianglePoints_Normal);
+	// }
+	//
+	// TSharedRef<FCustomTriangleHitTestPath>  TriangleHitTestRef = TestPathPtr.ToSharedRef();
+	//
+	// // 3. 第三步：向上转换为TSharedRef<ICustomHitTestPath>
+	// // 利用多态自动向上转换，无需额外强制转换（类型兼容）
+	// TSharedRef<ICustomHitTestPath> HitTestRef = TriangleHitTestRef;
 
-	TSharedRef<const SWidget> s = this->AsShared();
-	TSharedRef<SWidget> s2 = ConstCastSharedRef<SWidget>(s);
-	TSharedRef<STriangleButton>s3 = StaticCastSharedRef<STriangleButton>(s2);
-	if(!TestPathPtr.IsValid())
-	{
-		
-
-		// OnPaint中强制转换（仅确保控件可修改时使用）
-		// 步骤1：创建自定义HitTestPath的共享指针实例（传入必要参数）
-		TSharedPtr<STriangleButton::FCustomTriangleHitTestPath> CustomHitTestPath = 
-			MakeShared<STriangleButton::FCustomTriangleHitTestPath>(
-				s3,       // 当前按钮的TSharedRef（转TSharedPtr）
-				TrianglePoints_Normal,  // 三角形归一化顶点（用于命中判断）
-				AllottedGeometry        // 控件几何信息（用于坐标转换）
-			);
-		TestPathPtr = CustomHitTestPath;
-	}else
-	{
-		TestPathPtr->SetWidgetGeometry(AllottedGeometry);
-		TestPathPtr->SetTriangleNormalVerts(TrianglePoints_Normal);
-	}
-	
-	TSharedRef<FCustomTriangleHitTestPath>  TriangleHitTestRef = TestPathPtr.ToSharedRef();
-
-	// 3. 第三步：向上转换为TSharedRef<ICustomHitTestPath>
-	// 利用多态自动向上转换，无需额外强制转换（类型兼容）
-	TSharedRef<ICustomHitTestPath> HitTestRef = TriangleHitTestRef;
-
-	Args.GetHittestGrid().InsertCustomHitTestPath(s3, HitTestRef);
+	// Args.GetHittestGrid().InsertCustomHitTestPath(s3, HitTestRef);
 
 	TArray<FSlateVertex> Verts;
 	// const FPaintGeometry PaintGeometry = AllottedGeometry.ToPaintGeometry();
