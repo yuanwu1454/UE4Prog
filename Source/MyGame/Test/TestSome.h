@@ -5,7 +5,7 @@
 // 引入UE4核心头文件（必加）
 #include "Engine/Engine.h"
 #include "Misc/StringFormatArg.h"
-void TestString()
+inline void TestString()
 {
 	FString Str1 = "Hello";
 	FString Str2 = TEXT("Hello");
