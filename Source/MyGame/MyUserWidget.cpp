@@ -7,6 +7,45 @@
 #include "Blueprint/WidgetTree.h"
 #include "MyBlueprintFunctinLibrary.h"
 #include "Test/PropertyTest.h"
+#include "UOBject/Class.h"
+#include "UObject/EnumProperty.h"
+#include "UObject/Field.h"
+
+
+// 新增：解析参数标志（输入/输出/返回值）
+FString GetParamFlagsString(FProperty* Param)
+{
+    TArray<FString> FlagList;
+
+    if (Param->HasAnyPropertyFlags(CPF_ReturnParm)) FlagList.Add(TEXT("返回值"));
+    if (Param->HasAnyPropertyFlags(CPF_OutParm))    FlagList.Add(TEXT("输出"));
+    if (Param->HasAnyPropertyFlags(CPF_ReferenceParm)) FlagList.Add(TEXT("引用"));
+    // 若没有特殊标志，默认是输入参数
+    if (FlagList.Num() == 0 && Param->HasAnyPropertyFlags(CPF_Parm)) FlagList.Add(TEXT("输入"));
+
+    return FString::Join(FlagList, TEXT("/"));
+}
+
+// 新增：打印单个函数的所有参数
+void PrintFunctionParams(UFunction* Func)
+{
+    if (!Func) return;
+
+    // 遍历函数的所有属性，筛选出参数
+    for (TFieldIterator<FProperty> ParamIt(Func); ParamIt; ++ParamIt)
+    {
+        FProperty* Param = *ParamIt;
+        if (!Param || !Param->HasAnyPropertyFlags(CPF_Parm)) continue; // 只处理参数
+
+        FString ParamName = Param->GetName();
+        FString ParamType = Param->GetCPPType();
+        FString ParamFlags = GetParamFlagsString(Param);
+
+        // 打印参数详情（缩进2个空格，和函数名区分）
+        UE_LOG(LogTemp, Log, TEXT("  └─ 参数名：%-15s | 类型：%-10s | 类型：%s"), 
+               *ParamName, *ParamType, *ParamFlags);
+    }
+}
 
 // ========== 重写Widget构造函数（打开UI时） ==========
 void UMyUserWidget::NativeConstruct()
@@ -154,6 +193,31 @@ void UMyUserWidget::PrintAllWidgetVariableNames()
     }
 
     UE_LOG(LogTemp, Log, TEXT("\n======== 打印结束 ========"));
+
+
+    UE_LOG(LogTemp, Log, TEXT("========== 遍历【函数/方法】=========="));
+    // 关键修改：遍历 UFunction（函数）而非 FProperty（属性）
+    for (TFieldIterator<UFunction> FuncIt(WidgetClass); FuncIt; ++FuncIt)
+    {
+        UFunction* Func = *FuncIt;
+        if (!Func) continue;
+        
+        // 函数基础信息
+        FString FuncName = Func->GetName();
+        
+        // 获取返回值类型（UE4.27兼容）
+        FString ReturnType = GetBlueprintFunctionReturnType(Func);
+        // 解析函数标志（核心修改：不用StaticEnum）
+        FString FuncFlags = GetFunctionFlagsString(Func->FunctionFlags);
+
+        UE_LOG(LogTemp, Log, TEXT("函数名：%-20s | 返回值类型：%-10s | 函数标志：%s"), 
+               *FuncName, *ReturnType, *FuncFlags);
+
+        PrintFunctionParams(Func);
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("\n======== 打印结束 ========"));
+
 }
 
 FString UMyUserWidget::GetWidgetVariableName(UWidget* Widget)
@@ -188,19 +252,6 @@ FString UMyUserWidget::GetWidgetVariableName(UWidget* Widget)
 
 void UMyUserWidget::PrintAllProp()
 {
-    // 反射获取当前UserWidget的类信息
-    UClass* WidgetClass = this->GetClass();
-    if (!WidgetClass) return ;
-    // 关键修改1：遍历FProperty（替代UProperty）
-    for (TFieldIterator<FProperty> PropIt(WidgetClass); PropIt; ++PropIt)
-    {
-        FProperty* Prop = *PropIt;
-        if (!Prop) continue;
-
-        FString PropName = Prop->GetName();
-        FString PropType = GetPropertyTypeName(Prop);
-        UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
-    }
 }
 
 // 核心函数：获取任意FProperty的类型名称（适配所有类型）
@@ -257,10 +308,24 @@ FString UMyUserWidget::GetPropertyTypeName(FProperty* Prop)
     {
         if (DelegateProp->SignatureFunction)
         {
+            FString SignatureFunctionName = DelegateProp->SignatureFunction->GetName();
+            // UE_LOG(LogTemp, Log, TEXT("Delegte Begin %s "), *SignatureFunctionName);
+            // for (TFieldIterator<FProperty> PropIt(DelegateProp->SignatureFunction); PropIt; ++PropIt)
+            // {
+            //     FProperty* Prop = *PropIt;
+            //     if (!Prop) continue;
+            //
+            //     FString PropName = Prop->GetName();
+            //     FString PropType = GetPropertyTypeName(Prop);
+            //     UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
+            // }
+            // UE_LOG(LogTemp, Log, TEXT("Delegte End %s "), *SignatureFunctionName);
+            
             // 委托类型格式：Delegate<函数签名所属类::函数名>
             FString DelegateName = FString::Printf(TEXT("Delegate<%s::%s>"),
                 *DelegateProp->SignatureFunction->GetOuter()->GetName(),
                 *DelegateProp->SignatureFunction->GetName());
+            
             return DelegateName;
         }
         return TEXT("Delegate");
@@ -293,16 +358,18 @@ FString UMyUserWidget::GetPropertyTypeName(FProperty* Prop)
         {
 
             // 关键修改1：遍历FProperty（替代UProperty）
-            for (TFieldIterator<FProperty> PropIt(StructProperty->Struct); PropIt; ++PropIt)
-            {
-                FProperty* Prop = *PropIt;
-                if (!Prop) continue;
-
-                FString PropName = Prop->GetName();
-                FString PropType = GetPropertyTypeName(Prop);
-                UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
-            }
-            
+            // FString StructName = StructProperty->Struct->GetName();
+            // UE_LOG(LogTemp, Log, TEXT("Struct Begin %s "), *StructName);
+            // for (TFieldIterator<FProperty> PropIt(StructProperty->Struct); PropIt; ++PropIt)
+            // {
+            //     FProperty* Prop = *PropIt;
+            //     if (!Prop) continue;
+            //
+            //     FString PropName = Prop->GetName();
+            //     FString PropType = GetPropertyTypeName(Prop);
+            //     UE_LOG(LogTemp, Log, TEXT("变量名：%-20s | 类型：%s"), *PropName, *PropType);
+            // }
+            // UE_LOG(LogTemp, Log, TEXT("Struct End %s "), *StructName);
             return StructProperty->Struct->GetName();
         }
         return TEXT("UStruct");
@@ -329,6 +396,51 @@ FString UMyUserWidget::GetPropertyTypeName(FProperty* Prop)
     
     return Prop->GetClass()->GetName();
 
+}
+
+FString UMyUserWidget::GetFunctionFlagsString(EFunctionFlags Flags)
+{
+    TArray<FString> FlagList;
+
+    // 解析常用的函数标志（按需添加）
+    if (Flags & FUNC_Public)            FlagList.Add(TEXT("Public"));
+    if (Flags & FUNC_Private)           FlagList.Add(TEXT("Private"));
+    if (Flags & FUNC_Protected)         FlagList.Add(TEXT("Protected"));
+    if (Flags & FUNC_BlueprintCallable) FlagList.Add(TEXT("BlueprintCallable"));
+    if (Flags & FUNC_BlueprintPure)     FlagList.Add(TEXT("BlueprintPure"));
+    if (Flags & FUNC_Native)            FlagList.Add(TEXT("Native"));
+    if (Flags & FUNC_Event)             FlagList.Add(TEXT("Event"));
+    if (Flags & FUNC_BlueprintEvent)    FlagList.Add(TEXT("BlueprintEvent"));
+
+    // 拼接成字符串
+    return FString::Join(FlagList, TEXT(", "));
+}
+
+FString UMyUserWidget::GetBlueprintFunctionReturnType(UFunction* Func)
+{
+    if (!Func) return TEXT("void");
+
+    // 第一步：先尝试获取C++函数的返回值（兼容原有逻辑）
+    FProperty* ReturnProp = Func->GetReturnProperty();
+    if (ReturnProp)
+    {
+        return ReturnProp->GetCPPType();
+    }
+
+    // 第二步：遍历参数，找蓝图函数的返回值（核心修正）
+    for (TFieldIterator<FProperty> ParamIt(Func); ParamIt; ++ParamIt)
+    {
+        FProperty* Param = *ParamIt;
+        if (!Param) continue;
+
+        // 蓝图返回值的参数会被标记为「ReturnParm + Parm」
+        if (Param->HasAnyPropertyFlags(CPF_ReturnParm | CPF_Parm))
+        {
+            return Param->GetCPPType();
+        }
+    }
+
+    return TEXT("void");
 }
 
 // UStruct 是 UE 反射系统中 “结构化类型” 的基类，范围极广（包含类、结构体、函数等）；
