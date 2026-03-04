@@ -49,9 +49,4 @@ private:// 3. 按钮点击事件的回调函数（蓝图也可调用，方便扩
 
 	void PrintAllWidgetVariableNames();
 	FString GetWidgetVariableName(UWidget* Widget);
-	void PrintAllProp();
-	FString GetPropertyTypeName(FProperty* Prop);
-	// 辅助函数：解析EFunctionFlags为可读字符串（UE4.27专用）
-	FString GetFunctionFlagsString(EFunctionFlags Flags);
-	FString GetBlueprintFunctionReturnType(UFunction* Func);
 };
