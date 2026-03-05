@@ -146,7 +146,87 @@ void UMyUserWidget::OnButtonAClicked()
     
     // UMyBlueprintFunctinLibrary::Test(GetWorld());
 
-    PrintAllWidgetVariableNames();
+    // PrintAllWidgetVariableNames();
+    // FieldToolNS::CheckClassType(this->GetClass());
+    // 步骤1：普通UObject实例（Actor）的GetClass()
+    UClass* ActorClass = this->GetClass();
+    UE_LOG(LogTemp, Log, TEXT("=== 普通Actor实例的GetClass() ==="));
+    UE_LOG(LogTemp, Log, TEXT("Actor类名：%s"), *ActorClass->GetName());
+    UE_LOG(LogTemp, Log, TEXT("ActorClass的类型：%s"), *ActorClass->GetClass()->GetName());
+
+    // 步骤2：UClass实例的GetClass()（元类）
+    UClass* MetaClass = ActorClass->GetClass();
+    UE_LOG(LogTemp, Log, TEXT("\n=== UClass实例的GetClass()（元类） ==="));
+    UE_LOG(LogTemp, Log, TEXT("元类名：%s"), *MetaClass->GetName());
+    UE_LOG(LogTemp, Log, TEXT("元类的GetClass()：%s"), *MetaClass->GetClass()->GetName());
+
+
+    // 步骤2：UClass实例的GetClass()（元类）
+    UClass* MetaClass2 = MetaClass->GetClass();
+    UE_LOG(LogTemp, Log, TEXT("\n=== MetaClass实例的GetClass()（元类） ==="));
+    UE_LOG(LogTemp, Log, TEXT("元类2名：%s"), *MetaClass2->GetName());
+    UE_LOG(LogTemp, Log, TEXT("元类2的GetClass()：%s"), *MetaClass2->GetClass()->GetName());
+    
+    // 步骤3：验证元类的GetClass()指向自己（终止递归）
+    bool bIsSelf = (MetaClass->GetClass() == MetaClass);
+    UE_LOG(LogTemp, Log, TEXT("元类的GetClass()是否指向自己：%d"), bIsSelf);
+
+    // 步骤3：验证元类的GetClass()指向自己（终止递归）
+    bIsSelf = (MetaClass2->GetClass() == MetaClass2);
+    UE_LOG(LogTemp, Log, TEXT("元类2的GetClass()是否指向自己：%d"), bIsSelf);
+
+    // 额外：蓝图类的元类验证
+    UBlueprintGeneratedClass* BPGClass = Cast<UBlueprintGeneratedClass>(ActorClass);
+    if (BPGClass)
+    {
+        UClass* BPGCMetaClass = BPGClass->GetClass();
+        UE_LOG(LogTemp, Log, TEXT("\n=== UBPGC实例的GetClass() ==="));
+        UE_LOG(LogTemp, Log, TEXT("UBPGC的元类名：%s"), *BPGCMetaClass->GetName());
+        // bool bBPGCMetaIsUClass = BPGCMetaClass->IsA<UClass>();
+        // UE_LOG(LogTemp, Log, TEXT("UBPGC的元类是否是UClass：%d"), bBPGCMetaIsUClass);
+    }
+    UE_LOG(LogTemp, Log, TEXT(" this is a uclass %d"), this->IsA<UClass>());
+    UE_LOG(LogTemp, Log, TEXT(" this is a uobject %d"), this->IsA<UObject>());
+
+
+
+    // MyUserWidget_BP_C 不是 纯C++类
+    UE_LOG(LogTemp, Log, TEXT("%s %s 纯C++类"), *ActorClass->GetName(), ActorClass->IsNative()? TEXT("是"):TEXT("不是"));
+    // WidgetBlueprintGeneratedClass 是 纯C++类
+    UE_LOG(LogTemp, Log, TEXT("%s %s 纯C++类"), *MetaClass->GetName(), MetaClass->IsNative()? TEXT("是"):TEXT("不是"));
+    // Class 是 纯C++类
+    UE_LOG(LogTemp, Log, TEXT("%s %s 纯C++类"), *MetaClass2->GetName(), MetaClass2->IsNative()? TEXT("是"):TEXT("不是"));
+
+    
+    // 步骤2：找到 "Blueprint" 这个成员变量（UObjectProperty 类型）
+    UObjectProperty* BlueprintProp = Cast<UObjectProperty>(
+        ActorClass->FindPropertyByName(TEXT("Blueprint"))
+    );
+    
+    if (!BlueprintProp)
+    {
+        UE_LOG(LogTemp, Error, TEXT("无法找到UBPGC的Blueprint成员变量！"));
+    }else
+    {
+        // 步骤3：读取该变量的值（即关联的 UBlueprint）
+        UBlueprint* Blueprint = Cast<UBlueprint>(
+            BlueprintProp->GetObjectPropertyValue_InContainer(BPGClass)
+        );
+
+        if (Blueprint)
+        {
+            UE_LOG(LogTemp, Log, TEXT("成功获取UBPGC关联的蓝图：%s"), *Blueprint->GetName());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("该UBPGC未关联任何蓝图资源！"));
+        }
+    
+    }
+
+    FieldToolNS::PrintClassInfo(StaticClass());
+
+    // StaticClass();
 }
 
 void UMyUserWidget::PrintAllWidgetVariableNames()

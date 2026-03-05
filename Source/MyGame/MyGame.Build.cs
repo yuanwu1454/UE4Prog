@@ -16,7 +16,7 @@ public class MyGame : ModuleRules
 			"InputCore",
 			"UMG",
 			"SlateCore",
-			"Slate"
+			"Slate",
 		});
 		
 		// 关键：如果是编辑器模块，添加Editor相关依赖

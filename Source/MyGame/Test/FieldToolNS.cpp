@@ -1,6 +1,14 @@
 #include "FieldToolNS.h"
-
-
+// 必须添加的头文件（UE4.27 路径）
+// 若用到 UBlueprint，还需添加：
+// 基础头文件（确保已有）
+#include "CoreMinimal.h"
+#include "UObject/Class.h"
+#include "Blueprint/BlueprintSupport.h"
+#include "Engine/Blueprint.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/Engine.h"
+#include "UObject/UObjectBaseUtility.h"
 namespace FieldToolNS
 {
 	
@@ -213,4 +221,132 @@ FString GetBlueprintFunctionReturnType(UFunction* Func)
 //     // 这是一个函数
 //     UFunction* Func = Cast<UFunction>(SomeStruct);
 // }
+
+
+    
+    void CheckClassType(UClass* InClass)
+    {
+        if (!InClass) return;
+
+        if(InClass->IsAsset())
+        {
+            
+        }
+
+        // if (InClass->IsA<UBlueprintGeneratedClass>())
+        // {
+        //     
+        // }
+
+        
+        
+        // 1. 判断是否是蓝图生成的类（核心API）
+        // if (InClass->IsA<UBlueprintGeneratedClass>())
+        // {
+        //     // UE_LOG(LogTemp, Log, TEXT("这是蓝图生成的类：%s"), *InClass->GetName());
+        //     //
+        //     // // 转为UBPGC，获取蓝图特有信息
+        //     // UBlueprintGeneratedClass* BPGClass = Cast<UBlueprintGeneratedClass>(InClass);
+        //     // if (BPGClass)
+        //     // {
+        //     //     // 获取蓝图的原始蓝图资源（.uasset文件）
+        //     //     // 步骤2：找到 "Blueprint" 这个成员变量（UObjectProperty 类型）
+        //     //     UObjectProperty* BlueprintProp = Cast<UObjectProperty>(
+        //     //         BPGClass->FindPropertyByName(TEXT("Blueprint"))
+        //     //     );
+        //     //     
+        //     //     if (BlueprintProp)
+        //     //     {
+        //     //         // 步骤3：读取该变量的值（即关联的 UBlueprint）
+        //     //         UBlueprint* Blueprint = Cast<UBlueprint>(
+        //     //             BlueprintProp->GetObjectPropertyValue_InContainer(BPGClass)
+        //     //         );
+        //     //
+        //     //         UE_LOG(LogTemp, Log, TEXT("对应的蓝图资源名：%s"), *Blueprint->GetName());
+        //     //         UE_LOG(LogTemp, Log, TEXT("蓝图的父类（C++类）：%s"), *Blueprint->ParentClass->GetName());
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //         UE_LOG(LogTemp, Error, TEXT("无法找到UBPGC的Blueprint成员变量！"));
+        //     //     }
+        //     // }
+        // }
+        // else
+        // {
+        //     // UE_LOG(LogTemp, Log, TEXT("这是纯C++类：%s"), *InClass->GetName());
+        //     // // 纯C++类的判断：IsNative() 为 true
+        //     // if (InClass->IsNative())
+        //     // {
+        //     //     UE_LOG(LogTemp, Log, TEXT("确认是原生C++类"));
+        //     // }
+        // }
+    }
+
+// 打印UClass的详细信息（包含类基本信息、属性、函数、蓝图关联信息等）
+void PrintClassInfo(UClass* InClass)
+{
+    if (!InClass)
+    {
+        UE_LOG(LogTemp, Error, TEXT("PrintClassInfo: 传入的UClass为空！"));
+        return;
+    }
+
+    // ======================================
+    // 1. 打印类的基础信息
+    // ======================================
+    UE_LOG(LogTemp, Log, TEXT("======================================"));
+    UE_LOG(LogTemp, Log, TEXT("【UClass 详细信息】"));
+    UE_LOG(LogTemp, Log, TEXT("======================================"));
+    
+    // 类名/路径名
+    UE_LOG(LogTemp, Log, TEXT("1. 基础信息："));
+    UE_LOG(LogTemp, Log, TEXT("   类名：%s"), *InClass->GetName());
+    UE_LOG(LogTemp, Log, TEXT("   完整路径名：%s"), *InClass->GetPathName());
+    UE_LOG(LogTemp, Log, TEXT("   类的显示名：%s"), *InClass->GetDisplayNameText().ToString());
+    
+    // 父类信息
+    UClass* SuperClass = InClass->GetSuperClass();
+    if (SuperClass)
+    {
+        UE_LOG(LogTemp, Log, TEXT("   父类名：%s"), *SuperClass->GetName());
+        UE_LOG(LogTemp, Log, TEXT("   父类完整路径：%s"), *SuperClass->GetPathName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("   父类：无（根类）"));
+    }
+
+    // 类类型判断（原生C++类/蓝图类）
+    UE_LOG(LogTemp, Log, TEXT("   是否为原生C++类：%s"), InClass->IsNative() ? TEXT("是") : TEXT("否"));
+    // UE_LOG(LogTemp, Log, TEXT("   是否为蓝图生成类：%s"), InClass->IsA<UBlueprintGeneratedClass>() ? TEXT("是") : TEXT("否"));
+    UE_LOG(LogTemp, Log, TEXT("   是否为抽象类：%s"), InClass->HasAnyClassFlags(CLASS_Abstract) ? TEXT("是") : TEXT("否"));
+    // UE_LOG(LogTemp, Log, TEXT("   是否为蓝图可见：%s"), InClass->HasAnyClassFlags(CLASS_BlueprintVisible) ? TEXT("是") : TEXT("否"));
+
+    // ======================================
+    // 2. 打印蓝图类特有信息（如果是UBPGC）
+    // ======================================
+    if (UBlueprintGeneratedClass* BPGClass = Cast<UBlueprintGeneratedClass>(InClass))
+    {
+        UE_LOG(LogTemp, Log, TEXT("2. 蓝图类特有信息："));
+        
+        // UE4.27 获取关联的蓝图资源（反射方式）
+        UClass* BPGCClass = BPGClass->GetClass();
+        UObjectProperty* BlueprintProp = Cast<UObjectProperty>(BPGCClass->FindPropertyByName(TEXT("Blueprint")));
+        if (BlueprintProp)
+        {
+            UBlueprint* Blueprint = Cast<UBlueprint>(BlueprintProp->GetObjectPropertyValue_InContainer(BPGClass));
+            if (Blueprint)
+            {
+                UE_LOG(LogTemp, Log, TEXT("   关联蓝图名：%s"), *Blueprint->GetName());
+                UE_LOG(LogTemp, Log, TEXT("   蓝图路径：%s"), *Blueprint->GetPathName());
+                // UE_LOG(LogTemp, Log, TEXT("   蓝图是否已编译：%s"), Blueprint->IsCompiled() ? TEXT("是") : TEXT("否"));
+                UE_LOG(LogTemp, Log, TEXT("   蓝图父类（C++）：%s"), *Blueprint->ParentClass->GetName());
+            }
+            else
+            {
+                UE_LOG(LogTemp, Log, TEXT("   关联蓝图：无"));
+            }
+        }
+    }
+}
 };

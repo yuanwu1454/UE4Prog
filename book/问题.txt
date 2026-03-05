@@ -1,0 +1,13 @@
+继承关系
+UField FField
+UStruct
+UClass/UStructScript/UFunction
+UStruct: UField
+UField: UObject
+为啥有两个？
+一个迭代ufunction 一个迭代FProperty
+/** Pointer to start of linked list of child fields */
+UField* Children;
+/** Pointer to start of linked list of child fields */
+FField* ChildProperties;
+FProperty : public FField
