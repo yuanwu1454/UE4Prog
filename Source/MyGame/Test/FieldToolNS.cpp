@@ -9,6 +9,9 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/Engine.h"
 #include "UObject/UObjectBaseUtility.h"
+#include "UOBject/Class.h"
+#include "UObject/EnumProperty.h"
+#include "UObject/Field.h"
 namespace FieldToolNS
 {
 	
@@ -281,10 +284,10 @@ FString GetBlueprintFunctionReturnType(UFunction* Func)
         //     // }
         // }
     }
-
 // 打印UClass的详细信息（包含类基本信息、属性、函数、蓝图关联信息等）
 void PrintClassInfo(UClass* InClass)
 {
+    
     if (!InClass)
     {
         UE_LOG(LogTemp, Error, TEXT("PrintClassInfo: 传入的UClass为空！"));
@@ -325,16 +328,16 @@ void PrintClassInfo(UClass* InClass)
     // ======================================
     // 2. 打印蓝图类特有信息（如果是UBPGC）
     // ======================================
-    if (UBlueprintGeneratedClass* BPGClass = Cast<UBlueprintGeneratedClass>(InClass))
+    if (UBlueprintGeneratedClass* BPGClass2 = Cast<UBlueprintGeneratedClass>(InClass))
     {
         UE_LOG(LogTemp, Log, TEXT("2. 蓝图类特有信息："));
         
         // UE4.27 获取关联的蓝图资源（反射方式）
-        UClass* BPGCClass = BPGClass->GetClass();
-        UObjectProperty* BlueprintProp = Cast<UObjectProperty>(BPGCClass->FindPropertyByName(TEXT("Blueprint")));
-        if (BlueprintProp)
+        UClass* BPGCClass = BPGClass2->GetClass();
+        UObjectProperty* BlueprintProp2 = Cast<UObjectProperty>(BPGCClass->FindPropertyByName(TEXT("Blueprint")));
+        if (BlueprintProp2)
         {
-            UBlueprint* Blueprint = Cast<UBlueprint>(BlueprintProp->GetObjectPropertyValue_InContainer(BPGClass));
+            UBlueprint* Blueprint = Cast<UBlueprint>(BlueprintProp2->GetObjectPropertyValue_InContainer(BPGClass2));
             if (Blueprint)
             {
                 UE_LOG(LogTemp, Log, TEXT("   关联蓝图名：%s"), *Blueprint->GetName());
