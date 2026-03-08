@@ -12,7 +12,8 @@ AUPropertyTestActor::AUPropertyTestActor()
 
 	// 验证属性是否被反射识别
 	const UClass* Class = GetClass();
-	const FFloatProperty* Prop = FindField<FFloatProperty>(Class, TEXT("CallbackFloat"));
+	// FindFProperty 可以找到指定的属性
+	const FFloatProperty* Prop = FindFProperty<FFloatProperty>(Class, TEXT("CallbackFloat"));
 	if (Prop)
 	{
 		UE_LOG(LogTemp, Log, TEXT("✅ 属性CallbackFloat反射识别成功"));

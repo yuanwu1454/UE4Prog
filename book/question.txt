@@ -11,3 +11,8 @@ UField* Children;
 /** Pointer to start of linked list of child fields */
 FField* ChildProperties;
 FProperty : public FField
+
+客户端向服务器同步 一般是rpc
+服务器向客户端一般是 数据同步 rep
+
+网路上的序列化 是服务器向客户端触发。

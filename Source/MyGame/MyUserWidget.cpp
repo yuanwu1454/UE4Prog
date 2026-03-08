@@ -3,9 +3,11 @@
 
 #include "MyUserWidget.h"
 
+#include "MyAsset.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetTree.h"
 #include "MyBlueprintFunctinLibrary.h"
+#include "MyObject.h"
 #include "Components/TextBlock.h"
 #include "Test/PropertyTest.h"
 #include "UOBject/Class.h"
@@ -166,11 +168,12 @@ void UMyUserWidget::OnButtonAClicked()
         // PrintAllWidgetVariableNames();
         // FieldToolNS::CheckClassType(this->GetClass());
         // 步骤1：普通UObject实例（Actor）的GetClass()
-        FieldToolNS::PrintClassInfo(StaticClass());
+        // FieldToolNS::PrintClassInfo(StaticClass());
     }
     
 
-
+    // UMyObject::Test();
+    UMyAsset::TestCustomMapSerialization();
     // StaticClass();
 }
 
