@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetTree.h"
 #include "MyBlueprintFunctinLibrary.h"
+#include "MyGameMode.h"
 #include "MyObject.h"
 #include "Components/TextBlock.h"
 #include "Test/PropertyTest.h"
@@ -173,8 +174,14 @@ void UMyUserWidget::OnButtonAClicked()
     
 
     // UMyObject::Test();
-    UMyAsset::TestCustomMapSerialization();
+    // UMyAsset::TestCustomMapSerialization();
     // StaticClass();
+
+    AMyGameMode* GM = Cast<AMyGameMode>(GetWorld()->GetAuthGameMode());
+    if (GM&&IsValid(GM))
+    {
+        GM->FindGameSessions();
+    }
 }
 
 void UMyUserWidget::PrintAllWidgetVariableNames()

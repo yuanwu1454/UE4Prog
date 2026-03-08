@@ -19,6 +19,8 @@ public class MyGame : ModuleRules
 			"UMG",
 			"SlateCore",
 			"Slate",
+			"OnlineSubsystem",
+			"OnlineSubsystemNull"
 		});
 		
 		// 关键：如果是编辑器模块，添加Editor相关依赖

@@ -4,19 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "MyGameGameModeBase.generated.h"
+#include "MyGameSession.h"
+#include "MyGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYGAME_API AMyGameGameModeBase : public AGameModeBase
+class MYGAME_API AMyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AMyGameGameModeBase();
+	AMyGameMode();
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 public:
@@ -28,10 +30,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category="PlayerUtils")
 	void InitPlayerAttributes(float NewSpeed = 600.0f, int32 NewFPS = 60);
 
+
+	// 重写：指定使用自定义GameSession
+	virtual TSubclassOf<AGameSession> GetGameSessionClass() const override;
+
+	// 蓝图可调用：创建会话（对外暴露的入口）
+	UFUNCTION(BlueprintCallable, Category = "Session")
+	bool CreateGameSession(FName SessionName = FName("MyGameSession"), int32 MaxPlayers = 4);
+	
+	// MyGameMode.h 中补充声明
+	UFUNCTION(BlueprintCallable, Category = "Session")
+	bool FindGameSessions(); // 客户端查找可用Session
+	bool JoinGameSession(FName SessionName, const FOnlineSessionSearchResult& SessionResult); 
 private:
 	// 延迟重试获取玩家的计时器
 	FTimerHandle RetryGetPlayerTimer;
 	// 最大重试次数（避免无限重试）
 	int32 MaxRetryCount = 5;
 	int32 CurrentRetryCount = 0;
+	bool IsServer() const;
+	bool IsPureClient() const;
 };

@@ -20,7 +20,7 @@ public:
 	// ----------------------
 	// 需同步的核心属性（标记Replicated）
 	// ----------------------
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_MoveSpeed)
 	float MoveSpeed = 600.0f; // 角色移动速度（必须同步）
 
 	// ----------------------
