@@ -1,9 +1,12 @@
 ﻿// OnlineSessionSubsystem.cpp
 #include "OnlineSessionSubsystem.h"
+
+#include "ProjectNetworkUtils.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+
 
 void UOnlineSessionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -21,15 +24,13 @@ void UOnlineSessionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     }
 }
 
+bool UOnlineSessionSubsystem::ShouldCreateSubsystem(UObject* Outer) const
+{
+    return UProjectNetworkUtils::IsServer(this);
+}
+
 bool UOnlineSessionSubsystem::CreateSession(FName SessionName, int32 MaxPlayers, bool bIsLAN)
 {
-    // 仅服务器可创建
-    if (!IsServer())
-    {
-        UE_LOG(LogOnlineSession, Warning, TEXT("拒绝客户端创建会话！仅服务器可执行"));
-        return false;
-    }
-
     // 初始化SessionInterface
     if (!InitSessionInterface())
     {
@@ -81,13 +82,6 @@ bool UOnlineSessionSubsystem::CreateSession(FName SessionName, int32 MaxPlayers,
 
 bool UOnlineSessionSubsystem::DestroySession(FName SessionName)
 {
-    // 仅服务器可销毁
-    if (!IsServer())
-    {
-        UE_LOG(LogOnlineSession, Warning, TEXT("拒绝客户端销毁会话！仅服务器可执行"));
-        return false;
-    }
-
     if (!InitSessionInterface())
     {
         return false;
@@ -121,13 +115,6 @@ bool UOnlineSessionSubsystem::DestroySession(FName SessionName)
 
 bool UOnlineSessionSubsystem::FindAvailableSessions(bool bIsLAN, int32 MaxResults)
 {
-    // 仅纯客户端可查找
-    if (!IsPureClient())
-    {
-        UE_LOG(LogOnlineSession, Warning, TEXT("仅纯客户端可查找会话！"));
-        return false;
-    }
-
     if (!InitSessionInterface())
     {
         return false;
@@ -169,12 +156,6 @@ bool UOnlineSessionSubsystem::FindAvailableSessions(bool bIsLAN, int32 MaxResult
 
 bool UOnlineSessionSubsystem::JoinGameSession(FName SessionName, const FOnlineSessionSearchResult& SessionResult)
 {
-    if (!IsPureClient())
-    {
-        UE_LOG(LogOnlineSession, Warning, TEXT("仅纯客户端可加入会话！"));
-        return false;
-    }
-
     if (!InitSessionInterface() || !SessionResult.IsValid())
     {
         UE_LOG(LogOnlineSession, Error, TEXT("SessionInterface/会话结果无效，无法加入"));
@@ -215,7 +196,7 @@ bool UOnlineSessionSubsystem::JoinGameSession(FName SessionName, const FOnlineSe
 
 bool UOnlineSessionSubsystem::RegisterPlayerToSession(FName SessionName, const FUniqueNetIdRef& PlayerNetId)
 {
-    if (!IsServer() || !InitSessionInterface())
+    if (!InitSessionInterface())
     {
         return false;
     }
@@ -234,7 +215,7 @@ bool UOnlineSessionSubsystem::RegisterPlayerToSession(FName SessionName, const F
 
 bool UOnlineSessionSubsystem::UnregisterPlayerFromSession(FName SessionName, const FUniqueNetIdRef& PlayerNetId)
 {
-    if (!IsServer() || !InitSessionInterface())
+    if (!InitSessionInterface())
     {
         return false;
     }
@@ -307,46 +288,36 @@ void UOnlineSessionSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSe
     switch (Result)
     {
     case EOnJoinSessionCompleteResult::Success:
-        ResultStr = TEXT("成功");
-        // 加入成功：跳转服务器地图
-        FString ConnectString;
-        if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
         {
-            
-            APlayerController* PC = GetWorld()->GetFirstPlayerController();
-            if (PC)
+            ResultStr = TEXT("成功");
+            // 加入成功：跳转服务器地图
+            FString ConnectString;
+            if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
             {
-                PC->ClientTravel(ConnectString, TRAVEL_Absolute);
-                UE_LOG(LogOnlineSession, Log, TEXT("客户端跳转至服务器：%s"), *ConnectString);
+            
+                APlayerController* PC = GetWorld()->GetFirstPlayerController();
+                if (PC)
+                {
+                    PC->ClientTravel(ConnectString, TRAVEL_Absolute);
+                    UE_LOG(LogOnlineSession, Log, TEXT("客户端跳转至服务器：%s"), *ConnectString);
+                }
             }
+            break;            
         }
-        break;
-    case EOnJoinSessionCompleteResult::SessionDoesNotExist: ResultStr = TEXT("会话不存在"); break;
-    case EOnJoinSessionCompleteResult::SessionIsFull: ResultStr = TEXT("会话已满"); break;
-    case EOnJoinSessionCompleteResult::CouldNotRetrieveAddress: ResultStr = TEXT("无法获取服务器地址"); break;
-    default: ResultStr = TEXT("未知错误"); break;
+    case EOnJoinSessionCompleteResult::SessionDoesNotExist:
+        {ResultStr = TEXT("会话不存在"); break;}
+    case EOnJoinSessionCompleteResult::SessionIsFull:
+        {ResultStr = TEXT("会话已满"); break;}
+    case EOnJoinSessionCompleteResult::CouldNotRetrieveAddress:
+        {ResultStr = TEXT("无法获取服务器地址"); break;}
+    default:
+        {ResultStr = TEXT("未知错误"); break;}
     }
 
     UE_LOG(LogOnlineSession, Log, TEXT("加入会话 %s 结果：%s"), *SessionName.ToString(), *ResultStr);
     // 触发外部委托
-    OnJoinSessionCompleteDelegate.ExecuteIfBound(SessionName, Result);
+    OnJoinSessionCompleteDelegate.Broadcast(SessionName, Result);
     SessionInterface->ClearOnJoinSessionCompleteDelegates(this);
-}
-
-// ===== 辅助方法实现 =====
-bool UOnlineSessionSubsystem::IsServer() const
-{
-    UWorld* World = GetWorld();
-    if (!World) return false;
-    ENetMode NetMode = World->GetNetMode();
-    return NetMode == NM_DedicatedServer || NetMode == NM_ListenServer;
-}
-
-bool UOnlineSessionSubsystem::IsPureClient() const
-{
-    UWorld* World = GetWorld();
-    if (!World) return false;
-    return World->GetNetMode() == NM_Client;
 }
 
 bool UOnlineSessionSubsystem::InitSessionInterface()
@@ -382,7 +353,7 @@ bool UOnlineSessionSubsystem::GetValidPlayerNetId(FUniqueNetIdRepl& OutNetId, FN
     // 客户端逻辑
     if (World->IsNetMode(NM_Client))
     {
-        ULocalPlayer* LocalPlayer = GetGameInstance()->GetFirstLocalPlayer();
+        ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
         if (!LocalPlayer || !LocalPlayer->GetPreferredUniqueNetId().IsValid())
         {
             UE_LOG(LogOnlineSession, Error, TEXT("[客户端] 本地PlayerID无效，会话 %s"), *SessionName.ToString());

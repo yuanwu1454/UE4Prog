@@ -4,12 +4,15 @@
 #include "MyGameMode.h"
 #include "MyHUD.h"
 #include "MyPlayerCharacter.h"
+#include "OnlineSessionSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSubsystem.h"
+#include "ProjectNetworkUtils.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerController.h"
+#include "Subsystems/SubsystemBlueprintLibrary.h"
 
 AMyGameMode::AMyGameMode()
 {
@@ -22,7 +25,7 @@ void AMyGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     Super::InitGame(MapName, Options, ErrorMessage);
 
     // 初始化SessionInterface（仅在服务器端执行）
-    if (IsServer())
+    if (UProjectNetworkUtils::IsServer(this))
     {
         // 延迟1秒调用（时间可根据项目调整），确保在线子系统就绪
         FTimerHandle CreateSessionTimer;
@@ -32,8 +35,10 @@ void AMyGameMode::InitGame(const FString& MapName, const FString& Options, FStri
             // Lambda表达式：无参数、无返回值（符合FTimerDelegate要求）
             [this]() // 捕获this和需要的参数
             {
+
+                UOnlineSessionSubsystem* OnlineSessionSubsystem = Cast<UOnlineSessionSubsystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(this, UOnlineSessionSubsystem::StaticClass()));
                 // 1. 调用带返回值的核心方法
-                bool bCreateSuccess = this->CreateGameSession(FName("MyGameSession"),4);
+                bool bCreateSuccess = OnlineSessionSubsystem->CreateSession(FName("MyGameSession"),4);
 
                 // 2. 即时处理返回值（业务逻辑）
                 if (bCreateSuccess)
@@ -162,77 +167,3 @@ TSubclassOf<AGameSession> AMyGameMode::GetGameSessionClass() const
     return AMyGameSession::StaticClass();
 }
 
-bool AMyGameMode::CreateGameSession(FName SessionName, int32 MaxPlayers)
-{
-    // 1. 仅服务器端执行
-    if (!GetWorld()->IsServer())
-    {
-        UE_LOG(LogGameMode, Warning, TEXT("仅服务器可调用 CreateGameSession！"));
-        return false;
-    }
-
-    
-    // 2. 获取自定义 GameSession
-    AMyGameSession* MyGameSession = StaticCast<AMyGameSession*>(GameSession);
-    if (!MyGameSession)
-    {
-        UE_LOG(LogGameMode, Error, TEXT("获取 MyGameSession 失败，无法创建会话 %s"), *SessionName.ToString());
-        return false;
-    }
-
-    // 3. 调用 GameSession 的创建逻辑
-    return MyGameSession->CreateSession(SessionName, MaxPlayers);
-}
-
-// MyGameMode.cpp 中实现
-bool AMyGameMode::FindGameSessions()
-{
-    // GameMode仅存在于服务器，但客户端可通过GameMode调用（需确保是客户端实例）
-    if (GetWorld()->IsServer())
-    {
-        UE_LOG(LogGameMode, Warning, TEXT("服务器无需查找会话！"));
-        return false;
-    }
-
-    AMyGameSession* MyGameSession = StaticCast<AMyGameSession*>(GameSession);
-    if (!MyGameSession)
-    {
-        UE_LOG(LogGameMode, Error, TEXT("获取MyGameSession失败，无法查找会话"));
-        return false;
-    }
-
-    return MyGameSession->FindAvailableSessions();
-}
-
-bool AMyGameMode::JoinGameSession(FName SessionName, const FOnlineSessionSearchResult& SessionResult)
-{
-    if (GetWorld()->IsServer())
-    {
-        UE_LOG(LogGameMode, Warning, TEXT("服务器无需加入会话！"));
-        return false;
-    }
-
-    AMyGameSession* MyGameSession = StaticCast<AMyGameSession*>(GameSession);
-    if (!MyGameSession)
-    {
-        UE_LOG(LogGameMode, Error, TEXT("获取MyGameSession失败，无法加入会话 %s"), *SessionName.ToString());
-        return false;
-    }
-
-    return MyGameSession->JoinGameSession(SessionName, SessionResult);
-}
-
-// 判断是否是服务器（专用服务器/Listen Server）
-bool AMyGameMode::IsServer() const 
-{
-    // GetWorld()->IsServer()：true = 服务器/主机；false = 纯客户端
-    // GetNetMode()：返回当前网络模式，更精准
-    ENetMode NetMode = GetWorld()->GetNetMode();
-    return NetMode == NM_DedicatedServer || NetMode == NM_ListenServer;
-}
-
-// 判断是否是纯客户端（不包含主机）
-bool AMyGameMode::IsPureClient() const
-{
-    return GetWorld()->GetNetMode() == NM_Client;
-}

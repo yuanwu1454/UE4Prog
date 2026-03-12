@@ -177,11 +177,11 @@ void UMyUserWidget::OnButtonAClicked()
     // UMyAsset::TestCustomMapSerialization();
     // StaticClass();
 
-    AMyGameMode* GM = Cast<AMyGameMode>(GetWorld()->GetAuthGameMode());
-    if (GM&&IsValid(GM))
-    {
-        GM->FindGameSessions();
-    }
+    // AMyGameMode* GM = Cast<AMyGameMode>(GetWorld()->GetAuthGameMode());
+    // if (GM&&IsValid(GM))
+    // {
+    //     GM->FindGameSessions();
+    // }
 }
 
 void UMyUserWidget::PrintAllWidgetVariableNames()

@@ -32,8 +32,8 @@ public:
 
 	// 客户端回调：服务器返回Session信息后，本地执行加入
 	UFUNCTION(Client, Reliable)
-	void Client_OnSessionInfoReceived(const FOnlineSessionSearchResult& SessionResult);
-	void Client_OnSessionInfoReceived_Implementation(const FOnlineSessionSearchResult& SessionResult);
+	void Client_OnSessionInfoReceived(const TArray<FString>& SessionResult);
+	void Client_OnSessionInfoReceived_Implementation(const TArray<FString>& SessionResult);
 private:
 	// 获取当前操控的 PlayerCharacter
 	AMyPlayerCharacter* GetControlledCharacter();
