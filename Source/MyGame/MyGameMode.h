@@ -22,27 +22,14 @@ public:
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 public:
-	// 核心：兼容单机/服务器的玩家获取函数
-	UFUNCTION(BlueprintCallable, Category="PlayerUtils")
-	AMyPlayerCharacter* GetValidPlayerCharacter(bool bForceLocal = false);
-
-	// 示例：初始化玩家属性（兼容两种模式）
-	UFUNCTION(BlueprintCallable, Category="PlayerUtils")
-	void InitPlayerAttributes(float NewSpeed = 600.0f, int32 NewFPS = 60);
-
-
 	// 重写：指定使用自定义GameSession
 	virtual TSubclassOf<AGameSession> GetGameSessionClass() const override;
-
-	// // 蓝图可调用：创建会话（对外暴露的入口）
-	// UFUNCTION(BlueprintCallable, Category = "Session")
-	// bool CreateGameSession(FName SessionName = FName("MyGameSession"), int32 MaxPlayers = 4);
-	//
-	// // 加入游戏只能通过rpc来让服务器完成。
-	// // MyGameMode.h 中补充声明
-	// UFUNCTION(BlueprintCallable, Category = "Session")
-	// bool FindGameSessions(); // 客户端查找可用Session
-	// bool JoinGameSession(FName SessionName, const FOnlineSessionSearchResult& SessionResult); 
+	virtual APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
+	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void GameWelcomePlayer(UNetConnection* Connection, FString& RedirectURL) override;
+	virtual void Logout(AController* Exiting) override;
+	virtual void InitGameState() override;
 private:
 	// 延迟重试获取玩家的计时器
 	FTimerHandle RetryGetPlayerTimer;
@@ -50,3 +37,4 @@ private:
 	int32 MaxRetryCount = 5;
 	int32 CurrentRetryCount = 0;
 };
+

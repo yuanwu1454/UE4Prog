@@ -52,4 +52,6 @@ public:
 	
 	UFUNCTION()
 	void OnRep_MoveSpeed();
+
+	virtual void PossessedBy(AController* NewController) override;
 };

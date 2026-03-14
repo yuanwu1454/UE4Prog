@@ -4,9 +4,12 @@
 #include "MyPlayerController.h"
 #include "MyPlayerCharacter.h"
 #include "MyGameMode.h"
+#include "MyPlayerState.h"
 #include "OnlineSessionSubsystem.h"
 #include "OnlineSubsystem.h"
+#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Log/MultiplayerLogHelper.h"
 #include "Subsystems/SubsystemBlueprintLibrary.h"
 // 绑定输入（PlayerController 初始化时自动调用）
 void AMyPlayerController::SetupInputComponent()
@@ -36,83 +39,39 @@ void AMyPlayerController::OnTriggerQPressed()
 	UE_LOG(LogTemp, Log, TEXT("客户端按键 Q"));
 }
 
+void AMyPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	
+	// 记录新客户端登录，传入PlayerController作为PlayerContext
+	MULTI_LOG(FString::Printf(TEXT("OnPossess：%s"), *this->GetName()), this, this);
+
+	// 转换为自定义Character
+	AMyPlayerCharacter* PlayerChar = Cast<AMyPlayerCharacter>(aPawn);
+	if (!PlayerChar) return;
+
+	PlayerChar->UpdateAttributes(44.f, 100);
+}
+
+void AMyPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+	
+	// 记录新客户端登录，传入PlayerController作为PlayerContext
+	MULTI_LOG(FString::Printf(TEXT("OnRep_Pawn：%s"), *this->GetPlayerName()), this, this);
+}
+
+FString AMyPlayerController::GetPlayerName() const
+{
+	if (auto MyPlayerState = Cast<AMyPlayerState>(PlayerState))
+	{
+		return MyPlayerState->GetUniquePlayerName();
+	}
+	return GetFName().ToString();
+}
+
 // 安全获取操控的角色（加空检）
 AMyPlayerCharacter* AMyPlayerController::GetControlledCharacter()
 {
 	return Cast<AMyPlayerCharacter>(GetPawn());
 }
-
-// 客户端入口：触发加入Session
-void AMyPlayerController::Client_RequestJoinSpecificSession(const FString& TargetSessionName)
-{
-    if (HasAuthority()) return; // 确保只在客户端执行
-    Server_GetSessionInfo(TargetSessionName); // 调用服务器RPC
-}
-
-// 服务器RPC：调用GameMode的FindGameSessions，获取Session信息
-void AMyPlayerController::Server_GetSessionInfo_Implementation(const FString& TargetSessionName)
-{
-
-	UOnlineSessionSubsystem* OnlineSessionSubsystem = Cast<UOnlineSessionSubsystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(this, UOnlineSessionSubsystem::StaticClass()));
-	OnlineSessionSubsystem->BindFindSessionsComplete(FOnFindSessionsResultComplete::CreateLambda([this](const TArray<FOnlineSessionSearchResult>& FoundSessions)
-	{
-		TArray<FString> SessionNameArr;
-
-		// Lambda回调逻辑：处理搜索到的会话列表
-		for (auto& Result :  FoundSessions)
-		{
-			SessionNameArr.Add(Result.Session.SessionInfo->GetSessionId().ToString());
-		}
-		Client_OnSessionInfoReceived(SessionNameArr);
-	}));
-	if(OnlineSessionSubsystem && OnlineSessionSubsystem->FindAvailableSessions())
-	{
-	}
-	else
-	{
-		const TArray<FString> SessionNameArr;
-		Client_OnSessionInfoReceived(SessionNameArr);
-	}
-}
-
-// 客户端回调：拿到Session信息后，本地执行加入
-void AMyPlayerController::Client_OnSessionInfoReceived_Implementation(const TArray<FString>& SessionResult)
-{
-    // if (!SessionResult.IsValid())
-    // {
-    //     UE_LOG(LogPlayerController, Error, TEXT("客户端未获取到有效Session信息"));
-    //     return;
-    // }
-    //
-    // // 客户端本地执行加入Session（核心：这一步必须在客户端做，不能在GameMode做）
-    // ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-    // if (!LocalPlayer) return;
-    //
-    // IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-    // IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-    // if (!SessionInterface.IsValid()) return;
-    //
-    // // 绑定加入完成回调，切地图
-    // SessionInterface->ClearOnJoinSessionCompleteDelegates(this);
-    // SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(
-    //     FOnJoinSessionCompleteDelegate::CreateUObject(this, &AMyPlayerController::OnJoinSessionComplete)
-    // );
-    //
-    // // 客户端发起加入Session请求
-    // FName SessionName = FName(*SessionResult.Session.ToString());
-    // SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionName, SessionResult);
-}
-
-// 客户端加入Session完成：切地图
-// void AMyPlayerController::OnJoinSessionComplete(FName SessionName, bool bWasSuccessful)
-// {
-//     if (!bWasSuccessful) return;
-//
-//     FString ConnectURL;
-//     IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-//     IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-//     if (SessionInterface->GetResolvedConnectString(SessionName, ConnectURL))
-//     {
-//         UGameplayStatics::OpenLevel(GetWorld(), FName(*ConnectURL), true);
-//     }
-// }

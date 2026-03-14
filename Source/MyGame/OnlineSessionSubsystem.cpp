@@ -26,7 +26,7 @@ void UOnlineSessionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 bool UOnlineSessionSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
-    return UProjectNetworkUtils::IsServer(this);
+    return UProjectNetworkUtils::IsServer(Outer);
 }
 
 bool UOnlineSessionSubsystem::CreateSession(FName SessionName, int32 MaxPlayers, bool bIsLAN)

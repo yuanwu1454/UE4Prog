@@ -28,27 +28,3 @@ void AControllableActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-void AControllableActor::MoveActor(const FVector& Direction, float Speed)
-{
-	if (Direction.IsNearlyZero()) return;
-
-	// 计算移动增量
-	FVector MoveDelta = Direction.GetSafeNormal() * Speed * GetWorld()->GetDeltaSeconds();
-	// 移动Actor
-	AddActorWorldOffset(MoveDelta, true);
-}
-
-void AControllableActor::RotateActor(float YawDelta, float PitchDelta, float RollDelta, float RotationSpeed)
-{
-	if (FMath::IsNearlyZero(YawDelta) && FMath::IsNearlyZero(PitchDelta) && FMath::IsNearlyZero(RollDelta))
-		return;
-
-	// 计算旋转增量（欧拉角转四元数）
-	FRotator RotDelta(YawDelta * RotationSpeed * GetWorld()->GetDeltaSeconds(),
-					  PitchDelta * RotationSpeed * GetWorld()->GetDeltaSeconds(),
-					  RollDelta * RotationSpeed * GetWorld()->GetDeltaSeconds());
-    
-	// 旋转Actor
-	AddActorWorldRotation(RotDelta.Quaternion(), true);
-}

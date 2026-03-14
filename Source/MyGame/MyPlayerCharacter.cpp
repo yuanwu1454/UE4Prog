@@ -3,6 +3,7 @@
 
 #include "MyPlayerCharacter.h"
 
+#include "Log/MultiplayerLogHelper.h"
 #include "Net/UnrealNetwork.h"
 
 AMyPlayerCharacter::AMyPlayerCharacter()
@@ -42,10 +43,10 @@ void AMyPlayerCharacter::Serialize(FArchive& Ar)
 void AMyPlayerCharacter::UpdateAttributes(float NewSpeed, int32 NewFPS)
 {
 	if (HasAuthority()) // 单机/服务器才允许修改
-		{
+	{
 		MoveSpeed = NewSpeed;
 		TempFPS = NewFPS;
-		}
+	}
 	else
 	{
 		// 客户端请求服务器修改（通过RPC）
@@ -87,4 +88,12 @@ void AMyPlayerCharacter::Server_UpdateAttributes_Implementation(float NewSpeed, 
 void AMyPlayerCharacter::OnRep_MoveSpeed()
 {
 	UE_LOG(LogTemp, Log, TEXT("客户端同步 MoveSpeed：%.1f"), MoveSpeed);
+}
+
+void AMyPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// 记录新客户端登录，传入PlayerController作为PlayerContext
+	MULTI_LOG(FString::Printf(TEXT("PossessedBy：%s"), *this->GetName()), this, this);
 }
