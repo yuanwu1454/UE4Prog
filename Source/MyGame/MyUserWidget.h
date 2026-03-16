@@ -72,6 +72,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Test UMG Meta", meta = (IsBindableEvent))
 	FOnGetCustomText OnGetCustomText;
 
+
+	UFUNCTION(BlueprintCallable)
+	void CloseUI();
+
+
 	
 	UFUNCTION(BlueprintCallable)
 	UWorld* GetSelfWorld();

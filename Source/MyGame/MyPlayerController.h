@@ -22,9 +22,14 @@ public:
 	// 按键 Q 触发的函数（客户端执行）
 	UFUNCTION()
 	void OnTriggerQPressed();
+	void OnOpenMenu();
+
 	virtual void OnPossess(APawn* aPawn) override;
 
 	virtual void OnRep_Pawn();
+	// 假设在PlayerController中定义方法，用于打开UI并设置输入模式
+	void OpenUIAndSetInputMode(UUserWidget* TargetWidget);
+	void EnterGameOnlyInputMode();
 	FString GetPlayerName() const;
 private:
 	// 获取当前操控的 PlayerCharacter

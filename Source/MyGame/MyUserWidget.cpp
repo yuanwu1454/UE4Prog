@@ -9,6 +9,7 @@
 #include "MyBlueprintFunctinLibrary.h"
 #include "MyGameMode.h"
 #include "MyObject.h"
+#include "MyPlayerController.h"
 #include "Components/TextBlock.h"
 #include "Test/PropertyTest.h"
 #include "UOBject/Class.h"
@@ -143,6 +144,18 @@ APlayerController* UMyUserWidget::GetSafePlayerController()
     // if (MyCachedPlayerController) return MyCachedPlayerController;
 
     return PC;
+}
+
+void UMyUserWidget::CloseUI()
+{
+    // 方式1：通过创建UI的OwningPlayer获取（推荐，最安全）
+    if (APlayerController* PC = GetOwningPlayer())
+    {
+        if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC))
+        {
+            MyPC->EnterGameOnlyInputMode();
+        }
+    }
 }
 
 UWorld* UMyUserWidget::GetSelfWorld()
