@@ -54,4 +54,19 @@ public:
 	void OnRep_MoveSpeed();
 
 	virtual void PossessedBy(AController* NewController) override;
+
+	// 打开/关闭技能面板的函数
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OpenSkillPanel();
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void CloseSkillPanel();
+
+	// 技能面板的InputComponent（UI专用）
+	UPROPERTY()
+	UInputComponent* SkillPanelInputComp;
+	// 标记技能面板是否打开
+	bool bIsSkillPanelOpen = false;
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	bool IsSkillKeyPressed(FName KeyName);
 };

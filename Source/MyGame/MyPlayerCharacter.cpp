@@ -3,6 +3,9 @@
 
 #include "MyPlayerCharacter.h"
 
+#include "Components/InputComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerInput.h"
 #include "Log/MultiplayerLogHelper.h"
 #include "Net/UnrealNetwork.h"
 
@@ -97,3 +100,66 @@ void AMyPlayerCharacter::PossessedBy(AController* NewController)
 	// 记录新客户端登录，传入PlayerController作为PlayerContext
 	MULTI_LOG(FString::Printf(TEXT("PossessedBy：%s"), *this->GetName()), this, this);
 }
+
+
+// 打开技能面板
+void AMyPlayerCharacter::OpenSkillPanel()
+{
+	if (!bIsSkillPanelOpen)
+	{
+		bIsSkillPanelOpen = true;
+
+		// 2. 创建UI专用的InputComponent
+		SkillPanelInputComp = NewObject<UInputComponent>(this);
+		SkillPanelInputComp->RegisterComponent(); // 必须注册才能生效
+
+		// 3. 绑定UI的输入响应
+		// 关闭面板（ESC）
+		SkillPanelInputComp->BindAction("CloseSkillPanel", IE_Pressed, this, &AMyPlayerCharacter::CloseSkillPanel);
+
+		// 4. 将UI的InputComponent推到输入栈顶（优先级最高）
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			PC->PushInputComponent(SkillPanelInputComp);
+			UE_LOG(LogTemp, Warning, TEXT("技能面板打开，UI输入组件已置顶"));
+		}
+	}
+}
+
+// 关闭技能面板
+void AMyPlayerCharacter::CloseSkillPanel()
+{
+	if (bIsSkillPanelOpen)
+	{
+		bIsSkillPanelOpen = false;
+
+		// 5. 从输入栈中移除UI的InputComponent
+		if (APlayerController* PC = Cast<APlayerController>(this))
+		{
+			bool bRemoved = PC->PopInputComponent(SkillPanelInputComp);
+			if (bRemoved)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("技能面板关闭，UI输入组件已移除"));
+			}
+		}
+
+		// 销毁UI的InputComponent（可选，也可复用）
+		if (SkillPanelInputComp)
+		{
+			SkillPanelInputComp->UnregisterComponent();
+			SkillPanelInputComp = nullptr;
+		}
+	}
+}
+
+bool AMyPlayerCharacter::IsSkillKeyPressed(FName KeyName)
+{
+	// 1. 从PlayerController获取PlayerInput
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC && PC->PlayerInput)
+	{
+		// 2. 查询指定按键的按下状态（支持动作名/轴名/原始按键名）
+		return PC->PlayerInput->IsPressed(KeyName);
+	}
+	return false;
+}	

@@ -31,6 +31,67 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Permission")
 	bool IsAdmin() const { return bIsAdmin; }
 
+	// 切换图元组件渲染开关（带安全检查）
+	UFUNCTION(BlueprintCallable, Category = "Rendering")
+	void TogglePrimitiveComponentRendering(bool bEnableRender);
+
+	// 获取当前渲染开关状态
+	UFUNCTION(BlueprintPure, Category = "Rendering")
+	bool IsPrimitiveComponentRenderingEnabled() const { return bRenderPrimitiveComponents; }
+
+	
+public:
+	// 重写引擎的虚函数，自定义隐藏Actor逻辑
+	virtual void UpdateHiddenActors(const FVector& ViewLocation) override;
+
+private:
+	// 辅助方法：检测相机是否穿透某个Actor
+	bool IsCameraPenetratingActor(AActor* Actor, const FVector& CameraLocation);
+
+	
+public:
+	/**
+	 * Builds a list of components that are hidden based upon gameplay
+	 * 构建基于游戏玩法需要隐藏的组件列表
+	 * @param ViewLocation the view point to hide/unhide from
+	 *        用于判断隐藏/显示的相机视角位置
+	 * @param HiddenComponents the list to add to/remove from
+	 *        要添加/移除隐藏组件的目标列表（渲染层最终使用的列表）
+ 	 */
+	// 重写组件级隐藏逻辑
+	virtual void UpdateHiddenComponents(const FVector& ViewLocation, TSet<FPrimitiveComponentId>& HiddenComponents) override;
+
+	// 切换光标样式（蓝图可调用）
+	UFUNCTION(BlueprintCallable, Category = "Cursor")
+	void SwitchCursor(EMouseCursor::Type CursorType, TSubclassOf<UUserWidget> CursorWidgetClass);
+	/** Pawn has been possessed, so changing state to NAME_Playing. Start it walking and begin playing with it. */
+	
+	virtual void BeginPlayingState() override;
+
+	/** Leave playing state. */ 
+	virtual void EndPlayingState() override;
+private:
+	// 辅助方法：获取带指定标签的所有PrimitiveComponent
+	void GetComponentsWithTag(FName Tag, TArray<UPrimitiveComponent*>& OutComponents);
+
+	// 可选：根据玩家类型动态调整带宽（比如VIP玩家更高上限）
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void SetDynamicClientCap(int32 NewCap);
+
+
+	
+	virtual void DelayedPrepareMapChange() override;
+
+	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
+
+
+	virtual void SeamlessTravelTo(class APlayerController* NewPC) override;
+	
+	virtual void SeamlessTravelFrom(class APlayerController* OldPC) override;
+
+	virtual void PostSeamlessTravel()override;
+
+	virtual void SendToConsole(const FString& Command) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,9 +99,130 @@ private:
 	// ========== 各类 Router 实例（按业务归类） ==========
 	UPROPERTY()
 	URoomRouter* RoomRouter;
+
 	
 
 	// 玩家权限标识
 	UPROPERTY()
 	bool bIsAdmin = false;
+	// 保存自定义光标Widget实例（避免重复创建）
+	UPROPERTY()
+	UUserWidget* CustomCursorWidget;
 };
+
+// Actor 没有 “原生隐藏属性”，其 “隐藏” 本质是批量控制旗下所有 PrimitiveComponent 的渲染状态；
+// SetActorHiddenInGame是引擎提供的 “快捷方式”，帮你批量修改组件状态 + 同步到HiddenActors列表；
+// 引擎最终的隐藏逻辑（BuildHiddenComponentList），是通过识别组件的渲染状态、并将其加入渲染层的隐藏列表来实现的。
+//
+// UInputComponent 是 “输入响应的执行者”（绑定按键、处理输入），
+// 而 UPlayerInput 是 “输入调度的总管家”—— 它负责接收底层硬件输入（键盘、鼠标、手柄），
+// 并按照输入栈优先级分发给对应的 UInputComponent，是连接硬件输入和逻辑响应的关键桥梁。
+
+// K2_ClientPlayForceFeedback
+// APlayerController 的客户端执行函数，用于在玩家的手柄 / 外设上触发震动效果（比如开枪后手柄震动、被击中时的震动反馈
+// ClientStopForceFeedback
+// 停止所有力反馈
+
+// 只有客户端能调用服务器 RPC（server 标记的函数）；
+// 只有服务器能调用客户端 RPC（client 标记的函数）；
+// 用 HasAuthority() 判断当前是否在服务器端（拥有网络权限）
+
+// NetPlayerIndex
+// NetPlayerIndex 是分屏游戏的核心索引，用于标识同一设备 / 连接下的不同分屏玩家，从 0 开始编号；
+// 核心作用是让 UE4 网络代码匹配 PlayerController 与对应的分屏视口、输入、子连接，避免分屏数据错乱；
+// 开发中可主动利用它做分屏玩家的差异化处理（如不同视口、不同输入绑定），但禁止手动修改该值。
+
+// PendingSwapConnection
+// 场景
+// 分屏玩家切换角色 / 控制权；
+// 玩家断线重连后恢复控制权；
+// 管理员强制切换玩家的控制对象；
+// 多人游戏中 “替补玩家” 接管控制权。
+// 作用 标记旧 PC 需要等待哪个UNetConnection（网络连接）的确认，才能销毁
+// 简单来讲就是告知PC 替换完成 要记得及时清理老pc的作用
+
+// UNetConnection* NetConnection
+// UE4 网络层的核心类，代表一个端到端的网络连接（如客户端↔服务器的 TCP/UDP 连接）
+// 每个 PC（玩家控制器）都会通过这个指针 “绑定” 它对应的网络连接 —— 无论是客户端的 PC，
+// 还是服务器上代表远程玩家的 PC，NetConnection 就是 PC 和网络层之间的 “桥梁”，
+// 负责传递该玩家的所有网络数据（输入、同步、RPC 等）。
+// 其实就是网络连接接口
+
+// DuplicateTransient
+// 是 UPROPERTY 的属性标记（Specifier），专门用于控制 UE4 的Actor / 对象复制（Duplicate）行为
+// 通过 “复制 Actor”（比如 Ctrl+W 复制、代码中调用DuplicateObject/DuplicateActor）时，该属性的值不会被复制到新对象中，
+// 而是保留新对象的默认值（通常是nullptr/0 / 空），核心作用是避免 “复制对象时携带无效 / 冲突的临时数据”。
+
+// Transient
+// 明确告诉 UE4：不要序列化这个属性（优先级最高）；
+// 无 Transient = 让 UE4 根据默认规则判断：是否需要序列化（可能序列化，也可能不序列化）。
+
+// RotationInput
+// 定义旋转控制、修改旋转灵敏度、限制旋转范围：
+// RotationInput 是 PlayerController 中每帧累计旋转输入的临时缓冲区，用 FRotator 存储 Pitch（俯仰）、Yaw（偏航）、Roll（翻滚）的增量值；
+// 核心流程：每帧累加旋转输入 → 处理旋转（更新视角 / 角色朝向） → 清空该变量；
+
+// PlayerTick
+// 场景 1：基础重写（保留引擎默认逻辑 + 自定义扩展）
+// 场景 2：完全自定义 PlayerTick（替换默认旋转 / 移动逻辑）
+
+// PreProcessInput 和 PostProcessInput
+// 是玩家控制器（APlayerController）输入处理流程的 “前置 / 后置钩子函数”，你可以把它们理解为：
+// 输入处理的 “预处理 - 主处理 - 后处理” 三段式流程中，
+// PreProcessInput 是 “输入处理前的准备工作”，PostProcessInput 是 “输入处理后的收尾工作”——
+// 它们围绕 PlayerTick（输入主处理）展开，用于在不修改核心输入逻辑的前提下，灵活扩展输入相关的预处理 / 后处理逻辑。
+
+// GetHitResultAtScreenPosition
+// 点击拾取物体
+
+// ProjectWorldLocationToScreen
+// 就是用来判断是否在视野外的
+
+// PostProcessWorldToScreen 是 UE4/UE5 中 PlayerController 类的虚函数，作用是在 ProjectWorldLocationToScreen 完成 “3D 世界坐标→2D 屏幕坐标” 的投射后，对结果做自定义的后置处理，并最终决定这个投射坐标是否依然有效。
+// 场景 1：给屏幕坐标加固定偏移（比如 UI 图标偏移）
+// 场景 2：强制屏蔽特定区域的投射结果
+// PostProcessWorldToScreen 是投射后的自定义扩展钩子，用于修改投射结果或判定结果有效性；
+
+// UpdateRotation(float DeltaTime)
+// 场景 1：限制玩家视角旋转范围（比如固定视角游戏）
+// 场景 2：自定义旋转速度（比如慢动作视角）
+
+// InputYawScale/InputPitchScale/InputRollScale
+// 是视角旋转的灵敏度缩放系数，
+
+//exec
+// 加了exec的函数 = 代码调用 + 控制台快捷调用，是 UE 调试流程中 “提效神器”
+
+// ClientAddTextureStreamingLoc
+// 是服务器向客户端发送的可靠 RPC，核心作用是指定纹理流送的优先级位置，让客户端优先加载该区域高分辨率纹理；
+// 为啥传位置就能知道纹理呢？
+// 所有需要流送的纹理，都能通过绑定的资源，找到自己在世界中的 “空间范围” —— 这是 “传位置就能关联纹理” 的基础。
+// 位置是 “搜索中心”，引擎按 “距离 + 资源范围” 搜索该中心周围的纹理，再决定加载哪张、加载多高清 —— 这就是 “传位置就能控制纹理加载” 的本质
+// 持续时间 Duration 引擎以这个位置为核心优先加载高分辨率纹理” 的 “有效期”—— 超时后，引擎会自动取消这个位置的优先级，恢复到默认的纹理流送逻辑（以玩家当前视角位置为核心）。
+
+// 都是服务器通知客户端
+// ClientCommitMapChange()：执行由 PrepareMapChange() 准备好的地图切换（真正触发关卡加载 / 跳转）；
+// ClientCancelPendingMapChange()：取消客户端正在等待的地图切换（终止已准备但未执行的关卡跳转）。
+// ClientForceGarbageCollection() 强制客户端在当前 Tick 结束时执行一次垃圾回收（Garbage Collection，简称 GC）
+// ClientFlushLevelStreaming() 指令客户端 “阻塞等待” 所有待处理的关卡流送（Level Streaming）操作完成
+// 这个函数的设计初衷是解决 “玩家加入游戏时关卡流送不同步” 的问题：比如新玩家加入联网游戏时，客户端可能有多个关卡还在 “待加载” 状态，
+// 调用该函数能强制客户端立刻完成这些流送操作，让玩家快速看到完整的游戏场景，而非 “加载一半的残缺场景”。
+//
+// ClientIgnoreLookInput(bool bIgnore)：指令客户端忽略 / 恢复视角控制输入（比如鼠标转动视角、手柄右摇杆操作）；
+// ClientIgnoreMoveInput(bool bIgnore)：指令客户端忽略 / 恢复移动控制输入（比如 WASD、手柄左摇杆、跳跃 / 冲刺）。
+// 场景 1：剧情播放时禁用所有输入，剧情结束后恢复
+// 场景 2：加载关卡时禁用移动，加载完成后恢复
+
+// ClientMessage(const FString& S, FName Type = NAME_None, float MsgLifeTime = 0.f);
+// 服务器指令客户端在 HUD（游戏界面）上显示指定的文本消息，并可自定义消息类型、显示时长
+
+// ClientPlayCameraAnim(class UCameraAnim* AnimToPlay, float Scale=1.f, float Rate=1.f, float BlendInTime=0.f, float BlendOutTime=0.f, bool bLoop=false, bool bRandomStartTime=false, ECameraShakePlaySpace Space=ECameraShakePlaySpace::CameraLocal, FRotator CustomPlaySpace=FRotator::ZeroRotator);
+// 指令客户端在当前玩家相机上播放指定的相机动画（CameraAnim） —— 比如镜头晃动、震动、缩放、旋转等视觉反馈（如开枪后镜头后坐力、爆炸时镜头抖动、剧情中镜头推拉），是实现 “相机动效” 的核心接口。
+// 场景 1：开枪后播放相机后坐力动画（服务器指令）
+// 场景 2：爆炸时播放镜头震动动画（全局推送）
+
+// ClientPlaySound 播放声音
+
+// ClientPrepareMapChange
+// 核心作用是：服务器分批次指令客户端异步加载指定关卡资源，为后续的流式地图切换（Streaming Map Transition）做准备。
+// 这个函数的设计背景是：UE 的 RPC 不支持直接复制动态数组（比如一次性传多个关卡名），因此服务器需要通过 “多次调用该函数（每调用一次传一个关卡名）” 的方式，分批次告知客户端需要加载的所有关卡；同时通过 bFirst/bLast 标记批次的开始 / 结束，让客户端知道何时清空旧列表、何时开始正式准备切换。
