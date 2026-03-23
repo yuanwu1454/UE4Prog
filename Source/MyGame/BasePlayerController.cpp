@@ -77,17 +77,18 @@ void ABasePlayerController::UpdateHiddenActors(const FVector& ViewLocation)
 			// 同步标记Actor为隐藏（核心：修改组件渲染状态）
 			Actor->SetActorHiddenInGame(true);
 
-	CheatClass = UMyCheatManager::StaticClass();
-	
+			CheatClass = UMyCheatManager::StaticClass();
+		}
+	}
 }
-
+		
 void ABasePlayerController::GetLocalPlayerViewport()
 {
 	// 1. 判断Player是否有效，且是本地玩家（ULocalPlayer）
 	if (Player && Player->IsA<ULocalPlayer>())
 	{
 		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
-        
+
 		// 2. 获取该玩家绑定的视口（UGameViewportClient）
 		UGameViewportClient* Viewport = LocalPlayer->ViewportClient;
 		if (Viewport)
@@ -100,8 +101,6 @@ void ABasePlayerController::GetLocalPlayerViewport()
 		}
 	}
 }
-
-
 // 辅助方法：射线检测判断相机是否在Actor碰撞体内
 bool ABasePlayerController::IsCameraPenetratingActor(AActor* Actor, const FVector& CameraLocation)
 {
