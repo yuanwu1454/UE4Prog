@@ -249,6 +249,27 @@ void ABasePlayerController::SendToConsole(const FString& Command)
 	MULTI_LOG(FString::Printf(TEXT("SendToConsole %s"), *Command), this, this);
 }
 
+void ABasePlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest)
+{
+	Super::NotifyLoadedWorld(WorldPackageName, bFinalDest);
+
+	// 第二步：自定义逻辑（根据业务需求扩展）
+	// 1. 打印日志，确认客户端加载完成（调试用）
+
+	MULTI_LOG(FString::Format(TEXT("客户端已加载新地图：%s，是否最终地图：%s"), 
+		{*WorldPackageName.ToString(), bFinalDest ? TEXT("是") : TEXT("否")}), this, this);
+
+	// 2. 如果是最终目标地图，执行初始化逻辑
+	if (bFinalDest)
+	{
+		// 示例1：同步玩家数据（比如血量、道具）
+
+		// 示例2：激活玩家控制权（无缝旅行后可能暂时禁用，需手动开启）
+
+		// 示例3：播放新地图的欢迎剧情/音效
+	}
+}
+
 void ABasePlayerController::SwitchCursor(EMouseCursor::Type CursorType, TSubclassOf<UUserWidget> CursorWidgetClass)
 {
 	if (CursorWidgetClass)

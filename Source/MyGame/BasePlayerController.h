@@ -96,7 +96,8 @@ private:
 
 	bool IsLocalPlayerController();
 	bool IsNetPlayerController();
-
+	
+	virtual void NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -288,3 +289,34 @@ private:
 // 6. UI 与反馈：HUD、鼠标、震动 / 音效等玩家交互反馈；
 // 7. 观战逻辑：专门适配观战模式的视角 / 状态管理；
 // 8. 工具函数：坐标转换、状态查询等通用辅助逻辑。
+
+// exec 函数
+// ServerExec，RestartLevel，FOV，Pause，SetName,SwitchLevel
+
+//  SetPause() 是 PlayerController 的虚函数，核心功能是：
+// 本地暂停游戏（单机 / 客户端），如果是联网游戏会自动调用 ServerPause() 同步到服务端；
+// 最终会调用 GameModeBase::SetPause() 完成实际的暂停逻辑；
+// 返回值 bool 表示暂停 / 恢复操作是否成功（比如游戏已暂停时再次调用暂停会返回 false）。
+
+// void ServerUpdateLevelVisibility(const FUpdateLevelVisibilityLevelInfo& LevelVisibility);
+// 用于客户端告知服务端 “我加载 / 卸载了某个流送关卡”，从而保证服务端只同步客户端可见的 Actor（避免同步客户端未加载的 Actor 导致出错）
+// 监听关卡可见性变化（扩展业务逻辑）
+// ServerUpdateLevelVisibility() 是客户端→服务端的可靠 RPC，引擎自动调用，用于同步流送关卡的可见性状态；
+
+// ServerUpdateMultipleLevelsVisibility（批量版）
+// 无论变更多少关卡，只发 1 次 RPC
+
+// SealedEvent	密封事件：禁止子类重写这个函数（只能重写验证函数或依赖引擎回调）
+
+// ServerVerifyViewTarget 可以重写validation 与implemention
+// 用于客户端向服务端 “确认当前视角目标”，保证联网场景下客户端和服务端的视角目标一致
+
+// ServerViewPrevPlayer，ServerViewNextPlayer， ServerViewSelf
+// 移动视角 可以重写相关函数
+
+// AddYawInput,AddPitchInput,AddRollInput
+
+// SendClientAdjustment ：让服务器向客户端的 Pawn 同步调整数据（比如位置、状态、属性等）
+
+// PreClientTravel(const FString& PendingURL, ETravelType TravelType, bool bIsSeamlessTravel);
+// 专门处理客户端地图 / 服务器跳转前的预处理逻辑：
