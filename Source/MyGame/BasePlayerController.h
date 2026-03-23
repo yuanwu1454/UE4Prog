@@ -92,6 +92,11 @@ private:
 	virtual void PostSeamlessTravel()override;
 
 	virtual void SendToConsole(const FString& Command) override;
+	void GetLocalPlayerViewport();
+
+	bool IsLocalPlayerController();
+	bool IsNetPlayerController();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -226,3 +231,49 @@ private:
 // ClientPrepareMapChange
 // 核心作用是：服务器分批次指令客户端异步加载指定关卡资源，为后续的流式地图切换（Streaming Map Transition）做准备。
 // 这个函数的设计背景是：UE 的 RPC 不支持直接复制动态数组（比如一次性传多个关卡名），因此服务器需要通过 “多次调用该函数（每调用一次传一个关卡名）” 的方式，分批次告知客户端需要加载的所有关卡；同时通过 bFirst/bLast 标记批次的开始 / 结束，让客户端知道何时清空旧列表、何时开始正式准备切换。
+
+// UPlayer* Player 是 APlayerController 中的核心属性，用于关联玩家对象（UPlayer）—— 这个对象是 UE 中连接「玩家控制器（PlayerController）」和「游戏视口 / 输入系统」的桥梁，简单说：
+// APlayerController 负责处理游戏逻辑（如输入响应、角色控制）；
+// UPlayer 负责底层的「玩家身份」管理（如本地玩家 / 联网玩家、视口绑定、输入路由）；
+// 二者通过这个 Player 属性关联，确保输入能准确传递到对应的 PlayerController。
+
+// APawn* AcknowledgedPawn 是 APlayerController 中用于联网游戏的核心属性，作用是：
+// 客户端在「拥有（Possess）某个 Pawn」后，向服务器确认 “已成功接管该 Pawn”，服务器通过这个属性记录「客户端已确认拥有的 Pawn」，确保联网场景下 PlayerController 和 Pawn 的绑定关系在网络两端同步一致。
+// 简单说：
+// 单机游戏中这个属性几乎没用；
+// 联网游戏中，它是 “客户端告知服务器：我已经成功控制这个 Pawn 了” 的 “确认标记”，避免网络延迟导致的控制不同步。
+// AcknowledgedPawn 在所有联网角色（客户端、监听服务器、专用服务器） 上都存在，只是：
+// 客户端：主动设置该值，并向服务器发送确认；
+// 服务器（DS / 监听）：接收客户端的确认后同步设置该值，用于记录 “客户端已确认拥有的 Pawn”。
+
+// AHUD 是传统的 “即时绘制” HUD（通过DrawHUD()方法绘制 2D 图形 / 文字）；
+// UMG 是现代 UI 系统，通常会在 HUD 中创建 UMG 控件（MyHUD中持有 UMG 引用），而非直接用DrawHUD()。
+// MyHUD 是 PlayerController 关联专属 HUD 实例的核心指针，每个玩家独立持有，负责渲染该玩家视角的实时 UI；
+// 无需手动赋值，引擎自动初始化，使用前需做空指针检查并转换为自定义 HUD 类；
+// 联网场景下仅客户端的MyHUD负责绘制，服务器端MyHUD仅作为对象实例存在，无渲染作用。
+
+// bAutoManageActiveCameraTarget
+// 这是 UE 玩家控制器（PlayerController）中控制相机目标自动管理的核心布尔属性，决定了相机目标的控制权是交给引擎自动处理，还是由你手动接管。
+// 自动管理（true）：引擎会自动将相机目标绑定到玩家当前控制的 Pawn（比如玩家角色），相机始终跟随这个 Pawn 移动 / 旋转
+// 手动管理（false）：引擎不再自动更新相机目标，你需要自己指定相机该看向哪里、跟踪哪个对象
+
+
+// BlendedTargetViewRotation
+// 本地玩家的视角旋转是实时更新的，不会有问题
+// 其他玩家的视角旋转需要通过网络从服务器同步到本地客户端
+// 网络数据包不是连续的（有延迟 / 间隔），如果直接使用同步过来的 TargetViewRotation，会导致其他玩家的视角 “一跳一跳” 地变化（抖动）
+// BlendedTargetViewRotation 就是为了解决这个问题，通过插值平滑让旋转变化更自然
+
+
+
+// void AMyCharacter::Tick(float DeltaTime)
+// {
+// 	APlayerController* PC = Cast<APlayerController>(Controller);
+// 	if (PC && PC->WasInputKeyJustPressed(EKeys::Q) && !bSkillOnCooldown)
+// 	{
+// 		CastSkill(); // 仅按下Q且技能冷却完成时释放一次
+// 		StartSkillCooldown();
+// 	}
+// }
+// WasInputKeyJustPressed	仅按键按下的那一帧	跳跃、开火、交互、确认	移动（按住 W 只走一步）
+// IsInputKeyDown	按键持续按住的每一秒	移动、加速、持续瞄准	跳跃（按住空格狂跳）
