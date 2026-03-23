@@ -2,14 +2,14 @@
 
 
 #include "BasePlayerController.h"
-// BasePlayerController.cpp
-#include "BasePlayerController.h"
-
 #include "EngineUtils.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/NetConnection.h"
 #include "Kismet/GameplayStatics.h"
 #include "Log/MultiplayerLogHelper.h"
+#include "MyCheatManager.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/Player.h"
 
 ABasePlayerController::ABasePlayerController()
 {
@@ -76,9 +76,31 @@ void ABasePlayerController::UpdateHiddenActors(const FVector& ViewLocation)
 			HiddenActors.Add(Actor);
 			// 同步标记Actor为隐藏（核心：修改组件渲染状态）
 			Actor->SetActorHiddenInGame(true);
+
+	CheatClass = UMyCheatManager::StaticClass();
+	
+}
+
+void ABasePlayerController::GetLocalPlayerViewport()
+{
+	// 1. 判断Player是否有效，且是本地玩家（ULocalPlayer）
+	if (Player && Player->IsA<ULocalPlayer>())
+	{
+		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+        
+		// 2. 获取该玩家绑定的视口（UGameViewportClient）
+		UGameViewportClient* Viewport = LocalPlayer->ViewportClient;
+		if (Viewport)
+		{
+			// 用途：设置视口分辨率、获取鼠标位置、绑定UI等
+			FVector2D ViewportSize;
+			Viewport->GetViewportSize(ViewportSize);
+			UE_LOG(LogTemp, Log, TEXT("本地玩家视口分辨率：%fx%f"), ViewportSize.X, ViewportSize.Y);
+
 		}
 	}
 }
+
 
 // 辅助方法：射线检测判断相机是否在Actor碰撞体内
 bool ABasePlayerController::IsCameraPenetratingActor(AActor* Actor, const FVector& CameraLocation)
@@ -255,4 +277,16 @@ void ABasePlayerController::EndPlayingState()
 {
 	MULTI_LOG(FString::Printf(TEXT("EndPlayingState")), this, this);
 	Super::EndPlayingState();
+}
+
+bool ABasePlayerController::IsLocalPlayerController()
+{
+	// 核心逻辑：通过Player判断是否为本地玩家
+	return Player != nullptr && Player->IsA<ULocalPlayer>();
+}
+
+bool ABasePlayerController::IsNetPlayerController()
+{
+	// 判断是否为联网玩家（服务器端）
+	return Player != nullptr && Player->IsA<UNetConnection>();
 }
