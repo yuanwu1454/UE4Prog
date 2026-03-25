@@ -3,6 +3,20 @@
 
 void SMyMenuAnchor::Construct(const FArguments& InArgs)
 {
+
+    // 遍历查找你自己的类型
+    // 获取控件的元数据
+    const TArray<TSharedRef<ISlateMetaData>>& MetaData = InArgs.MetaData;
+    for (const auto& MD : MetaData)
+    {
+        if (MD->IsOfType<FMyMetaData>())
+        {
+            TSharedRef<FMyMetaData> MyMD = StaticCastSharedRef<FMyMetaData>(MD);
+            UE_LOG(LogTemp, Log, TEXT("拿到元数据：%s"), *MyMD->CustomInfo);
+            
+        }
+    }
+    
     // 调用父类构造，完全继承原生参数
     SMenuAnchor::Construct(
         SMenuAnchor::FArguments()
