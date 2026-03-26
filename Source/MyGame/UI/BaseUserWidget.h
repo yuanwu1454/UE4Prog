@@ -29,6 +29,7 @@ protected:
 	 * 安全获取当前玩家控制器
 	 * 避免空指针报错
 	 */
+	UFUNCTION(BlueprintCallable, Category = "UI|Base")
 	APlayerController* GetSafePlayerController();
 
 	/**

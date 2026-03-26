@@ -74,19 +74,23 @@ private:
 
 
 // 👇 这是一个可直接运行的测试控件，直接用它即可
+// 👇 这是【最终可运行】的测试控件，空指针彻底修复
 class SMyMenuAnchorTestWidget : public SCompoundWidget
 {
 public:
     SLATE_BEGIN_ARGS(SMyMenuAnchorTestWidget) {}
     SLATE_END_ARGS()
 
+    // ✅【关键】把 MenuAnchor 定义成【类成员变量】，不是局部变量！
+    TSharedPtr<SMyMenuAnchor> MyMenuAnchor;
+
     void Construct(const FArguments& InArgs)
     {
         ChildSlot
         [
-            SNew(SMyMenuAnchor)
-            .MenuContent
-            (
+            // ✅ 直接赋值给 this->MyMenuAnchor
+            SAssignNew(MyMenuAnchor, SMyMenuAnchor)
+            .MenuContent(
                 SNew(SBorder)
                 .BorderBackgroundColor(FColor::Black)
                 .Padding(10)
@@ -95,8 +99,19 @@ public:
                 ]
             )
             [
-                SNew(SButton).Text(FText::FromString(TEXT("点我弹出菜单")))
-            ].AddMetaData(FMyMetaData::Create(TEXT("MyCustomData")))
+                SNew(SButton)
+                .Text(FText::FromString(TEXT("点我弹出菜单")))
+                .OnClicked(FOnClicked::CreateLambda([this]()
+                {
+                    // ✅ 用 this 访问类成员，永远不会空！
+                    if (this->MyMenuAnchor.IsValid())
+                    {
+                        this->MyMenuAnchor->SetIsOpen(true);
+                    }
+                    return FReply::Handled();
+                }))
+            ]
+            .AddMetaData(FMyMetaData::Create(TEXT("MyCustomData")))
         ];
     }
 };

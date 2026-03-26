@@ -23,6 +23,13 @@ public class MyGame : ModuleRules
 			"OnlineSubsystemNull"
 		});
 		
+		// ✨ 优雅的头文件路径配置
+		PublicIncludePaths.AddRange(new[]
+		{
+			ModuleDirectory,
+			Path.Combine(ModuleDirectory, "UI")
+		});
+		
 		// 关键：如果是编辑器模块，添加Editor相关依赖
 		if (Target.bBuildEditor)
 		{

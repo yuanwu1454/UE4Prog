@@ -2,15 +2,19 @@
 
 
 #include "MyBlueprintFunctinLibrary.h"
+
+#include "Slate/MyMenuAnchor.h"
 #include "Test/SharePtrTest.h"
 #include "Widgets/SWindow.h"
 #include "Widgets/Layout/SPopup.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SConstraintCanvas.h"
 
 static TWeakPtr<SWindow> SPopupWeakPtr;
 static TWeakPtr<SWindow> SSimpleWindowWeakPtr;
+TMap<FName, TWeakPtr<SWidget>> UMyBlueprintFunctinLibrary::WidgetCache = {};
 static bool bClickeded = false;
 
 // 创建带边框/关闭按钮的 SPopupWindow
@@ -217,6 +221,47 @@ void UMyBlueprintFunctinLibrary::ShowPopWindow()
 {
     // ShowCustomPopupWindow();
     ShowSimpleWindow();
+}
+
+void UMyBlueprintFunctinLibrary::TestMyMenuAnchor(UWorld* Obj)
+{
+    // 1. 获取 视口客户端
+    UGameViewportClient* ViewportClient = Obj->GetGameViewport();
+    if (!ViewportClient) return;
+
+    FName Key = FName("MyMenu");
+    if (WidgetCache.Contains(Key))
+    {
+        // 2. 再看控件是否有效
+        if (WidgetCache[Key].IsValid())
+        {
+            // 3. 找到了 → 不重复创建
+            UE_LOG(LogTemp, Warning, TEXT("控件已存在"));
+            return;
+        }else
+        {
+            // 控件无效，清理脏数据
+            WidgetCache.Remove(Key);
+        }
+    }
+
+    // 2. 用 SNew 创建你的 Slate 控件
+    TSharedRef<SWidget> MySlateWidget = SNew(SConstraintCanvas)
+        + SConstraintCanvas::Slot()
+    .Offset( FMargin(
+    500,   // X 坐标（左边距）
+    200,   // Y 坐标（上边距）
+    300,   // 宽度
+    150    // 高度
+) ) // X=0, Y=0, W=1920, H=1080
+        [
+        SNew(SMyMenuAnchorTestWidget)
+        ];
+
+    // 3. ✅ 关键：添加到视口（最标准写法）
+    ViewportClient->AddViewportWidgetContent(MySlateWidget, 2);
+
+    WidgetCache.Add(Key, MySlateWidget->AsShared());
 }
 
 
