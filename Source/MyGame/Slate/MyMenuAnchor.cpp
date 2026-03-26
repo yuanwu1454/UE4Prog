@@ -6,8 +6,8 @@ void SMyMenuAnchor::Construct(const FArguments& InArgs)
 
     // 遍历查找你自己的类型
     // 获取控件的元数据
-    const TArray<TSharedRef<ISlateMetaData>>& MetaData = InArgs.MetaData;
-    for (const auto& MD : MetaData)
+    const TArray<TSharedRef<ISlateMetaData>>& MetaDataArr = InArgs.MetaData;
+    for (const auto& MD : MetaDataArr)
     {
         if (MD->IsOfType<FMyMetaData>())
         {

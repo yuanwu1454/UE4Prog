@@ -10,7 +10,7 @@
 void AMyHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	AsyncCreateMainUI();
+	// AsyncCreateMainUI();
 }
 
 void AMyHUD::BeginDestroy()

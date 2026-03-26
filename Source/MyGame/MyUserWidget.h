@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseUserWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "MyUserWidget.generated.h"
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(FString, FOnGetCustomText, int32, InInd
  * 
  */
 UCLASS()
-class MYGAME_API UMyUserWidget : public UUserWidget
+class MYGAME_API UMyUserWidget : public UBaseUserWidget
 {
 	GENERATED_BODY()
 
@@ -22,22 +23,6 @@ class MYGAME_API UMyUserWidget : public UUserWidget
 	virtual void NativeDestruct() override;
 
 private:
-	// ========== 辅助函数 ==========
-	/**
-	 * 切换到UI输入模式（游戏+UI 或 仅UI）
-	 */
-	void SwitchToUIMode();
-
-	/**
-	 * 恢复到游戏输入模式
-	 */
-	void RestoreToGameMode();
-
-	/**
-	 * 安全获取当前玩家控制器
-	 * 避免空指针报错
-	 */
-	APlayerController* GetSafePlayerController();
 
 	// 1. BindWidget：必须绑定，蓝图里必须有同名控件，否则报错
 	UPROPERTY(meta=(BindWidget))
@@ -72,14 +57,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Test UMG Meta", meta = (IsBindableEvent))
 	FOnGetCustomText OnGetCustomText;
 
-
-	UFUNCTION(BlueprintCallable)
-	void CloseUI();
-
-
-	
-	UFUNCTION(BlueprintCallable)
-	UWorld* GetSelfWorld();
 
 private:// 3. 按钮点击事件的回调函数（蓝图也可调用，方便扩展）
     UFUNCTION()  // 必须加UFUNCTION()，否则绑定会失败

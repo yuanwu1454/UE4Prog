@@ -19,8 +19,6 @@ public:
 
     // 你想存的数据
     FString CustomInfo;
-
-private:
     FMyMetaData(const FString& InInfo)
         : CustomInfo(InInfo)
     {}
@@ -30,7 +28,7 @@ private:
  * 自定义 MenuAnchor，完全继承引擎原生 SMenuAnchor
  * 可重写：打开/关闭、菜单位置、菜单逻辑
  */
-class SLATE_API SMyMenuAnchor : public SMenuAnchor
+class MYGAME_API SMyMenuAnchor : public SMenuAnchor
 {
 public:
     SLATE_BEGIN_ARGS(SMyMenuAnchor)
@@ -72,7 +70,6 @@ private:
     // 自定义标记
     bool bIsMyMenuOpening = false;
 };
-
 
 
 
@@ -133,10 +130,6 @@ public:
 // ✔ 提供安全的链式返回 Me()
 // ✔ 提供 AddMetaData 通用功能
 
-
-
-
-
 // template<class DeclarationType>
 // struct NamedSlotProperty
 // {
@@ -179,7 +172,8 @@ public:
 //
 // TAlwaysValidWidget _Content;
 // 返回了一个 NamedSlotProperty 的东西，另外他又重载了[]操作符
-// 所以支持 .Content()  [ 子控件 ] 这样的语法。 
+// 所以支持 * .Content()  [ 子控件 ] *
+// 这样的语法。 
 // 子控件 会被当作 InChild, 将InChild设置成 _Content.Widget
 
 
