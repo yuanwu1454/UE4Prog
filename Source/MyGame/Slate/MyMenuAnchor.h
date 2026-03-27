@@ -91,11 +91,12 @@ public:
 	TSharedPtr<FString> SPStringObject;
 
 public:
-	void Construct(const FArguments& InArgs)
+	void Construct(const FArguments& InArgs, int32 InCustomID)
 	{
 		// 初始化共享指针对象（用于 BindSP 演示）
 		SPStringObject = MakeShared<FString>(TEXT("SP指针提供的文字"));
 
+		UE_LOG(LogTemp, Log, TEXT("InCustomID %d"), InCustomID);
 		ChildSlot
 		[
 			SAssignNew(MyMenuAnchor, SMyMenuAnchor)
@@ -104,7 +105,7 @@ public:
 				// ------------------------------------------------
 				// ✅ 1. TAttribute 固定值
 				// ------------------------------------------------
-				.BorderBackgroundColor(TAttribute<FLinearColor>(FLinearColor::Black))
+				.BorderBackgroundColor(TAttribute<FSlateColor>(FSlateColor(FLinearColor::Black)))
 				.Padding(TAttribute<FMargin>(FMargin(10)))
 				[
 					SNew(STextBlock)
@@ -121,42 +122,42 @@ public:
 				{
 					return FText::FromString(FString::Printf(TEXT("点击: %d"), ClickCount));
 				})
-
+				
 				// ==============================================
 				// ✅ 3. MakeAttributeLambda（最常用）
 				// ==============================================
 				.ForegroundColor(MakeAttributeLambda([this]()
 				{
-					return CurrentHealth < 0.5f ? FLinearColor::Red : FLinearColor::Green;
+					return FSlateColor(CurrentHealth < 0.5f ? FLinearColor::Red : FLinearColor::Green);
 				}))
-
-				// ==============================================
-				// ✅ 4. BindUObject（绑定 UObject/类成员函数）
-				// ==============================================
+				//
+				// // ==============================================
+				// // ✅ 4. BindUObject（绑定 UObject/类成员函数）
+				// // ==============================================
 				.IsEnabled(TAttribute<bool>::Create(
-					TAttribute<bool>::FGetter::CreateUObject(this, &SMyMenuAnchorTestWidget::IsButtonEnabled)
+					TAttribute<bool>::FGetter::CreateSP(this, &SMyMenuAnchorTestWidget::IsButtonEnabled)
 				))
-
-				// ==============================================
-				// ✅ 5. BindRaw（裸指针绑定）
-				// ==============================================
+				
+				// // ==============================================
+				// // ✅ 5. BindRaw（裸指针绑定）
+				// // ==============================================
 				.ToolTipText(MakeAttributeRaw<FText>(this, &SMyMenuAnchorTestWidget::GetToolTipTextRaw))
-				// ==============================================
-				// ✅ 6. BindSP（共享指针 TSharedPtr 绑定）
-				// ==============================================
-				// .ButtonColorAndOpacity(MakeAttributeSP<FLinearColor>(
-				// 	SPStringObject.Get(),
-				// 	&FString::Len // 用长度动态控制透明度)
-				// 	))
-				//
 				// // ==============================================
-				// // ✅ 7. BindStatic（静态函数绑定）
+				// // ✅ 6. BindSP（共享指针 TSharedPtr 绑定）
 				// // ==============================================
-				// .DesiredSizeScale(MakeAttributeStatic<float>(&GetStaticScale))
-				//
-				// // ==============================================
-				// // ✅ 8. 手动创建 TAttribute（完整写法）
-				// // ==============================================
+				// // .ButtonColorAndOpacity(MakeAttributeSP<FLinearColor>(
+				// // 	SPStringObject.Get(),
+				// // 	&FString::Len // 用长度动态控制透明度)
+				// // 	))
+				// //
+				// // // ==============================================
+				// // // ✅ 7. BindStatic（静态函数绑定）
+				// // // ==============================================
+				// // .DesiredSizeScale(MakeAttributeStatic<float>(&GetStaticScale))
+				// //
+				// // // ==============================================
+				// // // ✅ 8. 手动创建 TAttribute（完整写法）
+				// // // ==============================================
 				.ButtonColorAndOpacity_Lambda([this]()
 				{
 					return ClickCount % 2 == 0 ? FLinearColor::Blue : FLinearColor::Yellow;
@@ -166,7 +167,7 @@ public:
 				{
 					if (MyMenuAnchor.IsValid())
 						MyMenuAnchor->SetIsOpen(true);
-
+				
 					ClickCount++;
 					CurrentHealth = 0.3f;
 					CustomTipText = TEXT("已点击！");

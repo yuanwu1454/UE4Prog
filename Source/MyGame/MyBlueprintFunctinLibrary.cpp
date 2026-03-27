@@ -255,7 +255,7 @@ void UMyBlueprintFunctinLibrary::TestMyMenuAnchor(UWorld* Obj)
     150    // 高度
 ) ) // X=0, Y=0, W=1920, H=1080
         [
-        SNew(SMyMenuAnchorTestWidget)
+        SNew(SMyMenuAnchorTestWidget, 30)
         ];
 
     // 3. ✅ 关键：添加到视口（最标准写法）
