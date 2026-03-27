@@ -36,3 +36,4 @@ Saved/
 */Source/ThirdParty/*
 */DerivedDataCache/*
 
+!/Config/**/*.ini
