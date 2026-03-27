@@ -51,6 +51,26 @@ void SMyMenuAnchor::SetIsOpen(bool InIsOpen, const bool bFocusMenu, const int32 
 
     // 必须调用父类，否则菜单无法正常工作
     SMenuAnchor::SetIsOpen(InIsOpen, bFocusMenu, FocusUserIndex);
+    // 1. 使用菜单栈 + 创建新窗口
+    // bUseApplicationMenuStack = true
+    // EPopupMethod::CreateNewWindow
+    // 最常见：编辑器菜单、右键菜单
+    // 独立窗口弹出，由 Slate 全局菜单栈管理
+    // 2. 使用菜单栈 + 复用当前窗口
+    // bUseApplicationMenuStack = true
+    // EPopupMethod::UseCurrentWindow
+    // 不创建窗口，直接作为子控件嵌入
+    // 适合游戏内 UI、层级内弹窗
+    // 3. 不使用菜单栈 + 创建新窗口
+    // bUseApplicationMenuStack = false
+    // EPopupMethod::CreateNewWindow
+    // 自己创建 SWindow，自己管理生命周期
+    // 完全自定义弹窗
+    // 4. 不使用菜单栈 + 复用当前窗口
+    // bUseApplicationMenuStack = false
+    // EPopupMethod::UseCurrentWindow
+    // 嵌入当前窗口，但不进全局菜单栈
+    // 轻量、自定义、独立生命周期
 }
 
 void SMyMenuAnchor::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
