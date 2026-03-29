@@ -13,6 +13,8 @@ UCLASS()
 class MYGAME_API UMyGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+	/** virtual function to allow custom GameInstances an opportunity to set up what it needs */
+	virtual void Init() override;
 	
 	virtual void Shutdown() override;
 };
@@ -50,3 +52,6 @@ class MYGAME_API UMyGameInstance : public UGameInstance
 // FEngineLoop::Init()
 // [/Script/Engine.Engine]
 // GameEngine=/Script/MyGame.MyGameEngine
+
+// UObject 才能用配置文件替换；FSlateApplication 不是 UObject，所以不能。
+// FSlateApplication 不行
