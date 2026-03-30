@@ -72,6 +72,12 @@ void UMyWorldSubsystem::TestWorldSubsystemFunction()
 	UE_LOG(LogTemp, Log, TEXT("调用了自定义世界子系统方法！"));
 }
 
+// ✅ 关键：必须这样写
+TStatId UMyWorldSubsystem::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(UMyWorldSubsystem, STATGROUP_Tickables);
+}
+
 // UWorldSubsystem = 当前地图 / 世界的全局子系统
 // 切换关卡 → 旧世界销毁 → 子系统自动销毁
 // 新世界加载 → 子系统自动重建

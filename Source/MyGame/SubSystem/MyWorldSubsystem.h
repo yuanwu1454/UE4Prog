@@ -27,7 +27,7 @@ protected:
 private:
 	// ==================== FTickableGameObject 必须实现 ====================
 	virtual void Tick(float DeltaTime) override;
-	virtual TStatId GetStatId() const override PURE_VIRTUAL(UMyWorldSubsystem::GetStatId, return TStatId(););
+	virtual TStatId GetStatId() const override;
 	virtual bool IsTickable() const override;
 	virtual bool IsTickableWhenPaused() const override;
 

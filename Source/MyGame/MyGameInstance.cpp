@@ -24,7 +24,7 @@ void UMyGameInstance::Init()
 
 void UMyGameInstance::Shutdown()
 {
-	FModuleManager::Get().UnloadModule("MyGame");
+	// FModuleManager::Get().UnloadModule("MyGame");
 	Super::Shutdown();
 
 	SMySlateWidget::GMySlateWidgetRoot.Reset();

@@ -20,7 +20,8 @@ public class MyGame : ModuleRules
 			"SlateCore",
 			"Slate",
 			"OnlineSubsystem",
-			"OnlineSubsystemNull"
+			"OnlineSubsystemNull",
+			"HeadMountedDisplay",
 		});
 		
 		// ✨ 优雅的头文件路径配置

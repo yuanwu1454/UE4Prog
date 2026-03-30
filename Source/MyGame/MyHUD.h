@@ -17,12 +17,20 @@ class MYGAME_API AMyHUD : public AHUD
 	virtual void BeginDestroy() override;
     // 软引用UI类（蓝图可编辑，路径可配置）
 public:
+
+	AMyHUD();
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     FSoftClassPath MainUISoftClass;
+
+	/** Primary draw call for the HUD */
+	virtual void DrawHUD() override;
 
 	// 异步加载并创建UI（软引用推荐异步加载，避免阻塞主线程）
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void AsyncCreateMainUI();
 	UFUNCTION()
 	void OnWidgetLoaded();
+private:
+	/** Crosshair asset pointer */
+	class UTexture2D* CrosshairTex;
 };
