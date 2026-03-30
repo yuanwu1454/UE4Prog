@@ -200,55 +200,68 @@ void FSlateEventsHelper::OnPreTick(float DeltaTime)
 
 void FSlateEventsHelper::OnPostTick(float DeltaTime)
 {
+	UE_LOG(LogTemp, Log, TEXT("PostTick: %.2f"), DeltaTime);
 }
 
 void FSlateEventsHelper::OnPreShutdown()
 {
+	UE_LOG(LogTemp, Log, TEXT("PreShutdown"));
 }
 
 void FSlateEventsHelper::OnUserRegistered(int32 UserId)
 {
+	UE_LOG(LogTemp, Log, TEXT("UserRegistered: %d"), UserId);
 }
 
 void FSlateEventsHelper::OnWindowBeingDestroyed(const SWindow& Window)
 {
+	UE_LOG(LogTemp, Log, TEXT("WindowBeingDestroyed %s"), *Window.GetTitle().ToString());
 }
 
 void FSlateEventsHelper::OnFocusChanging(const FFocusEvent&, const FWeakWidgetPath&, const TSharedPtr<SWidget>&, const FWidgetPath&, const TSharedPtr<SWidget>&)
 {
+	UE_LOG(LogTemp, Log, TEXT("FocusChanging"));
 }
 
 void FSlateEventsHelper::OnApplicationActivationChanged(bool IsActive)
 {
+	UE_LOG(LogTemp, Log, TEXT("ApplicationActivationChanged: %d"), IsActive);
 }
 
 void FSlateEventsHelper::OnModalLoopTick(float DeltaTime)
 {
+	// UE_LOG(LogTemp, Log, TEXT("ModalLoopTick: %.2f"), DeltaTime);
 }
 
 void FSlateEventsHelper::OnLastUserInteractionTimeUpdate(double NewTime)
 {
+	UE_LOG(LogTemp, Log, TEXT("LastUserInteractionTimeUpdate: %.2f"), NewTime);
 }
 
 bool FSlateEventsHelper::OnWindowAction(const TSharedRef<FGenericWindow>& Win, EWindowAction::Type Act)
 {
+	UE_LOG(LogTemp, Log, TEXT("WindowAction:Act %d"), Act);
 	return false;
 }
 
 #if WITH_EDITOR
 void FSlateEventsHelper::OnApplicationPreInputKeyDown(const FKeyEvent& KeyEvent)
 {
+	UE_LOG(LogTemp, Log, TEXT("ApplicationPreInputKeyDown: %s"), *KeyEvent.GetKey().ToString());
 }
 
 void FSlateEventsHelper::OnApplicationMousePreInputButtonDown(const FPointerEvent& MouseEvent)
 {
+	UE_LOG(LogTemp, Log, TEXT("ApplicationMousePreInputButtonDown: %s"), *MouseEvent.GetEffectingButton().ToString());
 }
 
 void FSlateEventsHelper::OnWindowDPIScaleChanged(TSharedRef<SWindow> Window)
 {
+	UE_LOG(LogTemp, Log, TEXT("WindowDPIScaleChanged: %s"), *Window->GetTitle().ToString());
 }
 
 void FSlateEventsHelper::OnSystemSignalDPIChanged(TSharedRef<SWindow> Window)
 {
+	UE_LOG(LogTemp, Log, TEXT("SystemSignalDPIChanged: %s"), *Window->GetTitle().ToString());
 }
 #endif
