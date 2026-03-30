@@ -53,7 +53,7 @@ void UMyWorldSubsystem::Tick(float DeltaTime)
 	if (TickTimer >= 1.0f)
 	{
 		TickTimer = 0.0f;
-		UE_LOG(LogTemp, Log, TEXT("世界子系统每1秒执行一次！"));
+		// UE_LOG(LogTemp, Log, TEXT("世界子系统每1秒执行一次！"));
 	}
 }
 

@@ -91,6 +91,8 @@ private:
 
 	virtual void PostSeamlessTravel()override;
 
+	virtual void BuildInputStack(TArray<UInputComponent*>& InputStack) override;
+
 	virtual void SendToConsole(const FString& Command) override;
 	void GetLocalPlayerViewport();
 

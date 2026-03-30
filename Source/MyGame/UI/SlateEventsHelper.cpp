@@ -200,7 +200,7 @@ void FSlateEventsHelper::OnPreTick(float DeltaTime)
 
 void FSlateEventsHelper::OnPostTick(float DeltaTime)
 {
-	UE_LOG(LogTemp, Log, TEXT("PostTick: %.2f"), DeltaTime);
+	// UE_LOG(LogTemp, Log, TEXT("PostTick: %.2f"), DeltaTime);
 }
 
 void FSlateEventsHelper::OnPreShutdown()
@@ -235,7 +235,7 @@ void FSlateEventsHelper::OnModalLoopTick(float DeltaTime)
 
 void FSlateEventsHelper::OnLastUserInteractionTimeUpdate(double NewTime)
 {
-	UE_LOG(LogTemp, Log, TEXT("LastUserInteractionTimeUpdate: %.2f"), NewTime);
+	// UE_LOG(LogTemp, Log, TEXT("LastUserInteractionTimeUpdate: %.2f"), NewTime);
 }
 
 bool FSlateEventsHelper::OnWindowAction(const TSharedRef<FGenericWindow>& Win, EWindowAction::Type Act)

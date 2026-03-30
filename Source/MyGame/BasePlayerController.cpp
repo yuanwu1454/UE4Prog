@@ -243,6 +243,13 @@ void ABasePlayerController::PostSeamlessTravel()
 	Super::PostSeamlessTravel();
 }
 
+// 2. PlayerController 会在构建输入栈时，自动加入 Pawn 的 InputComponent
+// 真正的输入栈不是 CurrentInputStack 那一个数组，而是 PlayerController::BuildInputStack() 动态构建的完整栈。
+void ABasePlayerController::BuildInputStack(TArray<UInputComponent*>& InputStack)
+{
+	Super::BuildInputStack(InputStack);
+}
+
 void ABasePlayerController::SendToConsole(const FString& Command)
 {
 	Super::SendToConsole(Command);
