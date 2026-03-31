@@ -11,6 +11,12 @@ void UMyGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// 子系统初始化逻辑
 	UE_LOG(LogTemp, Log, TEXT("UMyGameInstanceSubsystem 初始化成功！"));
 
+	// 顺序依赖
+	
+	// Collection.InitializeDependency(USubsystemA::StaticClass());
+	// // 现在可以安全访问 SubsystemA
+	// USubsystemA* A = GetGameInstance()->GetSubsystem<USubsystemA>();
+	// check(A != nullptr);
 	bIsInitialized = true;
 }
 
