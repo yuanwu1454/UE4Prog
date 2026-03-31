@@ -20,6 +20,9 @@ public:
 	static void ShowPopWindow();
 	UFUNCTION(BlueprintCallable)
 	static void TestMyMenuAnchor(UWorld* Obj);
+
+	UFUNCTION(BlueprintCallable)
+	static void Close(UWorld* Obj);
 	
 	// 静态缓存：保存全局唯一的 Slate 控件（关键）
 	static TMap<FName, TWeakPtr<SWidget>> WidgetCache;

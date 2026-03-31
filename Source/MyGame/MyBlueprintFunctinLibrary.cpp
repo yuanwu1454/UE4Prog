@@ -264,6 +264,11 @@ void UMyBlueprintFunctinLibrary::TestMyMenuAnchor(UWorld* Obj)
     WidgetCache.Add(Key, MySlateWidget->AsShared());
 }
 
+void UMyBlueprintFunctinLibrary::Close(UWorld* Obj)
+{
+    
+}
+
 
 void ShowCustomPopupWindow()
 {

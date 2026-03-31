@@ -37,3 +37,15 @@ Saved/
 */DerivedDataCache/*
 
 !/Config/**/*.ini
+**/[Dd]ebug/
+**/[Rr]elease/
+**/[Ll]ib/
+**/[Ll]ibs/
+**/build/
+**/x64/
+**/x86/
+**/bin/
+**/obj/
+**/ipch/
+**/ThirdParty/
+*.spec.cpp

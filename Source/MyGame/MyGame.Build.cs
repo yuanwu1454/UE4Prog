@@ -21,7 +21,7 @@ public class MyGame : ModuleRules
 			"Slate",
 			"OnlineSubsystem",
 			"OnlineSubsystemNull",
-			"HeadMountedDisplay",
+			"UnLua",
 		});
 		
 		// ✨ 优雅的头文件路径配置

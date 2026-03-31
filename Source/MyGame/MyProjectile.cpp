@@ -92,7 +92,6 @@ UStaticMeshComponent* AMyProjectile::GetStaticMeshComp()
 	// 	if (MyStaticMesh)
 	// 	{
 	// 		UE_LOG(LogTemp, Log, TEXT("A 成功获取蓝图中的StaticMesh: %s"), *MyStaticMesh->GetName());
- //    
 	// 		// 你可以在这里操作它：
 	// 		// MyStaticMesh->SetVisibility(false);
 	// 		// MyStaticMesh->SetStaticMesh(NewMesh);
