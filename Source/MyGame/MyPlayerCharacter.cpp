@@ -268,7 +268,13 @@ void AMyPlayerCharacter::OnFire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// spawn the projectile at the muzzle
-			World->SpawnActor<AMyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			AMyProjectile* SpawnedProjectile = World->SpawnActor<AMyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+			// 生成后 直接调用随机变色！
+			if (IsValid(SpawnedProjectile))
+			{
+				SpawnedProjectile->RandomChangeProjectileColor();
+			}
 		}
 	}
 }

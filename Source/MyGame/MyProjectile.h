@@ -39,4 +39,9 @@ public:
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	class UStaticMeshComponent* GetStaticMeshComp() ;
+
+	// 随机改变子弹颜色（公用接口）
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void RandomChangeProjectileColor();
 };
