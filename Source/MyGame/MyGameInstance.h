@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Global/MyGlobals.h"
 #include "MyGameInstance.generated.h"
 
 /**
@@ -17,6 +18,14 @@ class MYGAME_API UMyGameInstance : public UGameInstance
 	virtual void Init() override;
 	
 	virtual void Shutdown() override;
+public:
+	UPROPERTY(Transient)
+	UMyGlobals* MyGlobalsInstance;
+	// 全局配置类
+	UPROPERTY(Config)
+	TSoftClassPtr<class UMyGlobals> MyGlobalsClass;
+
+	void SetupGlobalsCfgObject();
 };
 
 

@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "UIPageBase.h"
+#include "MyViewControllerPage.h"
 
-void UUIPageBase::Init(UUserWidget* InRootView)
+void UMyViewControllerPage::Init(UUserWidget* InRootView)
 {
 	if (LifeState != EUILifeState::None) return;
 
@@ -11,17 +11,17 @@ void UUIPageBase::Init(UUserWidget* InRootView)
 	OnInit();
 }
 
-void UUIPageBase::Open()
+void UMyViewControllerPage::Show()
 {
 	if (RootView.IsValid())
 	{
 		RootView->SetVisibility(ESlateVisibility::Visible);
 		LifeState = EUILifeState::Visible;
-		OnOpen();
+		OnShow();
 	}
 }
 
-void UUIPageBase::Close()
+void UMyViewControllerPage::Hide()
 {
 	DestroyAllPanels();
 
@@ -31,22 +31,5 @@ void UUIPageBase::Close()
 	}
 
 	LifeState = EUILifeState::Hidden;
-	OnClose();
-}
-
-void UUIPageBase::DestroyPanel(UUIPanelBase* Panel)
-{
-	if (!Panel) return;
-	Panel->Release();
-	Panels.Remove(Panel);
-}
-
-void UUIPageBase::DestroyAllPanels()
-{
-	for (auto& WeakPanel : Panels)
-	{
-		if (WeakPanel.IsValid())
-			WeakPanel->Release();
-	}
-	Panels.Empty();
+	OnHide();
 }

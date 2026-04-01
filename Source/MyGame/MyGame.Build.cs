@@ -28,7 +28,13 @@ public class MyGame : ModuleRules
 		PublicIncludePaths.AddRange(new[]
 		{
 			ModuleDirectory,
-			Path.Combine(ModuleDirectory, "UI")
+			Path.Combine(ModuleDirectory, "UI"),
+			Path.Combine(ModuleDirectory, "Global"),
+			Path.Combine(ModuleDirectory, "Component"),
+			Path.Combine(ModuleDirectory, "Assets"),
+			Path.Combine(ModuleDirectory, "CSV"),
+			Path.Combine(ModuleDirectory, "Log"),
+			Path.Combine(ModuleDirectory, "Slate"),
 		});
 		
 		// 关键：如果是编辑器模块，添加Editor相关依赖

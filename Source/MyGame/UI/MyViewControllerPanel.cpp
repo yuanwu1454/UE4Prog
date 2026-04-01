@@ -1,46 +1,46 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "UIPanelBase.h"
+#include "MyViewControllerPanel.h"
 
-#include "UIPageBase.h"
+#include "MyViewControllerPage.h"
 
-void UUIPanelBase::Init(UUserWidget* InView, UUIPageBase* InOwnerPage)
+void UMyViewControllerPanel::Init(UUserWidget* InView, UMyViewController* InOwnerPage)
 {
 	if (LifeState != EUILifeState::None) return;
 
-	View = InView;
+	RootView = InView;
 	OwnerPage =  InOwnerPage;
 	
 	LifeState = EUILifeState::Initialized;
 	OnInit();
 }
 
-void UUIPanelBase::Release()
+void UMyViewControllerPanel::Release()
 {
 	if (LifeState == EUILifeState::Destroyed) return;
 
 	Hide();
 	OnRelease();
 	LifeState = EUILifeState::Destroyed;
-	View.Reset();
+	RootView.Reset();
 	OwnerPage.Reset();
 }
 
-void UUIPanelBase::Show()
+void UMyViewControllerPanel::Show()
 {
-	if (View.IsValid())
+	if (RootView.IsValid())
 	{
-		View->SetVisibility(ESlateVisibility::Visible);
+		RootView->SetVisibility(ESlateVisibility::Visible);
 		LifeState = EUILifeState::Visible;
 		OnShow();
 	}
 }
 
-void UUIPanelBase::Hide()
+void UMyViewControllerPanel::Hide()
 {
-	if (View.IsValid())
+	if (RootView.IsValid())
 	{
-		View->SetVisibility(ESlateVisibility::Hidden);
+		RootView->SetVisibility(ESlateVisibility::Hidden);
 		LifeState = EUILifeState::Hidden;
 		OnHide();
 	}

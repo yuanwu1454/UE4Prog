@@ -3,51 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyViewController.h"
 #include "UObject/Object.h"
 #include "UICommon.h"
-#include "UIPanelBase.h"
-#include "UIPageBase.generated.h"
+#include "MyViewControllerPanel.h"
+#include "MyViewControllerPage.generated.h"
 
-UCLASS(Abstract)
-class UUIPageBase : public UObject
+UCLASS()
+class UMyViewControllerPage : public UMyViewController
 {
 	GENERATED_BODY()
 
 public:
 	void Init(UUserWidget* InRootView);
-	void Open();
-	void Close();
-
-	template<typename T>
-	T* CreatePanel(TSubclassOf<UUIPanelBase> PanelClass)
-	{
-		if (!PanelClass) return nullptr;
-		T* Panel = NewObject<T>(this, PanelClass);
-		Panels.Add(Panel);
-		return Panel;
-	}
-
-	void DestroyPanel(UUIPanelBase* Panel);
-	void DestroyAllPanels();
-
-	UUserWidget* GetRootView() const { return RootView.Get(); }
-	EUILifeState GetLifeState() const { return LifeState; }
+	void Show();
+	void Hide();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EUILayer Layer = EUILayer::Normal;
 
-protected:
-	virtual void OnInit() {}
-	virtual void OnOpen() {}
-	virtual void OnClose() {}
-
-private:
-	TWeakObjectPtr<UUserWidget> RootView;
-	
-	TArray<TWeakObjectPtr<UUIPanelBase>> Panels;
-
-	EUILifeState LifeState = EUILifeState::None;
 };
 
 // 1. TWeakObjectPtr 支持前置声明
