@@ -11,14 +11,14 @@ UMySingleTableManagerBase::UMySingleTableManagerBase(const FObjectInitializer& O
 UMySingleTableManagerBase* UMySingleTableManagerBase::Get(UClass* Cls)
 {
 	UMyGameData* GameData = UMyGlobals::Get().GetGameData();	
-	// if(const auto SingleTableManager = GameData->GetTableManager(Cls))
-	// {
-	// 	return  SingleTableManager;
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("Failed to load PMDataTableAsset: '%s'!"), *GetNameSafe(Cls));
-	// }
+	if(const auto SingleTableManager = GameData->GetTableManager(Cls))
+	{
+		return  SingleTableManager;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to load PMDataTableAsset: '%s'!"), *GetNameSafe(Cls));
+	}
 	return nullptr;
 }
 

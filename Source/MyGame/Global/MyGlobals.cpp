@@ -42,7 +42,7 @@ UMyGlobals* UMyGlobals::SafeGet()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Retrive MyGlobals faild!GameInstance invalid!"))
+			UE_LOG(LogTemp, Warning, TEXT("Retrive MyGlobals faild!GameInstance invalid!"));
 		}
 	}
 	else
@@ -50,4 +50,9 @@ UMyGlobals* UMyGlobals::SafeGet()
 		UE_LOG(LogTemp, Warning, TEXT("Retrive MyGlobals when GEngine is null"))
 	}
 	return nullptr; 
+}
+
+void UMyGlobals::LoadGameData()
+{
+	GameData->LoadStartupData();
 }

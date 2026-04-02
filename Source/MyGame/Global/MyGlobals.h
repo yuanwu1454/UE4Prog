@@ -21,10 +21,20 @@ public:
 	{
 		return GameData;
 	}
+	void LoadGameData();
+	inline const UMyDataTableAsset* GetTableAsset() const
+	{
+		return GetGameData()->GetTableAsset();
+	}
 
 protected:
 	UPROPERTY()
 	UMyGameData* GameData;
+public:
+	UPROPERTY(config, EditDefaultsOnly, Category = "PM Data Table Asset", meta=(AllowedClasses="PMDataAsset", DisplayName="Data Table Asset"))
+	FSoftObjectPath DataTableAssetRef;
+	UPROPERTY(EditDefaultsOnly, Category = "PM String Table Asset", meta=(AllowedClasses="DataAsset", DisplayName="String Table Asset"))
+	FSoftObjectPath StringTableAsset;
 };
 
 // 二、它在引擎里的真实位置

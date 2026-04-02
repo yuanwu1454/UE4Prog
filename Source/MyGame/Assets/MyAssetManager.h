@@ -16,6 +16,12 @@ class MYGAME_API UMyAssetManager : public UAssetManager
 public:
 	UMyAssetManager();
 	UMyAssetManager(const FObjectInitializer& ObjectInitializer);
+
+	static UMyAssetManager& Get();
+	/** Returns the current AssetManager object */
+
+	// 通过StreamingManager加载(TargetToStream如果存在重定向会改路径)
+	TSharedPtr<FStreamableHandle> RequestSyncLoad(FSoftObjectPath& TargetToStream, bool bManageActiveHandle = false, FString DebugName = TEXT("RequestSyncLoad Single"));
 };
 
 
@@ -34,3 +40,4 @@ public:
 // ScanPrimaryAssetTypesFromConfig：自定义资源扫描
 // GetPackageChunkIds：自定义分包 / DLC 规则
 // Load/Unload/ChangeBundleState：自定义加载逻辑
+

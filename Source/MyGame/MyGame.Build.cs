@@ -35,6 +35,7 @@ public class MyGame : ModuleRules
 			Path.Combine(ModuleDirectory, "CSV"),
 			Path.Combine(ModuleDirectory, "Log"),
 			Path.Combine(ModuleDirectory, "Slate"),
+			Path.Combine(ModuleDirectory, "Assets"),
 		});
 		
 		// 关键：如果是编辑器模块，添加Editor相关依赖

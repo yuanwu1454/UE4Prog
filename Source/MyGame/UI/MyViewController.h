@@ -64,4 +64,6 @@ protected:
 	TArray<TWeakObjectPtr<UMyViewController>> Panels;
 
 	EUILifeState LifeState = EUILifeState::None;
+public:
+	FName PageName = NAME_None;
 };
