@@ -40,20 +40,23 @@ void UMyGameData::LoadStringTable()
 
 void UMyGameData::LoadDataTable()
 {
-	const FSoftObjectPath* DataTableAssetRefToUse = &UMyGlobals::Get().DataTableAssetRef;
-	if (DataTableAssetRefToUse->ToString().Len() > 0)
+	const FSoftObjectPath* DataTableAssetRefToUse = &UMyGlobals::Get().DataTableAsset;
+	if (DataTableAssetRefToUse->IsValid() && DataTableAssetRefToUse->ToString().Len() > 0)
 	{
-		DataTableAsset = LoadObject<UMyDataTableAsset>(NULL, *DataTableAssetRefToUse->ToString(), NULL, LOAD_None, NULL);
+		DataTableAsset = LoadObject<UMyDataTableAsset>(this, *DataTableAssetRefToUse->ToString(), NULL, LOAD_None, NULL);
 	}
 	
 	if (!DataTableAsset)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to load PMDataTableAsset: '%s', game will use inferior default settings!"), *DataTableAssetRefToUse->ToString());
 		// None in ini, so build a default
-		DataTableAsset = NewObject<UMyDataTableAsset>(UMyDataTableAsset::StaticClass());
+		DataTableAsset = NewObject<UMyDataTableAsset>(this);
 	}
 	check(DataTableAsset);
-	DataTableAsset->LoadStartupData();
+	if (DataTableAsset && !DataTableAsset->HasAnyFlags(RF_ClassDefaultObject))
+	{
+		DataTableAsset->LoadStartupData();
+	}
 }
 
 void UMyGameData::InitDataTableManager()

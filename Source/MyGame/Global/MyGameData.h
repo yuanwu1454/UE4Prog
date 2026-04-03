@@ -18,11 +18,11 @@ class MYGAME_API UMyGameData : public UObject
 	GENERATED_BODY()
 
 	// 不可编辑，意味着可以在蓝图中使用，但是也可以通过持久引用对应的资产
-	UPROPERTY()
-	UMyStringTableAsset* StringTableAsset;
-	UPROPERTY()
-	UMyDataTableAsset* DataTableAsset;
-	UPROPERTY()
+	UPROPERTY(Transient)
+	UMyStringTableAsset* StringTableAsset=nullptr;
+	UPROPERTY(Transient)
+	UMyDataTableAsset* DataTableAsset=nullptr;
+	UPROPERTY(Transient)
 	TMap<UClass*, UMySingleTableManagerBase*> DataTableManagersMap;
 public:
 	UMySingleTableManagerBase* RegisterTableManager(UClass* Class);

@@ -16,8 +16,9 @@ class MYGAME_API UMyAssetManager : public UAssetManager
 public:
 	UMyAssetManager();
 	UMyAssetManager(const FObjectInitializer& ObjectInitializer);
-
-	static UMyAssetManager& Get();
+	
+	// 返回指针，不是引用！！！
+	static UMyAssetManager* Get();
 	/** Returns the current AssetManager object */
 
 	// 通过StreamingManager加载(TargetToStream如果存在重定向会改路径)

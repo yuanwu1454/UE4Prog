@@ -6,6 +6,16 @@
 #include "MyGameInstance.h"
 #include "Engine/GameEngine.h"
 
+UMyGlobals::UMyGlobals()
+{
+	UE_LOG(LogTemp, Log, TEXT("UMyGlobals Construct"));
+}
+
+UMyGlobals::UMyGlobals(const FObjectInitializer& ObjectInitializer)
+{
+	UE_LOG(LogTemp, Log, TEXT("UMyGlobals Construct ObjectInitializer"));
+}
+
 UMyGlobals& UMyGlobals::Get()
 {
 #if WITH_EDITOR
@@ -52,7 +62,13 @@ UMyGlobals* UMyGlobals::SafeGet()
 	return nullptr; 
 }
 
-void UMyGlobals::LoadGameData()
+void UMyGlobals::LoadGameData() const
 {
+	UMyGlobals* const MutableThis = const_cast<UMyGlobals*>(this);
+	if (!GameData)
+	{
+		MutableThis->GameData = NewObject<UMyGameData>(UMyGameData::StaticClass());
+	}
+	check(GameData);
 	GameData->LoadStartupData();
 }

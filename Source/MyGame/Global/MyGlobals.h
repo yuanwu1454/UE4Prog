@@ -15,25 +15,28 @@ class MYGAME_API UMyGlobals : public UObject
 {
 	GENERATED_BODY()
 public:
+	UMyGlobals();
+	UMyGlobals(const FObjectInitializer& ObjectInitializer);
 	static UMyGlobals& Get();
 	static UMyGlobals* SafeGet();
-	UMyGameData* GetGameData() const
+	void LoadGameData() const;
+	inline UMyGameData* GetGameData() const
 	{
+		LoadGameData();
 		return GameData;
 	}
-	void LoadGameData();
 	inline const UMyDataTableAsset* GetTableAsset() const
 	{
 		return GetGameData()->GetTableAsset();
 	}
 
 protected:
-	UPROPERTY()
-	UMyGameData* GameData;
+	UPROPERTY(Transient)
+	UMyGameData* GameData=nullptr;
 public:
-	UPROPERTY(config, EditDefaultsOnly, Category = "PM Data Table Asset", meta=(AllowedClasses="PMDataAsset", DisplayName="Data Table Asset"))
-	FSoftObjectPath DataTableAssetRef;
-	UPROPERTY(EditDefaultsOnly, Category = "PM String Table Asset", meta=(AllowedClasses="DataAsset", DisplayName="String Table Asset"))
+	UPROPERTY(config, EditDefaultsOnly, Category = "PM Data Table Asset", meta=(AllowedClasses="MyDataTableAsset", DisplayName="Data Table Asset"))
+	FSoftObjectPath DataTableAsset;
+	UPROPERTY(EditDefaultsOnly, Category = "PM String Table Asset", meta=(AllowedClasses="MyStringTableAsset", DisplayName="String Table Asset"))
 	FSoftObjectPath StringTableAsset;
 };
 
@@ -66,3 +69,28 @@ public:
 // 全局 SDK 初始化（微信、登录、支付、引擎插件）
 // 跨 World 共享数据（不依赖 GameInstance）
 // 底层渲染 / 音频 / 输入全局管理
+
+
+
+// config=Engine DefaultEngine.ini
+// config=Game DefaultGame.ini
+// config=Input DefaultInput.ini
+// UCLASS(config=Game)  // 👈 写这个写入到 DefaultGame.ini
+// class UMyClass : public UObject
+
+// UProperty被globalconfig修饰
+// 2️⃣ globalconfig
+// 例如： UPROPERTY(globalconfig
+// 强制写到 DefaultEngine.ini
+// 不管 config= 写什么，都强制去 DefaultEngine.ini
+
+// defaultconfig
+// 只允许在 DefaultXXX.ini 里编辑
+// 不允许在运行时覆盖，一般和 config=Game 一起用：
+// UCLASS(config=Game, defaultconfig)
+
+// [/Script/ 模块名。类名]
+// 类：UEngine
+// 模块：Engine
+// [/Script/Engine.Engine]
+// [/Script/EngineSettings.GameMapsSettings]

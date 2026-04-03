@@ -7,16 +7,27 @@
 
 UMyAssetManager::UMyAssetManager()
 {
+	UE_LOG(LogTemp, Log, TEXT("UMyAssetManager Construct"));
 }
 
 UMyAssetManager::UMyAssetManager(const FObjectInitializer& ObjectInitializer)
 {
+	UE_LOG(LogTemp, Log, TEXT("UMyAssetManager Construct ObjectInitializer"));
 }
 
-UMyAssetManager& UMyAssetManager::Get()
+// UMyAssetManager& UMyAssetManager::Get()
+// {
+// 	// UMyAssetManager* MyAssetManager = Cast<UMyAssetManager>(&UAssetManager::Get());
+// 	// return *MyAssetManager;
+//
+// 	// ✅ 正确、安全、UE官方标准写法
+// 	return *CastChecked<UMyAssetManager>(UAssetManager::GetIfValid());
+// }
+
+UMyAssetManager* UMyAssetManager::Get()
 {
-	UMyAssetManager* MyAssetManager = Cast<UMyAssetManager>(&UAssetManager::Get());
-	return *MyAssetManager;
+	// 安全获取，可能返回 nullptr
+	return Cast<UMyAssetManager>(UAssetManager::GetIfValid());
 }
 
 

@@ -15,19 +15,22 @@ void UMyDataTableAsset::LoadStartupData()
 	for (auto& SoftObjectPath : StaticLoad)
 	{
 		FSoftObjectPath TmpSOP = SoftObjectPath;
-		TSharedPtr<FStreamableHandle> AssetHandle = UMyAssetManager::Get().RequestSyncLoad(TmpSOP);
-		if (AssetHandle.IsValid())
+		if(auto Ptr = UMyAssetManager::Get())
 		{
-			UDataTable* DataTable;
-			DataTable = Cast<UDataTable>(TmpSOP.ResolveObject());
-			if(DataTable)
+			TSharedPtr<FStreamableHandle> AssetHandle = Ptr->RequestSyncLoad(TmpSOP);
+			if (AssetHandle.IsValid())
 			{
-				DataTables.Emplace(DataTable->GetRowStruct(), DataTable);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to load PMDataTable: '%s'!"), *TmpSOP.ToString());
-			}
+				UDataTable* DataTable;
+				DataTable = Cast<UDataTable>(TmpSOP.ResolveObject());
+				if(DataTable)
+				{
+					DataTables.Emplace(DataTable->GetRowStruct(), DataTable);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Failed to load PMDataTable: '%s'!"), *TmpSOP.ToString());
+				}
+			}	
 		}
 	}
 }
