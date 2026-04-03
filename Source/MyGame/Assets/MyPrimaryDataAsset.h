@@ -29,6 +29,9 @@ public:
 	/** Updates AssetBundleData */
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override;
 #endif
+
+	// UPROPERTY(AssetBundleName = "Skin")
+	// TSoftObjectPtr<UTexture2D> WeaponSkin;
 };
 
 

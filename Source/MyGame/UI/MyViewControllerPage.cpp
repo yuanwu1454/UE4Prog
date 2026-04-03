@@ -2,34 +2,47 @@
 
 #include "MyViewControllerPage.h"
 
-void UMyViewControllerPage::Init(UUserWidget* InRootView)
-{
-	if (LifeState != EUILifeState::None) return;
-
-	RootView = InRootView;
-	LifeState = EUILifeState::Initialized;
-	OnInit();
-}
-
-void UMyViewControllerPage::Show()
-{
-	if (RootView.IsValid())
-	{
-		RootView->SetVisibility(ESlateVisibility::Visible);
-		LifeState = EUILifeState::Visible;
-		OnShow();
-	}
-}
-
-void UMyViewControllerPage::Hide()
-{
-	DestroyAllPanels();
-
-	if (RootView.IsValid())
-	{
-		RootView->SetVisibility(ESlateVisibility::Hidden);
-	}
-
-	LifeState = EUILifeState::Hidden;
-	OnHide();
-}
+// void UMyViewControllerPage::Init(UUserWidget* InRootView)
+// {
+// 	if (LifeState != EUILifeState::None) return;
+//
+// 	RootView = InRootView;
+// 	LifeState = EUILifeState::Initialized;
+// }
+//
+// void UMyViewControllerPage::Show()
+// {
+// 	if (RootView.IsValid())
+// 	{
+// 		RootView->SetVisibility(ESlateVisibility::Visible);
+// 		LifeState = EUILifeState::Visible;
+// 		OnShow();
+// 	}
+// }
+//
+// void UMyViewControllerPage::Close()
+// {
+// 	CloseAllPanels();
+//
+// 	if (RootView.IsValid())
+// 	{
+// 		RootView->SetVisibility(ESlateVisibility::Hidden);
+// 	}
+//
+// 	LifeState = EUILifeState::Close;
+// 	OnClose();
+// }
+//
+//
+// void UMyViewControllerPage::Release()
+// {
+// 	CloseAllPanels();
+//
+// 	if (RootView.IsValid())
+// 	{
+// 		RootView->SetVisibility(ESlateVisibility::Hidden);
+// 	}
+//
+// 	LifeState = EUILifeState::Destroyed;
+// 	OnRelease();
+// }

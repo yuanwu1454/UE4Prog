@@ -11,23 +11,20 @@
 
 class UMyViewControllerPanel;
 /**
- * 
+ * 简单的viewcontroller 暂时只是持有uuserwidget
  */
 UCLASS(Abstract)
 class MYGAME_API UMyViewController : public UObject
 {
 	GENERATED_BODY()
-protected:
-
-	//初始化
-	virtual void OnInit(){}
-	// 显示
-	virtual void OnShow(){}
-	// 隐藏
-	virtual void OnHide(){}
-	virtual void Release(){};
+// protected:
+// 	virtual void OnOpen(){}
+// 	virtual void OnClose(){}	
+// public:
+	// virtual void Init(UUserWidget* InRootView);
+// 	virtual void Open(){};
+// 	virtual void Close(){};
 public:
-	
 	//UObject interface
 	virtual class UWorld* GetWorld() const override;
 
@@ -35,35 +32,35 @@ public:
 	 * Gets the player controller associated with this UI.
 	 * @return The player controller that owns the UI.
 	 */
-	virtual APlayerController* GetOwningPlayer() const;
+	// virtual APlayerController* GetOwningPlayer() const;
 
-	void SetCacheView(UUserWidget* InView);
-	UUserWidget* GetCacheView() const;
-	
-	template<class T>
-	T* GetCacheView()
-	{
-		return Cast<T>(GetCacheView());
-	}
+	// void SetCacheView(UUserWidget* InView);
+	// UUserWidget* GetCacheView() const;
+	//
+	// template<class T>
+	// T* GetCacheView()
+	// {
+	// 	return Cast<T>(GetCacheView());
+	// }
 
-	template<typename T>
-	T* CreatePanel(TSubclassOf<UMyViewController> PanelClass)
-	{
-		if (!PanelClass) return nullptr;
-		T* Panel = NewObject<T>(this, PanelClass);
-		Panels.Add(Panel);
-		return Panel;
-	}
+	// template<typename T>
+	// T* CreatePanel(TSubclassOf<UMyViewController> PanelClass)
+	// {
+	// 	if (!PanelClass) return nullptr;
+	// 	T* Panel = NewObject<T>(this, PanelClass);
+	// 	Panels.Add(Panel);
+	// 	return Panel;
+	// }
 
-	void DestroyPanel(UMyViewControllerPanel* Panel);
-	void DestroyAllPanels();
-	EUILifeState GetLifeState() const { return LifeState; }
-protected:
-	TWeakObjectPtr<UUserWidget> RootView;
+	// void ClosePanel(UMyViewControllerPanel* Panel);
+	// void CloseAllPanels();
 
-	TArray<TWeakObjectPtr<UMyViewController>> Panels;
+	// EUILifeState GetLifeState() const { return LifeState; }
 
-	EUILifeState LifeState = EUILifeState::None;
+	// TArray<TWeakObjectPtr<UMyViewController>> Panels;
+
+	// EUILifeState LifeState = EUILifeState::None;
 public:
 	FName PageName = NAME_None;
+	TWeakObjectPtr<UUserWidget> RootView;
 };

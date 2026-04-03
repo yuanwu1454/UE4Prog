@@ -7,6 +7,68 @@
 #include "TableManager/MyBasicTableManager.h"
 
 
+UMyViewManager* UMyViewManager::Get(const UObject* ContextObject)
+{
+	if (ContextObject)
+	{
+		UWorld* World = ContextObject->GetWorld();
+		if (World && World->GetGameInstance())
+		{
+			return World->GetGameInstance()->GetSubsystem<UMyViewManager>();
+		}
+	}
+	return nullptr;
+}
+
+bool UMyViewManager::ClosePage(const FName& UIName)
+{
+	UMyViewControllerPage* Page = FindPage(UIName);
+	UE_LOG(LogTemp, Log, TEXT("UPMViewManager::ClosePage %s,exist :%d"), *(UIName.ToString()), !!Page);
+	if (Page)
+	{
+		// HideOrClosePageView(Page, true);
+		bool bRet = false;
+		if(Page->RootView.IsValid())
+		{
+			Page->RootView.Get()->RemoveFromViewport();
+			bRet = true;
+		}
+		AllPageLst.Remove(Page);
+		return bRet;
+	}
+	return false;
+}
+
+bool UMyViewManager::HidePage(const FName& UIName)
+{
+	UMyViewControllerPage* Page = FindPage(UIName);
+	UE_LOG(LogTemp, Log, TEXT("UPMViewManager::ClosePage %s,exist :%d"), *(UIName.ToString()), !!Page);
+	if (Page)
+	{
+		if(Page->RootView.IsValid())
+		{
+			Page->RootView.Get()->SetVisibility(ESlateVisibility::Collapsed);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UMyViewManager::ShowPage(const FName& UIName)
+{
+	UMyViewControllerPage* Page = FindPage(UIName);
+	UE_LOG(LogTemp, Log, TEXT("UPMViewManager::ClosePage %s,exist :%d"), *(UIName.ToString()), !!Page);
+	if (Page)
+	{
+		if(Page->RootView.IsValid())
+		{
+			Page->RootView.Get()->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			return true;
+		}
+	}
+	return false;
+}
+
 UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewInstance, UPageOpenData* OpenData)
 {
 	if (UIName == NAME_None)
@@ -45,71 +107,56 @@ UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewIn
     	}
     }
 
-
-	// 查找已经存在的 Page，找到所有的都打开
-	if (!bNewInstance)
+	// 已经存在 直接就展示
+	if (auto ControllerPage = FindPage(UIName))
 	{
-		auto Predicator = [Info](UMyViewControllerPage* Obj)
+		if(ShowPage(UIName))
 		{
-			if (IsValid(Obj))
-			{
-				return Obj->GetClass() == Info->PageClass && Obj->PageName == Info->PageName;
-			}
-			return false;
-		};
+			return ControllerPage;
+		}
+	}
 
-		UMyViewControllerPage** PagePtr = AllPageLst.FindByPredicate(Predicator);
+	TSubclassOf<UUserWidget> ViewClass = LoadClass<UUserWidget>(nullptr, *Info->ViewClass.GetAssetPathName().ToString());
+	UObject* OwningObject = nullptr;
+	UUserWidget* View = CreateWidget(World, ViewClass);
 
-		// if (PagePtr != nullptr && IsValid(*PagePtr))
-		// {
-		// 	CheckOpenedViewReactiveFocus(*PagePtr);
-		// 	if (!IsPageOpening(UIName))
-		// 	{
-		// 		UINameToPageName.Add(UIName, OpenUIName);
-		// 		ShowPageView(*PagePtr);
-		// 		(*PagePtr)->Show(OpenData);
-		// 	}
-		// 	return *PagePtr;
-		// }
+	UE_LOG(LogTemp, Log, TEXT("PMViewManager::OpenPage CreateWidget ViewClass: %s, OwningObject: %s"), *(UIName.ToString()), *GetNameSafe(OwningObject));
+	if (View == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PMViewManager::OpenPage ViewClass Cannot Find %s"), *(UIName.ToString()));
+		return nullptr;
 	}
 	
-	return nullptr;
+	UMyViewControllerPage* ViewController =NewObject<UMyViewControllerPage>(this);
+	if (!ViewController)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PMViewManager::OpenPage Controller Class Cannot Find %s"), *(UIName.ToString()));
+		return nullptr;
+	}
+	View->AddToViewport(Info->Order);
+	AllPageLst.Add(ViewController);
+	return ViewController;
 }
 
 void UMyViewManager::GetUITableRowWithUIName(const FName& UIName, const FMyUITableRow*& Info) const
 {
 	Info = UMyBasicTableManager::GetUITable<FMyUITableRow>(UIName);
 }
-
-bool UMyViewManager::IsPageOpening(FName Name)
-{
-	// if (UMyViewControllerPage* Page = FindPage(InName))
-	// {
-	// 	bool bNeedCheckVisibility = false;
-	// 	if(UPMBaseUserWidget* BaseUserWidget = Cast<UPMBaseUserWidget>(Page->GetCacheView()))
-	// 	{
-	// 		bNeedCheckVisibility = BaseUserWidget->bHideByCollapse;
-	// 	}
-	// 	if(bNeedCheckVisibility == false)
-	// 	{
-	// 		return Page->IsOpening();
-	// 	}
-	// 	else
-	// 	{
-	// 		if(UPMUserWidget* UserWidget = Cast<UPMUserWidget>(Page->GetCacheView()))
-	// 		{
-	// 			return Page->IsOpening() && UserWidget->IsVisibleWithPriority(ESlateVisibilityPriority::HideByCollapse);
-	// 		}
-	// 		else
-	// 		{
-	// 			return Page->IsOpening() && (Page->GetCacheView() && Page->GetCacheView()->IsVisible());
-	// 		}
-	// 	}
-	// }
-	return false;
-}
-
 UMyViewControllerPage* UMyViewManager::FindPage(const FName& UIName) const
 {
+	// Todo: Find all pages if needed.
+	for (UMyViewControllerPage* Page : AllPageLst) 
+	{
+		if (Page && !IsValid(Page))
+		{
+			UE_LOG(LogTemp, Error, TEXT("PMViewManager::FindPage InValid Page When find %s"), *(UIName.ToString()));
+		}
+		// Assume each page will be created only once so the first found page is what we want
+		if (Page && Page->PageName == UIName)
+		{
+			return Page;
+		}
+	}
 	return nullptr;
+
 }

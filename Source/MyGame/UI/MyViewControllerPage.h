@@ -14,14 +14,14 @@ class UMyViewControllerPage : public UMyViewController
 {
 	GENERATED_BODY()
 
-public:
-	void Init(UUserWidget* InRootView);
-	void Show();
-	void Hide();
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EUILayer Layer = EUILayer::Normal;
+// public:
+// 	void Init(UUserWidget* InRootView);
+// 	virtual void Show() override;
+// 	virtual void Close() override;
+// 	virtual void Release() override;
+// public:
+// 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+// 	EUILayer Layer = EUILayer::Normal;
 
 };
 

@@ -25,6 +25,7 @@ public:
 
 
 struct FMyUITableRow;
+class UMyUserWidget;
 /**
  * 
  */
@@ -36,7 +37,8 @@ public:
 	UPROPERTY()
 	TArray<UMyViewControllerPage*> AllPageLst; // 存放所有Page指针,直到退出游戏
 
-
+	UFUNCTION(BlueprintCallable)
+	static UMyViewManager* Get(const UObject* ContextObject);
 	// 打开界面
 	UMyViewControllerPage* OpenPage(const FName& UIName, bool bNewInstance = false, UPageOpenData* OpenData = nullptr);
 	template<class T>
@@ -45,12 +47,15 @@ public:
 		return Cast<T>(OpenPage(UIName, bNewInstance, OpenData));
 	}
 	void GetUITableRowWithUIName(const FName& UIName, const FMyUITableRow*& Info) const;
-	bool IsPageOpening(FName Name);
 	UMyViewControllerPage* FindPage(const FName& UIName) const;
-    
+	
     template<class T>
     T* FindPage(const FName& UIName)
     {
     	return Cast<T>(FindPage(UIName));
     }
+	// 关闭界面 唯一页面
+	bool ClosePage(const FName& UIName);
+	bool HidePage(const FName& UIName);
+	bool ShowPage(const FName& UIName);	
 };

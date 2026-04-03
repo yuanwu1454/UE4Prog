@@ -17,8 +17,7 @@ enum class EUILifeState : uint8
 	None,
 	Initialized,
 	Visible,
-	Hidden,
-	Destroyed
+	Close
 };
 // UI 的业务层次与物理层次
 // 二、为什么大厂 / 规范架构非要加「逻辑 ParentPage」？

@@ -10,18 +10,18 @@ UCLASS()
 class UMyViewControllerPanel : public UMyViewController
 {
 	GENERATED_BODY()
-
-public:
-	void Init(UUserWidget* InView, UMyViewController* InOwnerPage);
-	virtual void Release() override;
-
-	void Show();
-	void Hide();
-	
-	UMyViewController* GetOwnerPage() const { return OwnerPage.Get(); }
-protected:
-	virtual void OnRelease() {}
-
-private:
-	TWeakObjectPtr<UMyViewController> OwnerPage;
+//
+// public:
+// 	void Init(UUserWidget* InView, UMyViewController* InOwnerPage);
+// 	virtual void Release() override;
+//
+// 	void Show();
+// 	void Hide();
+// 	
+// 	UMyViewController* GetOwnerPage() const { return OwnerPage.Get(); }
+// protected:
+// 	virtual void OnRelease() {}
+//
+// private:
+// 	TWeakObjectPtr<UMyViewController> OwnerPage;
 };
