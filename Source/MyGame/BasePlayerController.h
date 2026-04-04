@@ -17,6 +17,9 @@ class MYGAME_API ABasePlayerController : public APlayerController
 public:
 	ABasePlayerController();
 
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void OnApplicationActivationStateChanged(bool bActive);
 	// ========== Router 访问器（对外唯一接口） ==========
 	UFUNCTION(BlueprintCallable, Category = "Router")
 	URoomRouter* GetRoomRouter() const { return RoomRouter; }
@@ -100,8 +103,6 @@ private:
 	bool IsNetPlayerController();
 	
 	virtual void NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest) override;
-protected:
-	virtual void BeginPlay() override;
 
 private:
 	// ========== 各类 Router 实例（按业务归类） ==========
@@ -116,6 +117,8 @@ private:
 	// 保存自定义光标Widget实例（避免重复创建）
 	UPROPERTY()
 	UUserWidget* CustomCursorWidget;
+	FDelegateHandle AppActivatedHandle;
+	void ForceCaptureMouse();
 };
 
 // Actor 没有 “原生隐藏属性”，其 “隐藏” 本质是批量控制旗下所有 PrimitiveComponent 的渲染状态；

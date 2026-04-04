@@ -33,6 +33,8 @@ UCLASS(config=Game)
 class MYGAME_API UMyViewManager : public UMyGameInstanceSubsystem
 {
 	GENERATED_BODY()
+	virtual void OnStartUp() override;
+	virtual void OnShutDown() override;
 public:
 	UPROPERTY()
 	TArray<UMyViewControllerPage*> AllPageLst; // 存放所有Page指针,直到退出游戏
@@ -57,5 +59,6 @@ public:
 	// 关闭界面 唯一页面
 	bool ClosePage(const FName& UIName);
 	bool HidePage(const FName& UIName);
-	bool ShowPage(const FName& UIName);	
+	bool ShowPage(const FName& UIName);
+	bool ProcessKeyEvent(FKey Key, EInputEvent InputEvent);
 };

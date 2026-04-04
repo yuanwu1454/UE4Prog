@@ -71,4 +71,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLuaClose();
 
+public:
+	virtual bool HandleKeyEvent(FKey Key, EInputEvent InputEvent);
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	bool LuaHandleKeyEvent(FKey Key, EInputEvent InputEvent);
+	
+
 };

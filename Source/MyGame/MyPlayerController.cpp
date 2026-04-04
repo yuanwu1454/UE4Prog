@@ -21,7 +21,7 @@ void AMyPlayerController::SetupInputComponent()
 	// 绑定按键 Q 到 OnTriggerQPressed（仅客户端生效）
 	InputComponent->BindAction("TriggerQ", IE_Pressed, this, &AMyPlayerController::OnTriggerQPressed);
 	// 绑定按键（如按ESC打开菜单）
-	InputComponent->BindAction("OpenMenu", IE_Pressed, this, &AMyPlayerController::OnOpenMenu);
+	InputComponent->BindAction("OpenMenu", IE_Released, this, &AMyPlayerController::OnOpenMenu);
 }
 
 // 按键 Q 触发逻辑（客户端执行）
@@ -98,7 +98,7 @@ void AMyPlayerController::OpenUIAndSetInputMode(UUserWidget* TargetWidget)
 	bShowMouseCursor = true;
 
 	// 4. 显示UI（可选，根据你的UI加载逻辑）
-	TargetWidget->AddToViewport();
+	// TargetWidget->AddToViewport();
 }
 
 void AMyPlayerController::EnterGameOnlyInputMode()
@@ -124,6 +124,18 @@ void AMyPlayerController::EnterGameOnlyInputMode()
 	// 		MyPC->RestoreGameInputMode();
 	// 	}
 	// }
+}
+
+void AMyPlayerController::EnterUIOnlyInputMode()
+{
+	FInputModeUIOnly UIOnlyMode;
+
+	// 2. 应用输入模式（核心步骤）
+	SetInputMode(UIOnlyMode);
+    
+	// 3. 可选：隐藏鼠标光标（游戏模式下通常不需要光标）
+	bShowMouseCursor = true;
+
 }
 
 FString AMyPlayerController::GetPlayerName() const

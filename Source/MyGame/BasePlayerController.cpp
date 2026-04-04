@@ -10,6 +10,7 @@
 #include "MyCheatManager.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/Player.h"
+#include "Slate/SceneViewport.h"
 
 ABasePlayerController::ABasePlayerController()
 {
@@ -25,6 +26,20 @@ void ABasePlayerController::BeginPlay()
 	// 初始化所有 Router（绑定 PlayerController）
 	RoomRouter = NewObject<URoomRouter>(this);
 	RoomRouter->Init(this);
+
+	ForceCaptureMouse();
+	
+	FSlateApplication& SlateApp = FSlateApplication::Get();
+	// 焦点
+	AppActivatedHandle = SlateApp.OnApplicationActivationStateChanged().AddUObject(this, &ABasePlayerController::OnApplicationActivationStateChanged);
+}
+
+void ABasePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	FSlateApplication& SlateApp = FSlateApplication::Get();
+	SlateApp.OnApplicationActivationStateChanged().Remove(AppActivatedHandle);
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void ABasePlayerController::TogglePrimitiveComponentRendering(bool bEnableRender)
@@ -277,6 +292,27 @@ void ABasePlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFina
 	}
 }
 
+void ABasePlayerController::ForceCaptureMouse()
+{
+	if (IsLocalPlayerController())
+	{
+
+		// 1. 判断Player是否有效，且是本地玩家（ULocalPlayer）
+		if (Player && Player->IsA<ULocalPlayer>())
+		{
+			ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+
+			// 2. 获取该玩家绑定的视口（UGameViewportClient）
+			UGameViewportClient* Viewport = LocalPlayer->ViewportClient;
+			if (Viewport)
+			{
+				Viewport->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
+				Viewport->SetMouseLockMode(EMouseLockMode::LockInFullscreen);
+			}
+		}
+	}
+}
+
 void ABasePlayerController::SwitchCursor(EMouseCursor::Type CursorType, TSubclassOf<UUserWidget> CursorWidgetClass)
 {
 	if (CursorWidgetClass)
@@ -317,3 +353,17 @@ bool ABasePlayerController::IsNetPlayerController()
 	// 判断是否为联网玩家（服务器端）
 	return Player != nullptr && Player->IsA<UNetConnection>();
 }
+
+void ABasePlayerController::OnApplicationActivationStateChanged(bool bIsActive){
+	if (bIsActive)
+	{
+		// 窗口被激活（切回游戏）
+		UE_LOG(LogTemp, Log, TEXT("游戏窗口获得焦点"));
+	}
+	else
+	{
+		// 窗口失去焦点（切出去）
+		UE_LOG(LogTemp, Log, TEXT("游戏窗口失去焦点"));
+	}
+}
+

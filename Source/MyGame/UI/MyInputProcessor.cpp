@@ -2,7 +2,24 @@
 
 
 #include "MyInputProcessor.h"
+
+#include "MyViewManager.h"
 #include "Framework/Application/SlateApplication.h"
+
+FMyInputProcessor::FMyInputProcessor()
+{
+	ViewManager = nullptr;
+}
+
+FMyInputProcessor::~FMyInputProcessor()
+{
+	ViewManager = nullptr;
+}
+void FMyInputProcessor::SetViewManager(UMyViewManager* InViewManager)
+{
+	ViewManager = InViewManager;
+}
+
 
 void FMyInputProcessor::Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor)
 {
@@ -21,7 +38,19 @@ bool FMyInputProcessor::HandleKeyDownEvent(FSlateApplication& SlateApp, const FK
 
 bool FMyInputProcessor::HandleKeyUpEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent)
 {
-	return false;
+	bool bRet = false;
+	if (!InKeyEvent.GetKey().IsValid())
+	{
+		return bRet;
+	}
+	if(!bRet)
+	{
+		if(ViewManager)
+		{
+			bRet = ViewManager->ProcessKeyEvent(InKeyEvent.GetKey(), IE_Released);
+		}
+	}
+	return bRet;
 }
 
 bool FMyInputProcessor::HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent)

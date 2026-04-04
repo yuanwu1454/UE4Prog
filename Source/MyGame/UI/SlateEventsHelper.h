@@ -12,6 +12,7 @@ public:
 
 	void Initialize();
 	void Shutdown();
+	TSharedPtr<FMyInputProcessor> GetMyInputProcessor();
 
 
 private:

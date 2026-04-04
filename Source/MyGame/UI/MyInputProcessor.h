@@ -8,6 +8,8 @@
 class FMyInputProcessor : public IInputProcessor
 {
 public:
+	FMyInputProcessor();
+	~FMyInputProcessor();
 	virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor) override;
 
 	virtual bool HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent) override;
@@ -19,6 +21,11 @@ public:
 	virtual bool HandleMouseButtonDoubleClickEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override;
 
 	virtual bool HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& WheelEvent, const FPointerEvent* GestureEvent) override;
+	void SetViewManager(class UMyViewManager* InViewManager);
+
+private:
+	class UMyViewManager* ViewManager;
+
 };
 
 // 🔥 UE 有两套完全独立的输入系统！

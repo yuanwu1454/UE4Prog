@@ -12,11 +12,13 @@ void UMyGameInstance::Init()
 {
 	Super::Init();
 
+	FSlateEventsHelper::Get().Initialize();
+	
 	NtySubsystemsStartUp();
 
 	SetupGlobalsCfgObject();
 	
-	FSlateEventsHelper::Get().Initialize();
+
 
 	
 	// 加载你的模块（模块名必须正确）

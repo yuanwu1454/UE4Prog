@@ -85,6 +85,11 @@ void FSlateEventsHelper::Shutdown()
 	SlateApp.UnregisterInputPreProcessor(MyInputProcessor);
 }
 
+TSharedPtr<FMyInputProcessor> FSlateEventsHelper::GetMyInputProcessor()
+{
+	return MyInputProcessor;
+}
+
 void FSlateEventsHelper::RegularQuerySlateApplicationExample()
 {
 	// 常用查询接口（高频）

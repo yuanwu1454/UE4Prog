@@ -5,8 +5,26 @@
 
 #include "BaseUserWidget.h"
 #include "MyUITableRow.h"
+#include "MyUserWidget.h"
+#include "SlateEventsHelper.h"
+#include "Engine/Console.h"
 #include "TableManager/MyBasicTableManager.h"
 
+
+void UMyViewManager::OnStartUp()
+{
+	Super::OnStartUp();
+
+	if(auto MyInputProcessor =  FSlateEventsHelper::Get().GetMyInputProcessor())
+	{
+		MyInputProcessor->SetViewManager(this);
+	}
+}
+
+void UMyViewManager::OnShutDown()
+{
+	Super::OnShutDown();
+}
 
 UMyViewManager* UMyViewManager::Get(const UObject* ContextObject)
 {
@@ -65,6 +83,38 @@ bool UMyViewManager::ShowPage(const FName& UIName)
 		{
 			Page->RootView.Get()->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 			return true;
+		}
+	}
+	return false;
+}
+
+bool UMyViewManager::ProcessKeyEvent(FKey Key, EInputEvent InputEvent)
+{
+#if !UE_BUILD_SHIPPING
+	//ugly code seeing if the console is open
+	if (GetGameInstance())
+	{
+		if (UGameViewportClient* GameViewportClient = GetGameInstance()->GetGameViewportClient())
+		{
+			UConsole* ViewportConsole = GameViewportClient->ViewportConsole;
+			if ( ViewportConsole != nullptr &&  ViewportConsole->ConsoleActive() ) 
+			{
+				return false;
+			}
+		}
+	}
+#endif
+
+	for (auto P : AllPageLst)
+	{
+		if(P->RootView.IsValid() && P->RootView->IsInViewport()&& P->RootView->IsVisible())
+		{
+			UBaseUserWidget* Widget = Cast<UBaseUserWidget>(P->RootView);
+			if(Widget->HandleKeyEvent(Key, InputEvent))
+			{
+				UE_LOG(LogTemp, Log, TEXT("UPMViewManager::ProcessKeyEvent %s Key:%s Event:%d"), *Widget->GetName(), *Key.GetFName().ToString(), InputEvent);
+				return true;
+			}
 		}
 	}
 	return false;
@@ -143,6 +193,8 @@ UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewIn
 			BaseUserWidget->UIName = UIName;
 		}
 	}
+	ViewController->PageName = UIName;
+	ViewController->RootView = View;
 	AllPageLst.Add(ViewController);
 	return ViewController;
 }

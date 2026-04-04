@@ -47,3 +47,24 @@ UWorld* UBaseUserWidget::GetSelfWorld()
 {
 	return GetWorld();
 }
+
+bool UBaseUserWidget::HandleKeyEvent(FKey Key, EInputEvent InputEvent)
+{
+	auto LogHandleEvent = [&](bool Ret, const UBaseUserWidget* Widget)
+	{
+#if !UE_BUILD_SHIPPING && !UE_BUILD_TEST
+		if (Ret)
+		{
+			UE_LOG(LogTemp, Log, TEXT("UPMBaseUserWidget::HandleKeyEvent %s Have Handle Key %s Event:%d"), *Widget->GetName(), *Key.GetFName().ToString(), InputEvent);
+		}
+#endif
+	};
+
+	if (!LuaModuleName.IsEmpty())
+	{
+		const bool bHandleRet = LuaHandleKeyEvent(Key, InputEvent);
+		LogHandleEvent(bHandleRet, this);
+		return bHandleRet;
+	}
+	return false;
+}
