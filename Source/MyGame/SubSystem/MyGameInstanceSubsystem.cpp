@@ -2,6 +2,8 @@
 
 
 #include "MyGameInstanceSubsystem.h"
+
+#include "MyGameInstance.h"
 #include "Engine/GameInstance.h"
 
 void UMyGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -17,7 +19,12 @@ void UMyGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// // 现在可以安全访问 SubsystemA
 	// USubsystemA* A = GetGameInstance()->GetSubsystem<USubsystemA>();
 	// check(A != nullptr);
-	bIsInitialized = true;
+
+
+	if (UMyGameInstance* MyGameinstance = Cast<UMyGameInstance>(GetGameInstance()))
+	{
+		MyGameinstance->RegisterMyGameSubSystemBase(this);
+	}
 }
 
 void UMyGameInstanceSubsystem::Deinitialize()
@@ -26,8 +33,6 @@ void UMyGameInstanceSubsystem::Deinitialize()
 
 	// 子系统销毁/清理逻辑
 	UE_LOG(LogTemp, Log, TEXT("UMyGameInstanceSubsystem 已销毁！"));
-
-	bIsInitialized = false;
 }
 
 bool UMyGameInstanceSubsystem::ShouldCreateSubsystem(UObject* Outer) const

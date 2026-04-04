@@ -7,6 +7,7 @@
 #include "Global/MyGlobals.h"
 #include "MyGameInstance.generated.h"
 
+class UMyGameInstanceSubsystem;
 /**
  * 
  */
@@ -26,6 +27,12 @@ public:
 	TSoftClassPtr<class UMyGlobals> MyGlobalsClass;
 
 	void SetupGlobalsCfgObject();
+	void NtySubsystemsStartUp();
+	void NtySubsystemsShutDown();
+	void RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subsystem);
+	
+	UPROPERTY(Transient)
+    TArray<UMyGameInstanceSubsystem*> CachedRegistedSubsystemArray;
 };
 
 

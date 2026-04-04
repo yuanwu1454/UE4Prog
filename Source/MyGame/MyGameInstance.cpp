@@ -4,12 +4,15 @@
 #include "MyGameInstance.h"
 
 #include "SubSystem/MyDynamicEngineSubsystem.h"
+#include "SubSystem/MyGameInstanceSubsystem.h"
 #include "UI\SlateEventsHelper.h"
 #include "Test/MySlateWidget.h"
 
 void UMyGameInstance::Init()
 {
 	Super::Init();
+
+	NtySubsystemsStartUp();
 
 	SetupGlobalsCfgObject();
 	
@@ -27,7 +30,9 @@ void UMyGameInstance::Init()
 
 void UMyGameInstance::Shutdown()
 {
-	// FModuleManager::Get().UnloadModule("MyGame");
+	NtySubsystemsShutDown();
+	CachedRegistedSubsystemArray.Empty();
+	
 	Super::Shutdown();
 
 	SMySlateWidget::GMySlateWidgetRoot.Reset();
@@ -50,5 +55,30 @@ void UMyGameInstance::SetupGlobalsCfgObject()
 		{
 			UE_LOG(LogTemp, Error, TEXT("can't load pmglobals class %s"), *MyGlobalsClass.ToString());
 		}
+	}
+}
+
+void UMyGameInstance::NtySubsystemsStartUp()
+{
+	for (auto RegistedSubsystem : CachedRegistedSubsystemArray)
+	{
+		RegistedSubsystem->OnStartUp();
+	}
+}
+
+void UMyGameInstance::NtySubsystemsShutDown()
+{
+	for (auto RegistedSubsystem : CachedRegistedSubsystemArray)
+	{
+		RegistedSubsystem->OnShutDown();
+	}
+}
+
+void UMyGameInstance::RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subsystem)
+{
+	if (Subsystem)
+	{
+		UE_LOG(LogTemp, Log, TEXT("PMGameinstanceSubsystem %s Regist!"), *Subsystem->GetName());
+		CachedRegistedSubsystemArray.Add(Subsystem);
 	}
 }

@@ -32,7 +32,9 @@ public:
 
     DECLARE_DELEGATE_RetVal_OneParam(int32, FGenericLuaDelegate, lua_State*);
     DECLARE_DELEGATE_RetVal_FourParams(bool, FCustomLuaFileLoader, UnLua::FLuaEnv&, const FString&, TArray<uint8>&, FString&);
+    DECLARE_DELEGATE_OneParam(FOnCallLuaError, FString&);
 
+    
     static FOnLuaStateCreated OnLuaStateCreated;
     static FOnLuaContextInitialized OnLuaContextInitialized;
     static FOnLuaContextCleanup OnPreLuaContextCleanup;
@@ -47,4 +49,5 @@ public:
     static FGenericLuaDelegate ConfigureLuaGC;
     
     static FCustomLuaFileLoader CustomLoadLuaFile;
+    static FOnCallLuaError CallLuaError;
 };

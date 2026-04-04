@@ -1,0 +1,6 @@
+require("Global.GlobalEnum")
+require("Global.GlobalMgr")
+require("Global.TimerMgr")
+require("Global.DelegateMgr")
+require("Global.FuncUtil")
+

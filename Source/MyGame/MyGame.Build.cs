@@ -22,6 +22,7 @@ public class MyGame : ModuleRules
 			"OnlineSubsystem",
 			"OnlineSubsystemNull",
 			"UnLua",
+			"Lua",
 		});
 		
 		// ✨ 优雅的头文件路径配置

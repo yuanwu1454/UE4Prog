@@ -20,6 +20,9 @@ public:
 	// 必须重写：子系统销毁（相当于 EndPlay）
 	virtual void Deinitialize() override;
 
+	virtual void OnStartUp(){};
+	virtual void OnShutDown(){};
+
 	// 可选重写：控制是否创建这个子系统（比如只在服务器创建）
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
@@ -32,8 +35,4 @@ public:
 	// 示例：获取 GameInstance（引擎自带方法，这里演示用法）
 	UFUNCTION(BlueprintCallable, Category = "My Subsystem")
 	UGameInstance* GetMyGameInstance() const;
-
-private:
-	// 你自己的成员变量
-	bool bIsInitialized = false;
 };
