@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyViewController.h"
+#include "UnLuaInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "BaseUserWidget.generated.h"
 
@@ -10,13 +12,19 @@
  * 
  */
 UCLASS()
-class MYGAME_API UBaseUserWidget : public UUserWidget
+class MYGAME_API UBaseUserWidget : public UUserWidget, public IUnLuaInterface
 {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+	virtual FString GetModuleName_Implementation() const override;
 
+
+
+public:
+	FName UIName;
+	
 protected:
 	// ========== 通用UI辅助函数 ==========
 
@@ -43,4 +51,24 @@ protected:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI|Base")
 	UWorld* GetSelfWorld();
+
+	// Lua文件路径，不需要扩展名
+	UPROPERTY(EditDefaultsOnly, AssetRegistrySearchable, Category = "Config | Lua")
+	FString LuaModuleName;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLuaOpen();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLuaReactiveFocus();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLuaShow();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLuaHide();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLuaClose();
+
 };

@@ -49,3 +49,5 @@ Saved/
 **/ipch/
 **/ThirdParty/
 *.spec.cpp
+
+*.code-workspace

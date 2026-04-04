@@ -57,6 +57,4 @@ function LoginView:OnToggleBtn()
     MyViewManagerInstance:ClosePage("LoginPage")
 end
 
-
-
 return LoginView

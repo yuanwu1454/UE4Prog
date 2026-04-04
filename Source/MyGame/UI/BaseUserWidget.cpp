@@ -14,6 +14,11 @@ void UBaseUserWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+FString UBaseUserWidget::GetModuleName_Implementation() const
+{
+	return this->LuaModuleName;
+}
+
 void UBaseUserWidget::RestoreToGameMode()
 {
 	//

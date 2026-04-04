@@ -3,6 +3,7 @@
 
 #include "MyViewManager.h"
 
+#include "BaseUserWidget.h"
 #include "MyUITableRow.h"
 #include "TableManager/MyBasicTableManager.h"
 
@@ -134,6 +135,14 @@ UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewIn
 		return nullptr;
 	}
 	View->AddToViewport(Info->Order);
+	
+	if (ViewClass && ViewClass->IsChildOf(UBaseUserWidget::StaticClass()))
+	{
+		if(auto BaseUserWidget = Cast<UBaseUserWidget>(View))
+		{
+			BaseUserWidget->UIName = UIName;
+		}
+	}
 	AllPageLst.Add(ViewController);
 	return ViewController;
 }
