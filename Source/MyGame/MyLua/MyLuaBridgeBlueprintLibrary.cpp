@@ -3,6 +3,7 @@
 
 
 #include "MyLogging.h"
+#include "LuaGlobal.h"
 
 void UMyLuaBridgeBlueprintLibrary::Lua_UELOG(uint8 LuaLogLevel, FString Msg)
 {
@@ -37,4 +38,23 @@ void UMyLuaBridgeBlueprintLibrary::Lua_UELOG(uint8 LuaLogLevel, FString Msg)
 	default:
 		break;
 	}
+}
+
+void UMyLuaBridgeBlueprintLibrary::Test()
+{
+	// 无参
+	bool bOK1 = LuaGlobal::CallVoidLua("ShowCommonTip");;
+	if (bOK1)
+	{
+		UE_LOG(LogTemp, Log, TEXT("ShowCommonTip called success"));
+	}
+
+	// 无参
+	int32 number = LuaGlobal::CallLua<int32>("GetNumber");;
+	UE_LOG(LogTemp, Log, TEXT("GetNumber called success %d"), number);
+
+
+	int32 addValue = LuaGlobal::CallLua<int32>("AddNumber", 1, 2);
+	UE_LOG(LogTemp, Log, TEXT("GetNumber called success %d"), addValue);
+	
 }

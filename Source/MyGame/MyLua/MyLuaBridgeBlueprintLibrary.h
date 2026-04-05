@@ -17,4 +17,7 @@ class MYGAME_API UMyLuaBridgeBlueprintLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "Lua")
 	static void Lua_UELOG(uint8 LuaLogLevel, FString Msg);
+
+	UFUNCTION(BlueprintCallable, Category = "Lua")
+	static void Test();
 };

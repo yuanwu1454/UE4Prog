@@ -40,6 +40,7 @@ end
 
 function SettingPage:OnClick1()
     LogInfo(" SettingPage ", "OnClick1");
+    UE4.UMyLuaBridgeBlueprintLibrary.Test()
 end
 
 
@@ -65,6 +66,5 @@ function SettingPage:LuaHandleKeyEvent(Key, InputEvent)
     end
     return false;
 end
-
 
 return SettingPage

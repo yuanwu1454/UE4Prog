@@ -51,4 +51,5 @@ Saved/
 *.spec.cpp
 
 *.code-workspace
+!Content/Script/debug/
 Content/Script/x.code-workspace
