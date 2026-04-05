@@ -7,12 +7,15 @@
 		{
 			"Name": "MyGame",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
 		{
-			"Name": "UnLua",
+			"Name": "UnLuaTestSuite",
 			"Enabled": true
 		}
 	]

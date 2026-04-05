@@ -30,7 +30,7 @@ public:
 	void NtySubsystemsStartUp();
 	void NtySubsystemsShutDown();
 	void RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subsystem);
-	
+	void TestSimpleLuaCall();
 	UPROPERTY(Transient)
     TArray<UMyGameInstanceSubsystem*> CachedRegistedSubsystemArray;
 };

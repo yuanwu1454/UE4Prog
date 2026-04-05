@@ -5,8 +5,9 @@
 
 #include "SubSystem/MyDynamicEngineSubsystem.h"
 #include "SubSystem/MyGameInstanceSubsystem.h"
-#include "UI\SlateEventsHelper.h"
+#include "UI/SlateEventsHelper.h"
 #include "Test/MySlateWidget.h"
+#include "UnLua.h"
 
 void UMyGameInstance::Init()
 {
@@ -17,9 +18,6 @@ void UMyGameInstance::Init()
 	NtySubsystemsStartUp();
 
 	SetupGlobalsCfgObject();
-	
-
-
 	
 	// 加载你的模块（模块名必须正确）
 	FModuleManager::Get().LoadModule("MyGame");
@@ -83,4 +81,27 @@ void UMyGameInstance::RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subs
 		UE_LOG(LogTemp, Log, TEXT("PMGameinstanceSubsystem %s Regist!"), *Subsystem->GetName());
 		CachedRegistedSubsystemArray.Add(Subsystem);
 	}
+}
+
+
+void UMyGameInstance::TestSimpleLuaCall()
+{
+	// 创建 Lua 状态
+	lua_State* L = luaL_newstate();
+	luaL_openlibs(L);
+
+	// 执行一句最简单的 Lua 代码
+	int ret = luaL_dostring(L, "print('Hello from Lua!')");
+
+	if (ret == 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("✅ Lua 运行成功！"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("❌ Lua 运行失败！"));
+	}
+	luaL_newmetatable(L, "zxvxzv");
+	// 关闭
+	lua_close(L);
 }

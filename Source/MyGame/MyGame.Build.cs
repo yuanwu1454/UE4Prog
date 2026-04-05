@@ -21,8 +21,6 @@ public class MyGame : ModuleRules
 			"Slate",
 			"OnlineSubsystem",
 			"OnlineSubsystemNull",
-			"UnLua",
-			"Lua",
 		});
 		
 		// ✨ 优雅的头文件路径配置
@@ -48,6 +46,11 @@ public class MyGame : ModuleRules
 			});
 		}
 		
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"UnLua",
+			"Lua",
+		});
 		
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

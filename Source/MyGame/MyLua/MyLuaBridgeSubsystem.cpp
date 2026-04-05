@@ -6,7 +6,7 @@
 #include "IPlatformFilePak.h"
 
 //###Plugins Include
-#include "UnLua/Public/UnLua.h"
+#include "UnLuaEx.h"
 #include "UnLuaDelegates.h"
 #include "Internationalization/Regex.h"
 #include "HAL/IConsoleManager.h"

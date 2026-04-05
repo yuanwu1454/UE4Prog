@@ -1,0 +1,13 @@
+# 统一所有文本文件用 LF 行尾符
+* text=auto eol=lf
+
+# UE 特定文件，明确为二进制，不做行尾符转换
+*.uasset binary
+*.umap binary
+*.uproject binary
+*.uplugin binary
+*.ini text eol=lf
+*.lua text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.cs text eol=lf
