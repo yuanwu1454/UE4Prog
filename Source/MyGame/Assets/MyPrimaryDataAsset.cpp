@@ -7,7 +7,7 @@ UMyPrimaryDataAsset::UMyPrimaryDataAsset()
 {
 }
 
-UMyPrimaryDataAsset::UMyPrimaryDataAsset(const FObjectInitializer& ObjectInitializer)
+UMyPrimaryDataAsset::UMyPrimaryDataAsset(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 }
 

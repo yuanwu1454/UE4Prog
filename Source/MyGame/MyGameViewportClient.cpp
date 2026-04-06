@@ -12,7 +12,7 @@ UMyGameViewportClient::UMyGameViewportClient()
 	UE_LOG(LogTemp, Log, TEXT("UMyGameViewportClient Construct"));
 }	
 
-UMyGameViewportClient::UMyGameViewportClient(const FObjectInitializer& ObjectInitializer)
+UMyGameViewportClient::UMyGameViewportClient(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	UE_LOG(LogTemp, Log, TEXT("UMyGameViewportClient ObjectInitializer Construct"));
 }

@@ -11,7 +11,7 @@ UMyGlobals::UMyGlobals()
 	UE_LOG(LogTemp, Log, TEXT("UMyGlobals Construct"));
 }
 
-UMyGlobals::UMyGlobals(const FObjectInitializer& ObjectInitializer)
+UMyGlobals::UMyGlobals(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
 	UE_LOG(LogTemp, Log, TEXT("UMyGlobals Construct ObjectInitializer"));
 }

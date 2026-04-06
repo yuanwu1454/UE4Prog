@@ -1,5 +1,6 @@
 ﻿//###First Include
 #include "MyLuaBridgeBlueprintLibrary.h"
+#include "Coroutine/MyCoroutine.h"
 
 
 #include "MyLogging.h"
@@ -48,12 +49,12 @@ void UMyLuaBridgeBlueprintLibrary::Test()
 	{
 		UE_LOG(LogTemp, Log, TEXT("ShowCommonTip called success"));
 	}
-
+	
 	// 无参
 	int32 number = LuaGlobal::CallLua<int32>("GetNumber");;
 	UE_LOG(LogTemp, Log, TEXT("GetNumber called success %d"), number);
-
-
+	
+	
 	int32 addValue = LuaGlobal::CallLua<int32>("AddNumber", 1, 2);
 	UE_LOG(LogTemp, Log, TEXT("GetNumber called success %d"), addValue);
 	
