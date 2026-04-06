@@ -20,7 +20,7 @@ public:
 	TMap<FName,void*> DataMap;
 
 	UPROPERTY()
-	int LuaOpenDataRef;
+	int LuaOpenDataRef=0;
 };
 
 

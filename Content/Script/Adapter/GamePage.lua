@@ -7,6 +7,7 @@ local GamePage = class('GamePage', GamePanel)
 -- 第一次打开
 ---@protected
 function GamePage:OnOpen(luaOpenData, nativeOpenData)
+
 end
 
 ---@protected
@@ -60,15 +61,14 @@ end
 -- 获取Lua传递过来的打数据及原始的数据Opendata
 ---@protected
 function GamePage:GetOpenData()
-    -- local openData = self:NativeGetOpenData()
-    -- LogDebug('GamePage', 'NativeGetOpenData Result %s', tostring(openData))
-    -- if (not self.luaData) then
-    --     if (openData and openData.LuaOpenDataRef) then
-    --         self.luaData = UE4.LuaBridge.LuaGetRefObject(openData.LuaOpenDataRef)
-    --     end
-    -- end
-    -- return self.luaData, openData
-    return nil, nil
+    local openData = self:NativeGetOpenData()
+    LogDebug('GamePage', 'NativeGetOpenData Result %s', tostring(openData))
+    if (not self.luaData) then
+        if (openData and openData.LuaOpenDataRef) then
+            self.luaData = UE4.LuaBridge.LuaGetRefObject(openData.LuaOpenDataRef)
+        end
+    end
+    return self.luaData, openData
 end
 
 
@@ -76,7 +76,14 @@ end
 ---@private
 function GamePage:OnLuaOpen()
     LogDebug('GamePage', 'OnLuaOpen')
+
+
+
     local luaData, originOpenData = self:GetOpenData()
+    local openStr = tostring(self.__cname) .. "OnLuaOpen"
+    table.print(luaData, openStr)
+    print("originOpenData", originOpenData)
+
     self:NotifyMediatorsPreOpenEvent(luaData, originOpenData)
     self:OnOpen(luaData, originOpenData)
     self:NotifyMediatorsPostOpenEvent(luaData, originOpenData)

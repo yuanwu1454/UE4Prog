@@ -12,11 +12,14 @@ end
 
 
 function SettingPage:Construct()
+    print("SettingPage Construct")
     SuperClass.Construct(self)
     self:CreateBindEvent("Button_Click1", "OnClicked", "OnClick1")
     self:CreateBindEvent("Button_Click2", "OnClicked", "OnClick2")
     self:CreateBindEvent("Button_Click3", "OnClicked", "OnClick3")
-    self:CreateBindEvent("Button_Close", "OnClicked", "OnCloseClick")
+    self.WBP_HotKey:SetClickFunc(function()
+        self:OnCloseClick()
+    end)
 
     local player = LuaGetPlayerController()
     if player then
@@ -35,6 +38,9 @@ function SettingPage:Destruct()
     if player then
         player:EnterGameOnlyInputMode()
     end
+end
+
+function SettingPage:OnOpen(luaData, originOpenData)
 end
 
 
@@ -60,11 +66,13 @@ end
 
 
 function SettingPage:LuaHandleKeyEvent(Key, InputEvent)
-    if Key.KeyName == "Escape" and InputEvent == UE4.EInputEvent.IE_Released then
-        self:OnCloseClick()
-        return true;
+    if self.WBP_HotKey then
+        local bRet = self.WBP_HotKey:MonitorKeyDown(Key, InputEvent)
+        if bRet then
+            return true
+        end
     end
-    return false;
+    return false
 end
 
 return SettingPage

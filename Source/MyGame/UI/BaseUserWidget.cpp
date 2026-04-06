@@ -68,3 +68,14 @@ bool UBaseUserWidget::HandleKeyEvent(FKey Key, EInputEvent InputEvent)
 	}
 	return false;
 }
+
+void UBaseUserWidget::OnOpen(UPageOpenData* OpenData)
+{
+	this->PageOpenData = OpenData;
+	OnLuaOpen();
+}
+
+UPageOpenData* UBaseUserWidget::NativeGetOpenData()
+{
+	return PageOpenData;
+}

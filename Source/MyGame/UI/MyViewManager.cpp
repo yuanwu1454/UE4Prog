@@ -191,6 +191,7 @@ UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewIn
 		if(auto BaseUserWidget = Cast<UBaseUserWidget>(View))
 		{
 			BaseUserWidget->UIName = UIName;
+			BaseUserWidget->OnOpen(OpenData);
 		}
 	}
 	ViewController->PageName = UIName;

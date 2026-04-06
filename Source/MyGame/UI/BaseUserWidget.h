@@ -6,6 +6,7 @@
 #include "MyViewController.h"
 #include "UnLuaInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "MyViewManager.h"
 #include "BaseUserWidget.generated.h"
 
 /**
@@ -76,6 +77,13 @@ public:
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	bool LuaHandleKeyEvent(FKey Key, EInputEvent InputEvent);
-	
+
+public:
+	virtual void OnOpen(UPageOpenData* OpenData = nullptr);
+	UFUNCTION()
+	UPageOpenData* NativeGetOpenData();
+private:
+	UPROPERTY(Transient)
+	UPageOpenData* PageOpenData;
 
 };

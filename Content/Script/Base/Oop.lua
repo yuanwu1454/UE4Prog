@@ -28,7 +28,6 @@ local function clone(other)
     return _copy(other)
 end
 
-
 function class(classname, super)
 	local superType = type(super)
 	local cls
@@ -81,6 +80,12 @@ function class(classname, super)
 			return instance
 		end
 	end
+
+	-- 🔥 全局统一添加 GetName 方法（所有类都会拥有）
+	function cls:GetName()
+		return tostring(self.__cname)
+	end
+
 	return cls
 end
 
