@@ -12,8 +12,11 @@ function DragItem:Destruct()
     SuperClass.Destruct(self)
 end
 
+
+
 function DragItem:OnDragDetected(MyGeometry, MouseEvent, Operation)
-    local dropOperation = UE4.UWidgetBlueprintLibrary.CreateDragDropOperation()
+    local OperationClass = FuncUtil:LoadClass('/Game/UI/MyDragDropOperation_BP.MyDragDropOperation_BP')
+    local dropOperation = UE4.UWidgetBlueprintLibrary.CreateDragDropOperation(OperationClass)
     dropOperation.Pivot = UE4.EDragPivot.CenterCenter
     dropOperation.DefaultDragVisual = self.Image_Drop
     dropOperation.Payload = self
@@ -29,18 +32,25 @@ end
 
 function DragItem:OnDragEnter(MyGeometry, PointerEvent, Operation)
     print("DragItem OnDragEnter")
+    print("Operation ItemID ", Operation.ItemID)
 end
 
 function DragItem:OnDragLeave(PointerEvent, Operation)
     print("DragItem OnDragLeave")
+    print("Operation ItemID ", Operation.ItemID)
 end
 
-function DragItem:OnDragDropOver(MyGeometry, PointerEvent, Operation)
-    print("DragItem OnDragDropOver")
+function DragItem:OnDragOver(MyGeometry, PointerEvent, Operation)
+    print("DragItem OnDragOver")
+    -- 返回true 表示告诉引擎 不需要处理了 
+    -- 返回false 表示告诉引擎 要处理了
+    return true
 end
 
 function DragItem:OnDrop(MyGeometry, PointerEvent, Operation)
     print("DragItem OnDrop")
+    -- 返回true 表示告诉引擎 不需要处理了 
+    -- 返回false 表示告诉引擎 要处理了
     return true
 end
 
