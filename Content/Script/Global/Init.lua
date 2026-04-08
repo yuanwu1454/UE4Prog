@@ -3,4 +3,5 @@ require("Global.GlobalMgr")
 require("Global.TimerMgr")
 require("Global.DelegateMgr")
 require("Global.FuncUtil")
+require("Global.ConfigMgr")
 

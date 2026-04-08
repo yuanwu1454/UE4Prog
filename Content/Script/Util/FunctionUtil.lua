@@ -583,25 +583,25 @@ end
 ---获取服务器当前时间戳，以UTC+0时区为准
 ---@return number Unix时间戳
 function FunctionUtil:GetServerTime()
-    return UE4.UPMLuaBridgeBlueprintLibrary.GetServerTime()
+    return UE4.UMyLuaBridgeBlueprintLibrary.GetServerTime()
 end
 
 ---获取当地时区的当前时间戳，根据服务器时间加客户端当前时区偏移计算得到
 ---@return number Unix时间戳
 function FunctionUtil:GetLocalizeTime()
-    return UE4.UPMLuaBridgeBlueprintLibrary.GetLocalizeTime()
+    return UE4.UMyLuaBridgeBlueprintLibrary.GetLocalizeTime()
 end
 
 ---获得本地时区与UTC时差Unix时间偏移(秒)
 ---@return number 秒数
 function FunctionUtil:GetTimeZoneOffset()
-    return UE4.UPMLuaBridgeBlueprintLibrary.GetTimeZoneOffset()
+    return UE4.UMyLuaBridgeBlueprintLibrary.GetTimeZoneOffset()
 end
 
 ---根据Unix时间戳返回FDateTime时间结构
 ---@return FDateTime UE时间结构
 function FunctionUtil:GetDateTimeFromUnix(timestamp)
-    return UE4.UPMLuaBridgeBlueprintLibrary.GetDateTimeFromUnix(timestamp)
+    return UE4.UMyLuaBridgeBlueprintLibrary.GetDateTimeFromUnix(timestamp)
 end
 
 ---根据Unix时间戳返回FTimespan时间差（EndTime-StartTime）
@@ -613,7 +613,7 @@ function FunctionUtil:GetTimeSpanFromUnix(startTime, endTime)
         endTime = startTime
         startTime = 0
     end
-    return UE4.UPMLuaBridgeBlueprintLibrary.GetTimeSpanFromUnix(startTime, endTime)
+    return UE4.UMyLuaBridgeBlueprintLibrary.GetTimeSpanFromUnix(startTime, endTime)
 end
 
 ---根据Unix时间戳返回日期文本
@@ -624,7 +624,7 @@ function FunctionUtil:FormatAsDate(timestamp, dateStyle)
     if type(timestamp) == "number" then
         timestamp = FunctionUtil:GetDateTimeFromUnix(timestamp)
     end
-    return UE4.UPMLuaBridgeBlueprintLibrary.FormatAsDate(timestamp, dateStyle or 0)
+    return UE4.UMyLuaBridgeBlueprintLibrary.FormatAsDate(timestamp, dateStyle or 0)
 end
 
 ---根据Unix时间戳返回日期时间文本
@@ -634,7 +634,7 @@ function FunctionUtil:FormatAsDateTime(timestamp, dateStyle, timeStyle)
     if type(timestamp) == "number" then
         timestamp = FunctionUtil:GetDateTimeFromUnix(timestamp)
     end
-    return UE4.UPMLuaBridgeBlueprintLibrary.FormatAsDateTime(timestamp, dateStyle or 0, timeStyle or 0)
+    return UE4.UMyLuaBridgeBlueprintLibrary.FormatAsDateTime(timestamp, dateStyle or 0, timeStyle or 0)
 end
 
 ---根据Unix时间戳返回时间文本
@@ -644,7 +644,7 @@ function FunctionUtil:FormatAsTime(timestamp, timeStyle)
     if type(timestamp) == "number" then
         timestamp = FunctionUtil:GetDateTimeFromUnix(timestamp)
     end
-    return UE4.UPMLuaBridgeBlueprintLibrary.FormatAsTime(timestamp, timeStyle or 0)
+    return UE4.UMyLuaBridgeBlueprintLibrary.FormatAsTime(timestamp, timeStyle or 0)
 end
 
 ---根据时间差返回时长文本
@@ -842,4 +842,4 @@ function FunctionUtil:CheckCanPlayAvg()
     return canPlay
 end
 
-return FunctionUtil
+_G.FunctionUtil = FunctionUtil

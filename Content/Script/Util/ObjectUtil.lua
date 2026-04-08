@@ -93,5 +93,5 @@ function ObjectUtil.GetTextFromFormatByST(STPathID, STPathKey, stringMap, useNum
     return self:GetTextFromFormat(formatString, stringMap, useNumberArgs)
 end
 
--- return ObjectUtil
-_G.Load = Load
+
+_G.ObjectUtil = ObjectUtil

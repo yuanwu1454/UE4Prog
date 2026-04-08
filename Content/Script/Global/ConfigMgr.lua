@@ -59,7 +59,7 @@ local function GetTableRowCached(tableRowStructName)
     if (cachedData[tableRowStructName]) then
         return cachedData[tableRowStructName]
     end
-    local loadFunc = UE4.UPMLuaBridgeBlueprintLibrary.GetConfigDataTable
+    local loadFunc = UE4.UMyLuaBridgeBlueprintLibrary.GetConfigDataTable
     local data = loadFunc(tableRowStructName)
     if (not data) then
         -- LogError('Config', 'No TableRowLoad for %s', tableRowStructName)
@@ -95,8 +95,7 @@ end
 
 --获取UI类型配置数据
 function ConfigMgr:GetUITableRows()
-	return GetTableRowCached('CyUITableRow')
+	return GetTableRowCached('MyUITableRow')
 end
 
 _G.ConfigMgr = ConfigMgr
-return ConfigMgr
