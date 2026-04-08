@@ -31,6 +31,7 @@ void FLuaProtobufModule::ShutdownModule()
 
 void FLuaProtobufModule::OnLuaEnvCreated(UnLua::FLuaEnv& Env)
 {
+    // 此处进行的pb注册，所以ue4 的lua环境能够使用pb
     Env.AddBuiltInLoader(TEXT("pb"), luaopen_pb);
     Env.AddBuiltInLoader(TEXT("pb.unsafe"), luaopen_pb_unsafe);
     Env.DoString("UnLua.PackagePath = UnLua.PackagePath .. ';/Plugins/UnLuaExtensions/LuaProtobuf/Content/Script/?.lua'");
