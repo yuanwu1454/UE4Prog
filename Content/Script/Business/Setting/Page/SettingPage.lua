@@ -56,6 +56,9 @@ end
 
 function SettingPage:OnClick3()
     LogInfo(" SettingPage ", "OnClick3");
+
+    local M = require("LuaProto/test")
+    M.Test()
 end
 
 function SettingPage:OnCloseClick()
