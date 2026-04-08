@@ -8,6 +8,7 @@
 #include "MyGameInstance.generated.h"
 
 class UMyGameInstanceSubsystem;
+class UGlobalStateMachine;
 /**
  * 
  */
@@ -30,9 +31,24 @@ public:
 	void NtySubsystemsStartUp();
 	void NtySubsystemsShutDown();
 	void RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subsystem);
-	void TestSimpleLuaCall();
 	UPROPERTY(Transient)
-    TArray<UMyGameInstanceSubsystem*> CachedRegistedSubsystemArray;
+    TArray<UMyGameInstanceSubsystem*> CachedRegisterSubsystemArray;
+
+
+	UPROPERTY()
+	UGlobalStateMachine* GlobalStateMachine;
+	UPROPERTY(Config)
+	FSoftObjectPath GlobalStateMachineAsset;
+	
+	UGlobalStateMachine* GetGlobalStateMachine() const {return GlobalStateMachine;}
+
+
+	FTickerDelegate TickDelegate;
+	FDelegateHandle TickDelegateHandle;
+	bool Tick(float DeltaSeconds);
+
+	void GotoLoginScene();
+	void GotoLobbyScene();
 };
 
 

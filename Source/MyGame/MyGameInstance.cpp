@@ -3,17 +3,31 @@
 
 #include "MyGameInstance.h"
 
+#include "MyViewManager.h"
 #include "SubSystem/MyDynamicEngineSubsystem.h"
 #include "SubSystem/MyGameInstanceSubsystem.h"
 #include "UI/SlateEventsHelper.h"
 #include "Test/MySlateWidget.h"
-#include "UnLua.h"
+#include "Base/StateMachine/GlobalStateMachine.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMyGameInstance::Init()
 {
 	Super::Init();
 
+
+	TickDelegate = FTickerDelegate::CreateUObject(this, &UMyGameInstance::Tick);
+	TickDelegateHandle = FTicker::GetCoreTicker().AddTicker(TickDelegate);
+
 	FSlateEventsHelper::Get().Initialize();
+	
+	// 创建全局状态机
+    const UClass* SMClass = LoadClass<UObject>(nullptr, *GlobalStateMachineAsset.ToString());
+    if (SMClass)
+    {
+    	GlobalStateMachine = NewObject<UGlobalStateMachine>(this, SMClass);
+    	GlobalStateMachine->Start();
+    }
 	
 	NtySubsystemsStartUp();
 
@@ -30,11 +44,18 @@ void UMyGameInstance::Init()
 
 void UMyGameInstance::Shutdown()
 {
+
+	FTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 	NtySubsystemsShutDown();
-	CachedRegistedSubsystemArray.Empty();
+	CachedRegisterSubsystemArray.Empty();
 	
 	Super::Shutdown();
 
+	if (GlobalStateMachine)
+	{
+		GlobalStateMachine->End();
+	}
+	
 	SMySlateWidget::GMySlateWidgetRoot.Reset();
 	FSlateEventsHelper::Get().Shutdown();
 }
@@ -60,7 +81,7 @@ void UMyGameInstance::SetupGlobalsCfgObject()
 
 void UMyGameInstance::NtySubsystemsStartUp()
 {
-	for (auto RegistedSubsystem : CachedRegistedSubsystemArray)
+	for (auto RegistedSubsystem : CachedRegisterSubsystemArray)
 	{
 		RegistedSubsystem->OnStartUp();
 	}
@@ -68,7 +89,7 @@ void UMyGameInstance::NtySubsystemsStartUp()
 
 void UMyGameInstance::NtySubsystemsShutDown()
 {
-	for (auto RegistedSubsystem : CachedRegistedSubsystemArray)
+	for (auto RegistedSubsystem : CachedRegisterSubsystemArray)
 	{
 		RegistedSubsystem->OnShutDown();
 	}
@@ -79,29 +100,31 @@ void UMyGameInstance::RegisterMyGameSubSystemBase(UMyGameInstanceSubsystem* Subs
 	if (Subsystem)
 	{
 		UE_LOG(LogTemp, Log, TEXT("PMGameinstanceSubsystem %s Regist!"), *Subsystem->GetName());
-		CachedRegistedSubsystemArray.Add(Subsystem);
+		CachedRegisterSubsystemArray.Add(Subsystem);
 	}
 }
 
-
-void UMyGameInstance::TestSimpleLuaCall()
+bool UMyGameInstance::Tick(float DeltaSeconds)
 {
-	// 创建 Lua 状态
-	lua_State* L = luaL_newstate();
-	luaL_openlibs(L);
-
-	// 执行一句最简单的 Lua 代码
-	int ret = luaL_dostring(L, "print('Hello from Lua!')");
-
-	if (ret == 0)
+	if (GlobalStateMachine)
 	{
-		UE_LOG(LogTemp, Log, TEXT("✅ Lua 运行成功！"));
+		GlobalStateMachine->ProcessTick(DeltaSeconds);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("❌ Lua 运行失败！"));
-	}
-	luaL_newmetatable(L, "zxvxzv");
-	// 关闭
-	lua_close(L);
+	return true;
+}
+
+
+void UMyGameInstance::GotoLoginScene()
+{
+	UE_LOG(LogTemp, Log, TEXT("UMyGameInstance::GotoLoginScene Cur World %s"), GetWorld() ? *GetWorld()->GetName() : TEXT("ERR_NOWorld"));
+	UGlobalStateMachine::Get(this)->TransferGlobalState(EGlobalStateType::Init, nullptr);
+}
+
+void UMyGameInstance::GotoLobbyScene()
+{
+	const UWorld* World = GetWorld();
+	UE_LOG(LogTemp, Log, TEXT("UMyGameInstance::GotoLobbyScene Cur World %s"), World ? *World->GetName() : TEXT("ERR_NOWorld"));
+	FString tempName = UGameplayStatics::GetCurrentLevelName(this);
+	UMyViewManager::Get(this)->CloseAllPage();
+	UGlobalStateMachine::Get(this)->TransferGlobalState(EGlobalStateType::Lobby, nullptr);
 }

@@ -5,7 +5,6 @@
 #include "UnLuaBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "lauxlib.h"
 
 DEFINE_LOG_CATEGORY(LogPM);
 DEFINE_LOG_CATEGORY(LogPMGameMode);

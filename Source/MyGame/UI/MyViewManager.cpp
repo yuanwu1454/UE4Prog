@@ -52,7 +52,7 @@ bool UMyViewManager::ClosePage(const FName& UIName)
 			Page->RootView.Get()->RemoveFromViewport();
 			bRet = true;
 		}
-		AllPageLst.Remove(Page);
+		AllPageList.Remove(Page);
 		return bRet;
 	}
 	return false;
@@ -105,7 +105,7 @@ bool UMyViewManager::ProcessKeyEvent(FKey Key, EInputEvent InputEvent)
 	}
 #endif
 
-	for (auto P : AllPageLst)
+	for (auto P : AllPageList)
 	{
 		if(P->RootView.IsValid() && P->RootView->IsInViewport()&& P->RootView->IsVisible())
 		{
@@ -118,6 +118,18 @@ bool UMyViewManager::ProcessKeyEvent(FKey Key, EInputEvent InputEvent)
 		}
 	}
 	return false;
+}
+
+void UMyViewManager::CloseAllPage()
+{
+	for (UMyViewControllerPage* Controller : AllPageList)
+	{
+		if(Controller->RootView.IsValid())
+		{
+			Controller->RootView.Get()->RemoveFromViewport();
+		}
+	}
+	AllPageList.Empty();
 }
 
 UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewInstance, UPageOpenData* OpenData)
@@ -196,7 +208,7 @@ UMyViewControllerPage* UMyViewManager::OpenPage(const FName& UIName, bool bNewIn
 	}
 	ViewController->PageName = UIName;
 	ViewController->RootView = View;
-	AllPageLst.Add(ViewController);
+	AllPageList.Add(ViewController);
 	return ViewController;
 }
 
@@ -207,7 +219,7 @@ void UMyViewManager::GetUITableRowWithUIName(const FName& UIName, const FMyUITab
 UMyViewControllerPage* UMyViewManager::FindPage(const FName& UIName) const
 {
 	// Todo: Find all pages if needed.
-	for (UMyViewControllerPage* Page : AllPageLst) 
+	for (UMyViewControllerPage* Page : AllPageList) 
 	{
 		if (Page && !IsValid(Page))
 		{

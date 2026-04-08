@@ -7,6 +7,8 @@
 #include "CoreTypes.h"
 
 //###Plugins Include
+#include "LuaCore.h"
+#include "UnLua.h"
 #include "UnLuaEx.h"
 // lua 头文件顺序不能出错，会导致依赖错误，
 // 进而导致找不到指定的库？ 头文件顺序也很重要的。

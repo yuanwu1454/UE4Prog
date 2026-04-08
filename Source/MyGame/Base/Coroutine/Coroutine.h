@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include "CoreTypes.h"
-#include "MyCoroutine.generated.h"
+#include "Coroutine.generated.h"
 
 DECLARE_DELEGATE(FCoroutineAction);
 DECLARE_DELEGATE_RetVal(bool, FCoroutineWaitAction);
 
 // 虚拟协程
 USTRUCT()
-struct FMyCoroutine
+struct FCoroutine
 {
 GENERATED_BODY()
 	enum EActionFlag

@@ -1,13 +1,13 @@
-﻿#include "MyCoroutine.h"
+﻿#include "Coroutine.h"
 // 
 
-void FMyCoroutine::Run()
+void FCoroutine::Run()
 {
 	check(Status == ERunStatus::NotRun)
 	Status = ERunStatus::Running;
 }
 
-void FMyCoroutine::Tick(float DeltaTime)
+void FCoroutine::Tick(float DeltaTime)
 {
 	if (Status != ERunStatus::Running)
 	{
@@ -68,39 +68,39 @@ void FMyCoroutine::Tick(float DeltaTime)
 	}
 }
 
-void FMyCoroutine::Reset()
+void FCoroutine::Reset()
 {
 	Status = ERunStatus::NotRun;
 	ActionList.Reset();
 	RunIndex = 0;
 }
 
-void FMyCoroutine::Stop()
+void FCoroutine::Stop()
 {
 	Status = ERunStatus::Stopped;
 }
 
-void FMyCoroutine::ConfigNewAction(FCoroutineAction Action)
+void FCoroutine::ConfigNewAction(FCoroutineAction Action)
 {
 	ConfigToActionList(TPair<EActionFlag, FActionEntry>(Flag_Action, FActionEntry{0.0f, Action}));
 }
 
-void FMyCoroutine::ConfigWaitAction(FCoroutineWaitAction WaitAction)
+void FCoroutine::ConfigWaitAction(FCoroutineWaitAction WaitAction)
 {
 	ConfigToActionList(TPair<EActionFlag, FActionEntry>(Flag_WaitAction, FActionEntry{0.0f, FCoroutineAction(), WaitAction}));
 }
 
-void FMyCoroutine::ConfigWaitForFrame(int FrameCount)
+void FCoroutine::ConfigWaitForFrame(int FrameCount)
 {
 	ConfigToActionList(TPair<EActionFlag, FActionEntry>(Flag_WaitFrame, FActionEntry{static_cast<float>(FrameCount), FCoroutineAction()}));
 }
 
-void FMyCoroutine::ConfigWaitForSeconds(float Seconds)
+void FCoroutine::ConfigWaitForSeconds(float Seconds)
 {
 	ConfigToActionList(TPair<EActionFlag, FActionEntry>(Flag_WaitSeconds, FActionEntry{Seconds, FCoroutineAction()}));
 }
 
-void FMyCoroutine::ConfigToActionList(TPair<EActionFlag, FActionEntry>&& Item)
+void FCoroutine::ConfigToActionList(TPair<EActionFlag, FActionEntry>&& Item)
 {
 	if (Status == ERunStatus::NotRun)
 	{
@@ -125,7 +125,7 @@ void FMyCoroutine::ConfigToActionList(TPair<EActionFlag, FActionEntry>&& Item)
 }
 
 // 全局协程对象
-static FMyCoroutine GTestCoroutine;
+static FCoroutine GTestCoroutine;
 
 // 测试用函数
 void TestCoroutineAction1()

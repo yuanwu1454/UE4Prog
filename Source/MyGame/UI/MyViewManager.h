@@ -37,7 +37,7 @@ class MYGAME_API UMyViewManager : public UMyGameInstanceSubsystem
 	virtual void OnShutDown() override;
 public:
 	UPROPERTY()
-	TArray<UMyViewControllerPage*> AllPageLst; // 存放所有Page指针,直到退出游戏
+	TArray<UMyViewControllerPage*> AllPageList; // 存放所有Page指针,直到退出游戏
 
 	UFUNCTION(BlueprintCallable)
 	static UMyViewManager* Get(const UObject* ContextObject);
@@ -61,4 +61,6 @@ public:
 	bool HidePage(const FName& UIName);
 	bool ShowPage(const FName& UIName);
 	bool ProcessKeyEvent(FKey Key, EInputEvent InputEvent);
+
+	void CloseAllPage();
 };
