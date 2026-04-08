@@ -57,7 +57,9 @@ end
 function SettingPage:OnClick3()
     LogInfo(" SettingPage ", "OnClick3");
 
-    local bpclass = ObjectUtil.LoadUIBPClass("SettingPage")
+    print(ConfigMgr:FromStringTable(StringTablePath.ST_Common, "OK"))
+
+    -- local bpclass = ObjectUtil.LoadUIBPClass("SettingPage")
 
     -- local M = require("LuaProto/test")
     -- M.Test()
