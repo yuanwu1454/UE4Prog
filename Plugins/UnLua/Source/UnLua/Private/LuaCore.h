@@ -36,7 +36,7 @@ private:
     const char *Name;
 };
 
-FString GetFullPathFromRelativePath(const FString& RelativePath);
+UNLUA_API FString GetFullPathFromRelativePath(const FString& RelativePath);
 void SetTableForClass(lua_State *L, const char *Name);
 
 /**

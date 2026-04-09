@@ -17,6 +17,32 @@
 #include "BaseUserWidget.h"
 #include "MyViewManager.h"
 
+
+static int32 Bridge_LoadPbFile(lua_State* L)
+{
+	if (lua_gettop(L) < 1)
+	{
+		return 0;
+	}
+	if (!lua_isstring(L, 1))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[LuaLib_Bridge.Bridge_LoadPbFile] not string %s"), ANSI_TO_TCHAR(lua_tostring(L, 1)));
+		return 0;
+	}
+	const char * Path = luaL_checkstring(L, 1);
+	TCHAR* TPath = ANSI_TO_TCHAR(Path);
+	FString FullPath = GetFullPathFromRelativePath(FString(TPath));
+	TArray<uint8> FileData;
+	if (FFileHelper::LoadFileToArray(FileData, *FullPath))
+	{
+		const char* FileData4Lua = reinterpret_cast<const char*>(FileData.GetData());
+		lua_pushlstring(L, FileData4Lua, FileData.Num());
+		return 1;
+	}
+	return 0;
+}
+
+
 static bool SucCheckViewManager(UObject* WorldObject)
 {
 	UMyViewManager* ViewManager = UMyViewManager::Get(WorldObject);
@@ -196,7 +222,7 @@ static int32 Bridge_GetUniqIdByPointer(lua_State* L)
 
 static const luaL_Reg LuaBridgeLib[] =
 {
-    // { "LoadPbFile", Bridge_LoadPbFile},
+    { "LoadPbFile", Bridge_LoadPbFile},
     { "LuaOpenPage", Bridge_OpenPage},
     { "LuaClosePage", Bridge_ClosePage},
     { "LuaHidePage", Bridge_HidePage},
