@@ -22,4 +22,9 @@ public:
 	void TransferToNextState();
 private:
 	void CreatePresentAnimWidget(UClass* WidgetClass);
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> StartupUserWidgetClass;
+
+	UPROPERTY(Transient)
+	UUserWidget* GameStartPageInst;
 };

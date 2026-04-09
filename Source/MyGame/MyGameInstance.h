@@ -20,6 +20,7 @@ class MYGAME_API UMyGameInstance : public UGameInstance
 	virtual void Init() override;
 	
 	virtual void Shutdown() override;
+	virtual void StartGameInstance() override;
 public:
 	UPROPERTY(Transient)
 	UMyGlobals* MyGlobalsInstance;

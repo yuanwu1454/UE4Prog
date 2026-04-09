@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "MyStartupGameMode.generated.h"
+#include "StartupGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYGAME_API AMyStartupGameMode : public AGameModeBase
+class MYGAME_API AStartupGameMode : public AGameModeBase
 {
 	GENERATED_UCLASS_BODY()
 	virtual void StartPlay() override;
@@ -24,4 +24,7 @@ class MYGAME_API AMyStartupGameMode : public AGameModeBase
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StartupUserWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseGlobalState;
 };

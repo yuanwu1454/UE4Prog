@@ -1,3 +1,4 @@
+local pb = require "pb"
 local allProtoFiles = {
     -- "activity_cfg.proto",
     "test.pb",

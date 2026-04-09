@@ -102,19 +102,15 @@ void UGlobalStateMachine::TransferState(uint32 StateID, UStateEventData* EventDa
 	EGlobalStateType  StateType = static_cast<EGlobalStateType>(CurStateID);
 	if (StateType == EGlobalStateType::Entry)//启动游戏
 	{
-		//UPMPerfSightSdkSubSystem::PostStepEvent(0,0,0,TEXT("To Entry success"));
 	}
 	else if (StateType == EGlobalStateType::Init )//初始化
 	{
-		//UPMPerfSightSdkSubSystem::PostStepEvent(1,0,0,TEXT("To Init success"));
 	}
 	else if(StateType == EGlobalStateType::Scenario)//剧情
 	{
-		//UPMPerfSightSdkSubSystem::PostStepEvent(7,0,0,TEXT("To Scenario success"));
 	}
 	else if (StateType == EGlobalStateType::Lobby)//到达大厅
 	{
-		//UPMPerfSightSdkSubSystem::PostStepEvent(8,0,0,TEXT("To Lobby success"),false,true);
 	}
 }
 

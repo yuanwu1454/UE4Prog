@@ -63,6 +63,15 @@ struct FGlobalStateConfig
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UStateBase> StateClass;
 };
+
+UCLASS()
+class UGlobalEntryStateEventData : public UStateEventData
+{
+	GENERATED_BODY()
+public:
+	UClass* StudioPresentWidgetClass;	// 用于展示工作室的UI
+};
+
 UCLASS()
 class UGlobalPlayingStateEventData : public UStateEventData
 {

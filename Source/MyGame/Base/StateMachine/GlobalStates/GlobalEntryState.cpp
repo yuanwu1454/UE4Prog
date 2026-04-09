@@ -3,6 +3,8 @@
 
 #include "GlobalEntryState.h"
 
+#include "Blueprint/UserWidget.h"
+
 void UGlobalEntryState::ConfigEnterStateCoroutine(FCoroutine& PMCoroutine)
 {
 	Super::ConfigEnterStateCoroutine(PMCoroutine);
@@ -26,13 +28,19 @@ bool UGlobalEntryState::CheckShowStudioPresentFinish() const
 
 void UGlobalEntryState::TransferToNextState()
 {
+	
 }
 
 void UGlobalEntryState::CreatePresentAnimWidget(UClass* WidgetClass)
 {
-	UGlobalResUpStateEventData* Data = NewObject<UGlobalResUpStateEventData>();
-	// Data->DebugMessage = TEXT("Entry->Resup");
-	// Data->ResUpReason = EResUpReasonType::FirstResourceUpdate;
-	// Data->PtrGameStartPageInst = GameStartPageInst;
-	// TransferState(EPMGlobalStateType::ResUp, Data);
+	if (IsValid(WidgetClass))
+	{
+		GameStartPageInst = CreateWidget(GetWorld(), WidgetClass);
+		if (GameStartPageInst)
+		{
+			GameStartPageInst->AddToViewport();
+			// GameStartPageInst->AnimEndEvent.BindDynamic(this, &UPMGlobalEntryState::OnPresentStudioFinish);
+			// GameStartPageInst->StartPresentation();
+		}
+	}
 }

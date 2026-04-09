@@ -60,6 +60,17 @@ void UMyGameInstance::Shutdown()
 	FSlateEventsHelper::Get().Shutdown();
 }
 
+void UMyGameInstance::StartGameInstance()
+{
+	Super::StartGameInstance();
+
+	if (UGlobalStateMachine* GlobalSM = UGlobalStateMachine::Get(this))
+	{
+		UGlobalEntryStateEventData* EventData = NewObject<UGlobalEntryStateEventData>();
+		GlobalSM->TransferGlobalState(EGlobalStateType::Entry, EventData);
+	}
+}
+
 void UMyGameInstance::SetupGlobalsCfgObject()
 {
 	QUICK_SCOPE_CYCLE_COUNTER(STAT_UPMGameInstance_SetupGlobalsCfgObject);
