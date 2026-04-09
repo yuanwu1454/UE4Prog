@@ -48,10 +48,10 @@ protected:
 	class UMediaPlayer* VideoMediaPlayer;
 
 	UPROPERTY(meta=(BindWidget))
-	UImage* Logo;
+	class UImage* Logo;
 
 	UPROPERTY(meta=(BindWidget))
-	UImage* ImgVideoBg;
+	class UImage* ImgVideoBg;
 
 	UPROPERTY(BlueprintReadOnly, Category = Widget, meta = (BindWidgetAnimOptional))
 	class UWidgetAnimation* AnimLogoFadeIn;
