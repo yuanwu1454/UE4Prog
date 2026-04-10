@@ -57,7 +57,10 @@ end
 function SettingPage:OnClick3()
     LogInfo(" SettingPage ", "OnClick3");
 
-    print(ConfigMgr:FromStringTable(StringTablePath.ST_Common, "OK"))
+    UE4.UGameplayStatics.OpenLevel(self, "/Game/Cinema/King.King", true)
+    -- local USequenceMapManager = UE4.USequenceMapManager.Get(self)
+    -- USequenceMapManager:TeleportMap(97001)
+    -- print(ConfigMgr:FromStringTable(StringTablePath.ST_Common, "OK"))
 
     -- local bpclass = ObjectUtil.LoadUIBPClass("SettingPage")
 

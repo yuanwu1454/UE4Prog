@@ -26,4 +26,6 @@ public:
 	
 	// 静态缓存：保存全局唯一的 Slate 控件（关键）
 	static TMap<FName, TWeakPtr<SWidget>> WidgetCache;
+	UFUNCTION(BlueprintCallable)
+	static void OpenLevel(FString MapName);
 };
