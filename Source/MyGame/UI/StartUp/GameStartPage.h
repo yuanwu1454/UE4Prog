@@ -53,7 +53,7 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	class UImage* ImgVideoBg;
 
-	UPROPERTY(BlueprintReadOnly, Category = Widget, meta = (BindWidgetAnimOptional))
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Widget, meta = (BindWidgetAnimOptional))
 	class UWidgetAnimation* AnimLogoFadeIn;
 
 	UPROPERTY()
