@@ -124,8 +124,8 @@ class UGlobalLobbyStateEventData : public UStateEventData
 {
 	GENERATED_BODY()
 public:
-	// 是否前往休息室（如果是休息室需要加载streaming level
-	bool bGotoBedroom = false;
+	// 加载streaming level
+	bool bNeedLobbyStreamingLevel = false;
 };
 
 

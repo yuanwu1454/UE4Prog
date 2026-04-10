@@ -139,3 +139,13 @@ void UMyGameInstance::GotoLobbyScene()
 	UMyViewManager::Get(this)->CloseAllPage();
 	UGlobalStateMachine::Get(this)->TransferGlobalState(EGlobalStateType::Lobby, nullptr);
 }
+
+void UMyGameInstance::SetOpenLobbyMsgTips(const FText& Msg)
+{
+	OpenLobbyMsgTips = Msg;
+}
+
+void UMyGameInstance::ClearOpenLobbyTips()
+{
+	OpenLobbyMsgTips = FText::GetEmpty();
+}

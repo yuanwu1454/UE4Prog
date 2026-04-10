@@ -50,6 +50,12 @@ public:
 
 	void GotoLoginScene();
 	void GotoLobbyScene();
+
+public:
+	void SetOpenLobbyMsgTips(const FText& Msg);
+	void ClearOpenLobbyTips();
+	FText OpenLobbyMsgTips;
+	
 };
 
 
