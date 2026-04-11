@@ -28,6 +28,25 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPostLoadMapWithWorld, const UWorl
 #pragma endregion 加载进度
 
 
+#pragma region 单局
+// 重尝试重连回DS
+DECLARE_DYNAMIC_DELEGATE(FTryReconnectToDS);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandleNetworkFailure, const FGameTransitionReason&, Reason);
+// // 单局表现阶段
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayingShowStageChange, EGamePlayingStage, Stage);
+// // 局内GameState Begin Play事件
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayingGameStateBeginPlay, APMGameState*, GS);
+// // ds踢出玩家
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDSKickOutPlayer, const ECyDSKickOutPlayerReasonType, InExitGameReason);
+// 触发结算系统
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTriggerResultSystem);
+// 触发结算个人展示UI
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResultPersonalShowPage);
+// Sequence触发展示合影界面UI
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResultSequenceShowGroupPhotoView);
+#pragma endregion 单局
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadingAssetDelegate, float, percent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadingAssetTipDelegate, FText, tip);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadingAssetPageCloseDelegate, ECyLoadingStyle, LoadingStyle);
@@ -83,4 +102,27 @@ public:
 	UPROPERTY(BlueprintCallable)
 	FOnLoadingAssetPageCloseDelegate OnLoadingAssetPageCloseDelegate;
 
+
+#pragma region Game
+	UPROPERTY(BlueprintReadOnly)
+	FDynDelegateEmptyParam OnBeginGameDelegateSubsystem;
+	UPROPERTY(BlueprintReadOnly)
+	FDynDelegateEmptyParam OnEndGameDelegateSubsystem;
+
+	// // 局内进入选角及结算表演状态 
+	// UPROPERTY(BlueprintReadOnly)
+	// FOnPlayingShowStageChange OnPlayingShowStageChange;
+	//
+	// UPROPERTY(BlueprintReadOnly)
+	// FOnPlayingGameStateBeginPlay OnPlayingGameStateBeginPlay;
+
+	UPROPERTY(BlueprintReadOnly)
+	FOnTriggerResultSystem OnTriggerResultSystem;
+
+	UPROPERTY(BlueprintReadOnly)
+	FOnResultPersonalShowPage OnResultPersonalShowPage;
+
+	UPROPERTY(BlueprintReadOnly)
+	FOnResultSequenceShowGroupPhotoView OnResultSequenceShowGroupPhotoView;
+#pragma endregion Game 
 };

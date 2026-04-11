@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Gameplay/PlayerControllerBase.h"
 #include "MyGame/Router/Room/RoomRouter.h"
 #include "BasePlayerController.generated.h"
 
@@ -11,7 +12,7 @@
  * 
  */
 UCLASS()
-class MYGAME_API ABasePlayerController : public APlayerController
+class MYGAME_API ABasePlayerController : public APlayerControllerBase
 {
 	GENERATED_BODY()
 public:

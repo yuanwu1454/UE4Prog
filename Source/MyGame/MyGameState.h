@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
+#include "Gameplay/MyGameStateBase.h"
 #include "MyGameState.generated.h"
 
 /**
@@ -18,7 +19,7 @@
  */
 // GameStateBase	服务器 + 所有客户端
 UCLASS()
-class MYGAME_API AMyGameState : public AGameState
+class MYGAME_API AMyGameState : public AMyGameStateBase
 {
 
 	GENERATED_BODY()

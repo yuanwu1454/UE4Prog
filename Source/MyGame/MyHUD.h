@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
+#include "Gameplay/HUDBase.h"
 #include "MyHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYGAME_API AMyHUD : public AHUD
+class MYGAME_API AMyHUD : public AHUDBase
 {
 	GENERATED_BODY()
 	virtual void BeginPlay() override;

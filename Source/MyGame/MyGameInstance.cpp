@@ -3,32 +3,48 @@
 
 #include "MyGameInstance.h"
 
+#include "MyLogging.h"
 #include "MyViewManager.h"
 #include "SubSystem/MyDynamicEngineSubsystem.h"
 #include "SubSystem/MyGameInstanceSubsystem.h"
 #include "UI/SlateEventsHelper.h"
 #include "Test/MySlateWidget.h"
 #include "Base/StateMachine/GlobalStateMachine.h"
+#include "GameFramework/WorldSettings.h"
 #include "Kismet/GameplayStatics.h"
+#include "Startup/StartupGameMode.h"
+
+#include "LuaCore.h"
+#include "UnLua.h"
+#include "UnLuaEx.h"
 
 void UMyGameInstance::Init()
 {
-	Super::Init();
 
+	// 创建全局状态机
+	const UClass* SMClass = LoadClass<UObject>(nullptr, *GlobalStateMachineAsset.ToString());
+	if (SMClass)
+	{
+		GlobalStateMachine = NewObject<UGlobalStateMachine>(this, SMClass);
+		GlobalStateMachine->Start();
+	}
+	// 可以设置平台信息
+	
+	bAllSubsystemFinishInit = false;
+	Super::Init();
+	bAllSubsystemFinishInit = true;
+	
+	FCoreDelegates::OnHandleSystemError.AddUObject(this, &UMyGameInstance::OnHandleSystemError);
+	FCoreDelegates::OnShutdownAfterError.AddUObject(this, &UMyGameInstance::OnShutdownAfterError);
+
+	
 
 	TickDelegate = FTickerDelegate::CreateUObject(this, &UMyGameInstance::Tick);
 	TickDelegateHandle = FTicker::GetCoreTicker().AddTicker(TickDelegate);
 
 	FSlateEventsHelper::Get().Initialize();
 	
-	// 创建全局状态机
-    const UClass* SMClass = LoadClass<UObject>(nullptr, *GlobalStateMachineAsset.ToString());
-    if (SMClass)
-    {
-    	GlobalStateMachine = NewObject<UGlobalStateMachine>(this, SMClass);
-    	GlobalStateMachine->Start();
-    }
-	
+
 	NtySubsystemsStartUp();
 
 	SetupGlobalsCfgObject();
@@ -60,9 +76,9 @@ void UMyGameInstance::Shutdown()
 	FSlateEventsHelper::Get().Shutdown();
 }
 
-void UMyGameInstance::StartGameInstance()
+void UMyGameInstance::OnStart()
 {
-	Super::StartGameInstance();
+	Super::OnStart();
 
 	if (UGlobalStateMachine* GlobalSM = UGlobalStateMachine::Get(this))
 	{
@@ -70,6 +86,47 @@ void UMyGameInstance::StartGameInstance()
 		GlobalSM->TransferGlobalState(EGlobalStateType::Entry, EventData);
 	}
 }
+
+bool UMyGameInstance::Exec(UWorld* InWorld, const TCHAR* Cmd, FOutputDevice& Out)
+{
+	return Super::Exec(InWorld, Cmd, Out);
+}
+
+#if WITH_EDITOR
+FGameInstancePIEResult UMyGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
+                                                                      const FGameInstancePIEParameters& Params)
+{
+	bool bEditorStartupFromStartupWorld = false;
+	if (UWorld* World = GetWorld())
+	{
+		if (World && World->GetWorldSettings() && World->GetWorldSettings() && World->GetWorldSettings()->DefaultGameMode)
+		{
+			bEditorStartupFromStartupWorld = World->GetWorldSettings()->DefaultGameMode->IsChildOf(AStartupGameMode::StaticClass());
+		}
+	}
+	if (UGlobalStateMachine* GlobalSM = UGlobalStateMachine::Get(this))
+	{
+		if (bEditorStartupFromStartupWorld)
+		{
+			// 正常状态机流程
+			UGlobalEntryStateEventData* EventData = NewObject<UGlobalEntryStateEventData>();
+			EventData->DebugMessage = TEXT("Editor enter entry");
+			GlobalSM->TransferGlobalState(EGlobalStateType::Entry, EventData);
+		}
+		else
+		{
+			// 执行完初始化
+			UGlobalInitStateEventData* Data = NewObject<UGlobalInitStateEventData>();
+			Data->DebugMessage = TEXT("Editor enter init");
+			Data->bNeedQuickFinishAndWait = true;
+			Data->bInitForStartup = true;
+			GlobalSM->TransferGlobalState(EGlobalStateType::Init, Data);
+		}
+	}
+	return Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
+}
+#endif
+
 
 void UMyGameInstance::SetupGlobalsCfgObject()
 {
@@ -148,4 +205,40 @@ void UMyGameInstance::SetOpenLobbyMsgTips(const FText& Msg)
 void UMyGameInstance::ClearOpenLobbyTips()
 {
 	OpenLobbyMsgTips = FText::GetEmpty();
+}
+
+void UMyGameInstance::ReleaseCachedObject()
+{
+	MyGlobalsInstance = nullptr;
+}
+
+void UMyGameInstance::OnHandleSystemError()
+{
+	UE_LOG(LogPM, Error, TEXT("==== OnHandleSystemError ==="));
+	lua_State* L = UnLua::GetState();
+	if (L)
+	{
+		luaL_traceback(L, L, "", 0);
+		FString LuaInfo = UTF8_TO_TCHAR(lua_tostring(L,-1));
+		lua_pop(L, 1);
+		UE_LOG(LogPM, Log, TEXT("CrashCallback lua traceback\n %s"), UTF8_TO_TCHAR(lua_tostring(L,-1)));
+		// FCoreDelegates::LogImportantKeyValue.Broadcast(TEXT("LuaTraceback"), LuaInfo);
+	}
+	UE_LOG(LogPM, Error, TEXT("=== Critical error: ===\n %s"), GErrorHist);
+}
+
+
+// 自动打印当前代码的调用路径，帮你快速定位 BUG 发生在哪个文件、哪一行、哪个函数。
+void UMyGameInstance::OnShutdownAfterError()
+{
+	TArray<FProgramCounterSymbolInfo> SymbolInfo = FGenericPlatformStackWalk::GetStack(0);
+	FString StackInfo = "";
+	for (FProgramCounterSymbolInfo Info : SymbolInfo)
+	{
+		StackInfo += FString::Format(TEXT("File: {0} {1} {2} \n"), {FStringFormatArg(Info.Filename), FStringFormatArg(Info.LineNumber), FStringFormatArg(Info.FunctionName)});
+	}
+
+	UE_LOG(LogPM, Error, TEXT("Statck Info: \n%s"), *StackInfo);
+
+	FGenericPlatformProcess::ConditionalSleep([&]() { return true; }, 1);
 }

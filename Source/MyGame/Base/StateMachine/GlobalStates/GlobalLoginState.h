@@ -13,4 +13,8 @@ UCLASS(BlueprintType)
 class MYGAME_API UGlobalLoginState : public UGlobalState
 {
 	GENERATED_BODY()
+	virtual void BeginState() override;
+	virtual void EndState() override;
+	virtual void ConfigEnterStateCoroutine(FCoroutine& PMCoroutine) override;
+	virtual void Tick(const float DeltaTime) override;
 };

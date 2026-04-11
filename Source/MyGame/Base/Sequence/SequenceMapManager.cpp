@@ -252,6 +252,10 @@ void USequenceMapManager::LoadNextStreamLevel()
 	FLatentActionInfo Info;
 	Info.CallbackTarget = this;
 	Info.ExecutionFunction = TEXT("OnStreamLevelLoaded");
+	// 这个linkage 必须需要 不然会出现无法回调
+	Info.UUID = 1;
+    Info.Linkage = 1;
+	
 	UGameplayStatics::LoadStreamLevel(this, LevelName, true, true, Info);
 }
 

@@ -45,13 +45,6 @@ void AMyPlayerController::OnTriggerQPressed()
 
 void AMyPlayerController::OnOpenMenu()
 {
-	// 加载UI蓝图（替换为你的UI路径）
-	// UClass* UIMenuClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/Maps/WBP_MainMenu.WBP_MainMenu_C"));
-	// if (UIMenuClass)
-	// {
-	// 	UUserWidget* MenuWidget = CreateWidget<UUserWidget>(this, UIMenuClass);
-	// 	OpenUIAndSetInputMode(MenuWidget);
-	// }
 	UMyViewManager::Get(this)->OpenPage(FName("SettingPage"));
 }
 

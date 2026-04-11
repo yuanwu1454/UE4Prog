@@ -29,7 +29,7 @@ public:
 	{
 		return GetGameData()->GetTableAsset();
 	}
-
+	void ReloadGameData(){};
 protected:
 	UPROPERTY(Transient)
 	UMyGameData* GameData=nullptr;

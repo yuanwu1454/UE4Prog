@@ -16,11 +16,21 @@ UCLASS()
 class MYGAME_API UMyGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+public:
 	/** virtual function to allow custom GameInstances an opportunity to set up what it needs */
 	virtual void Init() override;
-	
 	virtual void Shutdown() override;
-	virtual void StartGameInstance() override;
+	// virtual void StartGameInstance() override;
+	
+	/** Called when the game instance is started either normally or through PIE. */
+	virtual void OnStart();
+	
+	virtual bool Exec(UWorld* InWorld, const TCHAR* Cmd, FOutputDevice& Out = *GLog) override;
+	
+#if WITH_EDITOR
+	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params) override;
+#endif
+	
 public:
 	UPROPERTY(Transient)
 	UMyGlobals* MyGlobalsInstance;
@@ -55,7 +65,13 @@ public:
 	void SetOpenLobbyMsgTips(const FText& Msg);
 	void ClearOpenLobbyTips();
 	FText OpenLobbyMsgTips;
+
+	void ReleaseCachedObject();
 	
+	bool bAllSubsystemFinishInit = false;
+
+	virtual void OnHandleSystemError();
+	virtual void OnShutdownAfterError();
 };
 
 

@@ -270,15 +270,6 @@ void UMyBlueprintFunctinLibrary::Close(UWorld* Obj)
     
 }
 
-void UMyBlueprintFunctinLibrary::OpenLevel(FString MapName)
-{
-    // 1. 提取关卡短名（OpenLevel只需要短名，不需要完整包名）
-    FString MapShortName = FPackageName::GetShortName(MapName);
-    
-    // 2. 直接用OpenLevel加载，完全绕开LoadPackageAsync的所有问题
-    UGameplayStatics::OpenLevel(this, FName(*MapShortName), true);
-}
-
 
 void ShowCustomPopupWindow()
 {

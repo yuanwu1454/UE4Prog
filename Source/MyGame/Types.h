@@ -33,4 +33,5 @@ typedef FName FUINameID;
 namespace FUINames
 {
 	const FUINameID EM_LoadingAssetPage(TEXT("LoadingAssetPage"));
+	const FUINameID EM_LoginPage(TEXT("LoginPage"));
 };
