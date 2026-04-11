@@ -97,7 +97,10 @@ class UGlobalResUpStateEventData : public UStateEventData
 	GENERATED_BODY()
 public:
 	EResUpReasonType ResUpReason = EResUpReasonType::Default;
-	UBaseUserWidget* PtrGameStartPageInst = nullptr;		// 传递GameStartUp界面指针，到Login状态关闭
+
+	// 传递GameStartUp界面指针，到Login状态关闭
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UUserWidget> PtrGameStartPageInst = nullptr;	
 };
 
 
@@ -108,7 +111,10 @@ class UGlobalInitStateEventData : public UStateEventData
 public:
 	bool bNeedQuickFinishAndWait = false;  // 非Startup启动，需要同一帧完成初始化.供其它系统使用.
 	bool bInitForStartup = false;	      // 启动初始化，只有第一次进Init时才设置true.
-	UBaseUserWidget* PtrGameStartPageInst = nullptr;		// 传递GameStartUp界面指针，到Login状态关闭
+	// 传递GameStartUp界面指针，到Login状态关闭
+
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UUserWidget> PtrGameStartPageInst = nullptr;		
 };
 
 UCLASS()
@@ -116,7 +122,10 @@ class UGlobalLoginStateEventData : public UStateEventData
 {
 	GENERATED_BODY()
 public:
-	UBaseUserWidget* PtrGameStartPageInst = nullptr;		// 传递GameStartUp界面指针，到Login状态关闭
+	// 传递GameStartUp界面指针，到Login状态关闭
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UUserWidget> PtrGameStartPageInst=nullptr;
+	// UUserWidget* PtrGameStartPageInst = nullptr;		
 };
 
 UCLASS()

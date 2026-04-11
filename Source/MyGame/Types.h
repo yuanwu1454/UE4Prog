@@ -34,4 +34,23 @@ namespace FUINames
 {
 	const FUINameID EM_LoadingAssetPage(TEXT("LoadingAssetPage"));
 	const FUINameID EM_LoginPage(TEXT("LoginPage"));
+	const FUINameID EM_NavigationPage(TEXT("NavigationPage"));
 };
+
+/**
+ * 局内使用的 玩法类型
+ */
+UENUM(BlueprintType)
+enum class EPMGameModeType : uint8
+{
+	None,
+	// 新手引导
+	NoviceGuide								UMETA(DisplayName="新手引导"),
+	// 靶场
+	Practice								UMETA(DisplayName="靶场"),
+	// 大厅
+	FrontEnd								UMETA(DisplayName="大厅"),
+	
+	Max,
+};
+

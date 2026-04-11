@@ -22,6 +22,7 @@ public:
 	void TransferToNextState();
 private:
 	void CreatePresentAnimWidget(UClass* WidgetClass);
+	bool bStudioWidgetPresentFinish = false;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StartupUserWidgetClass;
 

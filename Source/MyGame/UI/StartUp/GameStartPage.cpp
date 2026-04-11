@@ -3,6 +3,7 @@
 #include "GameStartPage.h"
 
 #include "MyGameInstance.h"
+#include "Blueprint/WidgetTree.h"
 #include "MediaAssets/Public/FileMediaSource.h"
 #include "MediaAssets/Public/MediaPlayer.h"
 #include "MediaAssets/Public/MediaPlaylist.h"
@@ -18,9 +19,7 @@ void UGameStartPage::NativeOnInitialized()
 	// 配置Logo视频播放列表
 	if (LogoVideoPlaylist)
 	{
-		// 清空播放列表第0个元素（清理默认/旧视频）
 		LogoVideoPlaylist->RemoveAt(0);
-
 		// 将指定视频文件添加到播放列表
 		if (LogoFile)
 		{
@@ -95,6 +94,14 @@ void UGameStartPage::AfterPlayTXLogo()
         VideoMediaPlayer->Close();
 	}
 
+	{
+
+		auto ImgVideoBg = WidgetTree->FindWidget("ImgVideoBg");
+		if (ImgVideoBg)
+		{
+			ImgVideoBg->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 	// 播放下一个Logo淡入动画
 	CyLogoFadeIn();
 }

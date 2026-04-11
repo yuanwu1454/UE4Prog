@@ -13,6 +13,8 @@ UCLASS()
 class MYGAME_API AFrontEndPlayerController : public APlayerControllerBase
 {
 	GENERATED_BODY()
+
+	AFrontEndPlayerController(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override {}

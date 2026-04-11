@@ -3,6 +3,20 @@
 
 #include "FrontEndGameMode.h"
 
+#include "FrontEndGameState.h"
+#include "FrontEndHUD.h"
+#include "FrontEndPlayerController.h"
+
+
+AFrontEndGameMode::AFrontEndGameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	PlayerControllerClass = AFrontEndPlayerController::StaticClass();
+	HUDClass = AFrontEndHUD::StaticClass();
+	GameStateClass = AFrontEndGameState::StaticClass();
+}
+
+
 void AFrontEndGameMode::StartPlay()
 {
 	Super::StartPlay();

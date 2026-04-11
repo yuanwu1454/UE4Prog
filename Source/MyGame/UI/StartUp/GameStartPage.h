@@ -46,19 +46,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	class UMediaPlayer* VideoMediaPlayer;
-
-	UPROPERTY(meta=(BindWidget))
-	class UImage* Logo;
-
-	UPROPERTY(meta=(BindWidget))
-	class UImage* ImgVideoBg;
-
+	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Widget, meta = (BindWidgetAnimOptional))
 	class UWidgetAnimation* AnimLogoFadeIn;
 
 	UPROPERTY()
 	FTimerHandle OutTimeTimerHandle;
-
-	UPROPERTY(meta=(BindWidgetOptional))
-	class UWidgetSwitcher* Switcher_Logo;
 };
