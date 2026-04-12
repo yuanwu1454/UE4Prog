@@ -88,5 +88,7 @@ private:
 	bool hasConfirmFirstResUp = false;
 
 public:
-	static bool HasDownloadedAnyRes();
+
+	UPROPERTY(EditAnywhere)
+	bool bSkip=false;
 };

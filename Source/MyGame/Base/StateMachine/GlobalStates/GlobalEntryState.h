@@ -28,4 +28,6 @@ private:
 
 	UPROPERTY(Transient)
 	UUserWidget* GameStartPageInst;
+	UPROPERTY(EditAnywhere)
+	bool bSkip=false;
 };

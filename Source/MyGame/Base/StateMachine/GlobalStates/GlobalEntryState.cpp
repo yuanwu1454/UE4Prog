@@ -11,9 +11,16 @@ void UGlobalEntryState::ConfigEnterStateCoroutine(FCoroutine& PMCoroutine)
 {
 	Super::ConfigEnterStateCoroutine(PMCoroutine);
 
-	ConfigShowStudioPresent();
-	// 进入初始化状态
-	Coroutine.ConfigNewAction(FCoroutineAction::CreateUObject(this, &UGlobalEntryState::TransferToNextState));
+	if (bSkip)
+	{
+		Coroutine.ConfigNewAction(FCoroutineAction::CreateUObject(this, &UGlobalEntryState::TransferToNextState));		
+	}else
+	{
+		ConfigShowStudioPresent();
+		// 进入初始化状态
+		Coroutine.ConfigNewAction(FCoroutineAction::CreateUObject(this, &UGlobalEntryState::TransferToNextState));		
+	}
+
 }
 
 void UGlobalEntryState::ConfigShowStudioPresent()

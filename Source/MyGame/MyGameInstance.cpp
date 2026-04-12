@@ -45,7 +45,7 @@ void UMyGameInstance::Init()
 	FSlateEventsHelper::Get().Initialize();
 	
 
-	NtySubsystemsStartUp();
+	// NtySubsystemsStartUp();
 
 	SetupGlobalsCfgObject();
 	

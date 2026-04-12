@@ -29,6 +29,15 @@ void UGlobalResUpState::ConfigEnterStateCoroutine(FCoroutine& InCoroutine)
 {
 	Super::ConfigEnterStateCoroutine(InCoroutine);
 
+	if (bSkip)
+	{
+		Coroutine.ConfigNewAction(FCoroutineAction::CreateLambda([&]()
+		{
+			TransferToNextState();
+		}));		
+		return ;
+	}
+	
 	const bool bEnableUpdate = IsEnableUpdate();
 	UE_LOG(LogTemp, Log, TEXT("Is Update Res Enable %d"), bEnableUpdate);
 	
