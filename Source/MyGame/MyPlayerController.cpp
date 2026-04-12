@@ -13,6 +13,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "Log/MultiplayerLogHelper.h"
 #include "Subsystems/SubsystemBlueprintLibrary.h"
+
+void AMyPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (IsLocalController())
+	{
+		EnterGameOnlyInputMode();
+	}
+}
+
 // 绑定输入（PlayerController 初始化时自动调用）
 void AMyPlayerController::SetupInputComponent()
 {

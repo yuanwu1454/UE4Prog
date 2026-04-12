@@ -18,6 +18,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -64,33 +65,6 @@ AMyPlayerCharacter::AMyPlayerCharacter()
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
-
-	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
-	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
-
-	// Create VR Controllers.
-	// R_MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("R_MotionController"));
-	// R_MotionController->MotionSource = FXRMotionControllerBase::RightHandSourceId;
-	// R_MotionController->SetupAttachment(RootComponent);
-	// L_MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("L_MotionController"));
-	// L_MotionController->SetupAttachment(RootComponent);
-	//
-	// // Create a gun and attach it to the right-hand VR controller.
-	// // Create a gun mesh component
-	// VR_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("VR_Gun"));
-	// VR_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
-	// VR_Gun->bCastDynamicShadow = false;
-	// VR_Gun->CastShadow = false;
-	// VR_Gun->SetupAttachment(R_MotionController);
-	// VR_Gun->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	//
-	// VR_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("VR_MuzzleLocation"));
-	// VR_MuzzleLocation->SetupAttachment(VR_Gun);
-	// VR_MuzzleLocation->SetRelativeLocation(FVector(0.000004, 53.999992, 10.000000));
-	// VR_MuzzleLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));		// Counteract the rotation of the VR gun model.
-
-	// Uncomment the following line to turn motion controllers on by default:
-	//bUsingMotionControllers = true;
 }
 
 // 第一步：声明要同步的属性（仅MoveSpeed）
@@ -175,7 +149,16 @@ void AMyPlayerCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	// 记录新客户端登录，传入PlayerController作为PlayerContext
-	MULTI_LOG(FString::Printf(TEXT("PossessedBy：%s"), *this->GetName()), this, this);
+	// MULTI_LOG(FString::Printf(TEXT("PossessedBy：%s"), *this->GetName()), this, this);
+	
+	// if (IsLocallyControlled())
+	// {
+	//
+	// 	if(UPawnMovementComponent* MovementComponent = GetMovementComponent())
+	// 	{
+	// 		MovementComponent->SetUpdatedComponent(GetRootComponent());
+	// 	}
+	// }
 }
 
 
@@ -249,6 +232,14 @@ void AMyPlayerCharacter::BeginPlay()
 
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	Mesh1P->SetHiddenInGame(false, true);
+
+	// 强制占有Pawn，恢复输入
+	// if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	// {
+	// 	PC->Possess(this);
+	// 	PC->SetInputMode(FInputModeGameOnly());
+	// 	PC->bShowMouseCursor = false;
+	// }
 }
 
 void AMyPlayerCharacter::OnFire()
@@ -289,11 +280,12 @@ void AMyPlayerCharacter::MoveForward(float Value)
 }
 
 void AMyPlayerCharacter::MoveRight(float Value)
-{	if (Value != 0.0f)
 {
-	// add movement in that direction
-	AddMovementInput(GetActorRightVector(), Value);
-}
+	if (Value != 0.0f)
+	{
+		// add movement in that direction
+		AddMovementInput(GetActorRightVector(), Value);
+	}
 }
 
 void AMyPlayerCharacter::TurnAtRate(float Rate)

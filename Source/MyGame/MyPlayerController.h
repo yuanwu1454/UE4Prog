@@ -16,6 +16,8 @@ class MYGAME_API AMyPlayerController : public ABasePlayerController
 {
 	GENERATED_BODY()
 public:
+
+	virtual void BeginPlay() override;
 	// 初始化输入绑定（PlayerController 专属）
 	virtual void SetupInputComponent() override;
 
