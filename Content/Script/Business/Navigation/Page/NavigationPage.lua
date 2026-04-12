@@ -22,6 +22,7 @@ function NavigationPage:OnPracticeClick()
     print("OnPracticeClick")
 
     -- UE4.UGameplayStatics.OpenLevel(self, '/Game/FirstPersonCPP/Maps/FirstPersonExampleMap.FirstPersonExampleMap')
+    -- 你用了带点后缀的写法，等于把 “主地图切换” 当成了 “流关卡加载”，
     -- 2. 错误写法（你不能动）
     -- plaintext
     -- /Game/FirstPersonCPP/Maps/FirstPersonExampleMap.FirstPersonExampleMap
