@@ -22,7 +22,8 @@ public class MyGame : ModuleRules
 			"OnlineSubsystem",
 			"OnlineSubsystemNull",
 			"MediaAssets",
-			"Media"
+			"Media",
+			"ChunkDownloader"
 		});
 		
 		// ✨ 优雅的头文件路径配置

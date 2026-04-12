@@ -29,10 +29,7 @@ public:
 	virtual void OnRep_Pawn();
 	// 假设在PlayerController中定义方法，用于打开UI并设置输入模式
 	void OpenUIAndSetInputMode(UUserWidget* TargetWidget);
-	UFUNCTION(BlueprintCallable)
-	void EnterGameOnlyInputMode();
-	UFUNCTION(BlueprintCallable)
-	void EnterUIOnlyInputMode();
+
 	FString GetPlayerName() const;
 private:
 	// 获取当前操控的 PlayerCharacter

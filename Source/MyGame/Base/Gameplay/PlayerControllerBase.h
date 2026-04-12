@@ -13,4 +13,10 @@ UCLASS()
 class MYGAME_API APlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void EnterGameOnlyInputMode();
+	UFUNCTION(BlueprintCallable)
+	void EnterUIOnlyInputMode();
 };

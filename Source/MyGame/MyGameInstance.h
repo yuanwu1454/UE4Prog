@@ -58,7 +58,9 @@ public:
 	FDelegateHandle TickDelegateHandle;
 	bool Tick(float DeltaSeconds);
 
+	UFUNCTION(BlueprintCallable)
 	void GotoLoginScene();
+	UFUNCTION(BlueprintCallable)
 	void GotoLobbyScene();
 
 public:

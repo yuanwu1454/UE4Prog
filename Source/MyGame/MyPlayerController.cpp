@@ -94,43 +94,6 @@ void AMyPlayerController::OpenUIAndSetInputMode(UUserWidget* TargetWidget)
 	// TargetWidget->AddToViewport();
 }
 
-void AMyPlayerController::EnterGameOnlyInputMode()
-{
-	// 1. 创建“仅游戏输入”模式对象
-	FInputModeGameOnly GameOnlyMode;
-    
-	// 可选：修改鼠标捕获事件的消耗规则（默认true）
-	// GameOnlyMode.SetConsumeCaptureMouseDown(false);
-    
-	// 2. 应用输入模式（核心步骤）
-	SetInputMode(GameOnlyMode);
-    
-	// 3. 可选：隐藏鼠标光标（游戏模式下通常不需要光标）
-	bShowMouseCursor = false;
-
-
-	// 方式1：通过创建UI的OwningPlayer获取（推荐，最安全）
-	// if (APlayerController* PC = GetOwningPlayer())
-	// {
-	// 	if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC))
-	// 	{
-	// 		MyPC->RestoreGameInputMode();
-	// 	}
-	// }
-}
-
-void AMyPlayerController::EnterUIOnlyInputMode()
-{
-	FInputModeUIOnly UIOnlyMode;
-
-	// 2. 应用输入模式（核心步骤）
-	SetInputMode(UIOnlyMode);
-    
-	// 3. 可选：隐藏鼠标光标（游戏模式下通常不需要光标）
-	bShowMouseCursor = true;
-
-}
-
 FString AMyPlayerController::GetPlayerName() const
 {
 	if (auto MyPlayerState = Cast<AMyPlayerState>(PlayerState))

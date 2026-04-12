@@ -2,3 +2,19 @@
 
 
 #include "PlayerControllerBase.h"
+
+
+void APlayerControllerBase::EnterGameOnlyInputMode()
+{
+	FInputModeGameOnly GameOnlyMode;
+	SetInputMode(GameOnlyMode);
+	bShowMouseCursor = false;
+}
+
+void APlayerControllerBase::EnterUIOnlyInputMode()
+{
+	FInputModeUIOnly UIOnlyMode;
+	SetInputMode(UIOnlyMode);
+	bShowMouseCursor = true;
+
+}

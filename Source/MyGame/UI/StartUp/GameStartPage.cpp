@@ -136,6 +136,7 @@ void UGameStartPage::CyLogoFadeIn()
  */
 void UGameStartPage::StartFlowEnd()
 {
+	this->SetVisibility(ESlateVisibility::Collapsed);
 	AnimEndEvent.ExecuteIfBound();
 }
 
