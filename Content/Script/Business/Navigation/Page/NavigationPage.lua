@@ -36,8 +36,10 @@ function NavigationPage:OnPracticeClick()
     -- PawnOwner = nullptr
     -- 角色有输入，但是不动！
 
-    local USequenceMapManager = UE4.USequenceMapManager.Get(self)
-    USequenceMapManager:TeleportMap(17001)
+    -- local USequenceMapManager = UE4.USequenceMapManager.Get(self)
+    -- USequenceMapManager:TeleportMap(17001)
+
+    ShowTip("这是导航页面")
 end
 
 return NavigationPage

@@ -2,7 +2,7 @@ local GameFacade = PureMVC.Facade:GetInstance('GameFacade')
 print("GameFacade", GameFacade)
 -- 全局
 local GlobalModuleInits = {
-	-- "Business/Common/Init",
+	"Business/Common/Init",
 	-- "Business/ResUpdate/Init",
 	"Business/Login/Init",
 }

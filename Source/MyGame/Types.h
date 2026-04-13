@@ -35,6 +35,7 @@ namespace FUINames
 	const FUINameID EM_LoadingAssetPage(TEXT("LoadingAssetPage"));
 	const FUINameID EM_LoginPage(TEXT("LoginPage"));
 	const FUINameID EM_NavigationPage(TEXT("NavigationPage"));
+	const FUINameID EM_TipPage(TEXT("TipPage"));
 };
 
 /**
