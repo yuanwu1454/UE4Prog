@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Global/MyGlobals.h"
+#include "Engine/World.h" // 必须包含
 #include "MyGameInstance.generated.h"
 
 class UMyGameInstanceSubsystem;
@@ -74,6 +75,15 @@ public:
 
 	virtual void OnHandleSystemError();
 	virtual void OnShutdownAfterError();
+
+	// 关卡切换开始（旧关卡即将销毁）
+	virtual void OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld) override;
+
+	// 外部可安全使用的回调签名
+	void OnPostWorldInit(UWorld* World, const UWorld::InitializationValues IV);
+
+	void OnLevelAddedToWorld( ULevel* Level, UWorld* World);
+	void OnLevelRemovedFromWorld( ULevel* Level, UWorld* World);
 };
 
 

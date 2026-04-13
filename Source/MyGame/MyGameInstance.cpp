@@ -13,7 +13,7 @@
 #include "GameFramework/WorldSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "Startup/StartupGameMode.h"
-
+#include "Engine/World.h"
 #include "LuaCore.h"
 #include "UnLua.h"
 #include "UnLuaEx.h"
@@ -36,6 +36,11 @@ void UMyGameInstance::Init()
 	
 	FCoreDelegates::OnHandleSystemError.AddUObject(this, &UMyGameInstance::OnHandleSystemError);
 	FCoreDelegates::OnShutdownAfterError.AddUObject(this, &UMyGameInstance::OnShutdownAfterError);
+
+	FWorldDelegates::OnPostWorldInitialization.AddUObject(this, &UMyGameInstance::OnPostWorldInit);
+	FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UMyGameInstance::OnLevelAddedToWorld);
+	FWorldDelegates::LevelRemovedFromWorld.AddUObject(this, &UMyGameInstance::OnLevelRemovedFromWorld);
+
 
 	
 
@@ -60,6 +65,10 @@ void UMyGameInstance::Init()
 
 void UMyGameInstance::Shutdown()
 {
+	// 必须解绑
+	FWorldDelegates::LevelAddedToWorld.RemoveAll(this);
+	FWorldDelegates::LevelRemovedFromWorld.RemoveAll(this);
+	FWorldDelegates::OnPostWorldInitialization.RemoveAll(this);
 
 	FTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 	NtySubsystemsShutDown();
@@ -241,4 +250,56 @@ void UMyGameInstance::OnShutdownAfterError()
 	UE_LOG(LogPM, Error, TEXT("Statck Info: \n%s"), *StackInfo);
 
 	FGenericPlatformProcess::ConditionalSleep([&]() { return true; }, 1);
+}
+
+void UMyGameInstance::OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld)
+{
+	Super::OnWorldChanged(OldWorld, NewWorld);
+
+	if (OldWorld)
+	{
+		FName OldLevel = OldWorld->GetFName();
+		UE_LOG(LogTemp, Log, TEXT("关卡被关闭: %s"), *OldLevel.ToString());
+	}
+	
+	if (NewWorld)
+	{
+		FName NewLevel = NewWorld->GetFName();
+		UE_LOG(LogTemp, Log, TEXT("主关卡切换到: %s"), *NewLevel.ToString());
+	}
+}
+
+void UMyGameInstance::OnPostWorldInit(UWorld* World, const UWorld::InitializationValues IV)
+{
+	if (!World || !World->IsGameWorld())
+		return;
+
+	// 新的主关卡已经完全加载好！
+	FString LevelName = World->GetMapName();
+	UE_LOG(LogTemp, Log, TEXT("✅ 主关卡加载完成：%s"), *LevelName);
+}
+
+void UMyGameInstance::OnLevelAddedToWorld(ULevel* Level, UWorld* World)
+{
+
+
+	if (!World || !Level) return;
+
+	// 是否是 主关卡
+	const bool bIsPersistent = Level->IsPersistentLevel();
+
+	UE_LOG(LogTemp, Log, TEXT("✅ 关卡加入世界: [%s]  %s"),
+		bIsPersistent ? TEXT("主关卡") : TEXT("子关卡"),
+		*Level->GetName());
+}
+
+void UMyGameInstance::OnLevelRemovedFromWorld(ULevel* Level, UWorld* World)
+{
+	if (!World || !Level) return;
+
+	const bool bIsPersistent = Level->IsPersistentLevel();
+
+	UE_LOG(LogTemp, Warning, TEXT("❌ 关卡移出世界: [%s]  %s"),
+		bIsPersistent ? TEXT("主关卡") : TEXT("子关卡"),
+		*Level->GetName());
 }

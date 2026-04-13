@@ -6,4 +6,5 @@ require("Global.FuncUtil")
 require("Global.ConfigMgr")
 require("Global.ProtobufMgr")
 require("Global.ViewMgr")
+require("Global.LevelMgr")
 
