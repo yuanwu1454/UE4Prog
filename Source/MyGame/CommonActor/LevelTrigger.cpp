@@ -56,12 +56,12 @@ void ALevelTrigger::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				TriggerVolume->SetGenerateOverlapEvents(false);
 				bHasLoaded = true;
 			}
-
-			ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, SubLevelToLoad);
-			if (StreamLevel && !StreamLevel->IsLevelLoaded() && !StreamLevel->IsStreamingStatePending())
-			{
-				return;
-			}
+			//
+			// ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, SubLevelToLoad);
+			// if (StreamLevel && !StreamLevel->IsLevelLoaded() && !StreamLevel->IsStreamingStatePending())
+			// {
+			// 	return;
+			// }
 
 			// 核心：加载子关卡，保留主地图！
 			UGameplayStatics::LoadStreamLevel(
