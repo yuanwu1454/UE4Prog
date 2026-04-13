@@ -319,11 +319,12 @@ function GamePanel:SetWidgetVis(widget, bShow, bInteract)
         if bInteract then
             widget:SetVisibility(UE4.ESlateVisibility.Visible)
         else
-            self:ShowUWidget(widget)
+            -- self:ShowUWidget(widget)
+             widget:SetVisibility(UE4.ESlateVisibility.SelfHitTestInvisible)
         end
 
     else
-        self:HideUWidget(widget)
+             widget:SetVisibility(UE4.ESlateVisibility.Collapsed)
     end
 end
 
@@ -403,6 +404,13 @@ end
 function GamePanel:SetWidgetActiveIndex(widget, index)
     if widget then
         widget:SetActiveWidgetIndex(index)
+    end
+end
+
+
+function GamePanel:SetWidgetText(textWidget, text)
+    if textWidget and textWidget.SetText and text then
+        textWidget:SetText(tostring(text))
     end
 end
 

@@ -28,6 +28,8 @@ local function clone(other)
     return _copy(other)
 end
 
+local classMap = {}
+
 function class(classname, super)
 	local superType = type(super)
 	local cls
@@ -85,9 +87,12 @@ function class(classname, super)
 	function cls:GetName()
 		return tostring(self.__cname)
 	end
-
+	classMap[classname] = cls
 	return cls
 end
 
 _G.class = class
 _G.clone = clone
+_G.getClass = function (classname)
+    return classMap[classname]
+end

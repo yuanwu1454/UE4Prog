@@ -13,7 +13,10 @@ function TabSwitchPage:InitializeLuaEvent()
 end
 
 function TabSwitchPage:LuaHandleKeyEvent(key, inputEvent)
-    return self.HotKeyButton_Esc:MonitorKeyDown(key, inputEvent)
+    if self.HotKeyButton_Esc then
+        return self.HotKeyButton_Esc:MonitorKeyDown(key, inputEvent)
+    end
+    return false
 end
 
 function TabSwitchPage:Construct()
@@ -68,10 +71,10 @@ function TabSwitchPage:PrivateSelectTab(index)
         item:SetSelectState(index == i)
     end
 
-    if self.curLotteryId == index then
+    if self.curId == index then
 		return
 	end
-	self.curLotteryId = index
+	self.curId = index
 
     local id = self:GetID(index)
     self:SetLastOpenData(id)
@@ -208,7 +211,7 @@ function TabSwitchPage:SetLastOpenData(var)
 end
 
 function TabSwitchPage:OnEscHotKeyClick()
-    GameFacade:SendNotification(NotificationDefines.NavigationBar.SwitchDisplayPage)
+    -- GameFacade:SendNotification(NotificationDefines.NavigationBar.SwitchDisplayPage)
 end
 
 function TabSwitchPage:GetTabs()
