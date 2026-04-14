@@ -5,7 +5,7 @@
 print("entrypoint")
 
 function GlobalFunc()
-    UE4.LuaBridge.LuaOpenPage(LuaGetWorld(), "SettingPage", nil, {a = 1,b = 2})
+    ViewMgr:OpenPage(LuaGetWorld(), "SettingPage", nil, {a = 1,b = 2})
 end
 
 
