@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActorBase.h"
 #include "GameFramework/Actor.h"
 #include "LevelTrigger.generated.h"
 
 UCLASS()
-class MYGAME_API ALevelTrigger : public AActor
+class MYGAME_API ALevelTrigger : public AActorBase
 {
 	GENERATED_BODY()
 

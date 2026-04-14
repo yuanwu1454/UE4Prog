@@ -13,4 +13,6 @@ UCLASS()
 class MYGAME_API AKingPlayerController : public APlayerControllerBase
 {
 	GENERATED_BODY()
+	AKingPlayerController(const FObjectInitializer& ObjectInitializer);
+
 };

@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/HUD.h"
 
 // Called when the game starts or when spawned
 void ALevelTrigger::BeginPlay()
@@ -13,6 +14,18 @@ void ALevelTrigger::BeginPlay()
 	Super::BeginPlay();
 
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ALevelTrigger::OnOverlap);
+	
+	if (AHUD* HUD = GetHUD())
+	{
+		HUD->AddDebugText(
+			TEXT("我是普通Actor，成功调用HUD!"),
+			this,
+			3.0f,// 持续时间
+			FVector(0, 0, 100),
+			FVector(0, 0, 100),
+			FColor::Yellow
+		);
+	}
 }
 
 // Called every frame
