@@ -29,7 +29,9 @@ end
 
 function APage:OnClick1()
     LogInfo(" APage ", "OnClick1");
-    UE4.UGameplayStatics.OpenLevel(self, '/Game/FirstPersonCPP/Maps/FirstPersonExampleMap')
+    -- UE4.UGameplayStatics.OpenLevel(self, '/Game/FirstPersonCPP/Maps/FirstPersonExampleMap', true, "a=1")
+
+    UE4.UGameplayStatics.OpenLevel(self, "/Game/Cinema/King", true)
     -- 你用了带点后缀的写法，等于把 “主地图切换” 当成了 “流关卡加载”，
     -- 2. 错误写法（你不能动）
     -- plaintext

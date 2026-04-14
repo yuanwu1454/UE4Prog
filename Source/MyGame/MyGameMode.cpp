@@ -40,6 +40,13 @@ void AMyGameMode::InitGame(const FString& MapName, const FString& Options, FStri
         UE_LOG(LogGameMode, Error, TEXT("InitGame failed (super): %s"), *ErrorMessage);
         return;
     }
+
+
+    UE_LOG(LogGameMode, Log, TEXT("InitGame Options%s"), *Options);
+
+    // 不传递 就是一个空字符串
+    FString PlayerID = UGameplayStatics::ParseOption(Options, TEXT("PlayerID"));
+    UE_LOG(LogGameMode, Log, TEXT("PlayerID is %s"), *PlayerID);
     
     // ========== 第二步：解析启动参数，初始化核心配置（核心逻辑） ==========
     // 1. 解析服务器最大玩家数（从启动Options中读取，默认32）

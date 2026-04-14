@@ -7,25 +7,32 @@
 
 void UGlobalInitializeState::BeginState()
 {
-	// bool bNeedFinishInitInOneFrame = false;
-	// if (const UGlobalInitStateEventData* EvtData = Cast<const UGlobalInitStateEventData>(GetTriggerEventData()))
-	// {
-	// 	bNeedFinishInitInOneFrame = EvtData->bNeedQuickFinishAndWait;
-	// }
-	// // 需要一帧内同步完成初始化
-	// if (bNeedFinishInitInOneFrame)
-	// {
-	// 	CleanPhaseResetData();
-	// 	InitPhaseLoadGameData();
-	// 	InitPhaseStartupGameinstanceSubsystem();
-	// 	InitPhaseStartDataCenterSubsystem();
-	// 	RunPostInitActions();
-	// }
-	// else
-	// {
+	bool bNeedFinishInitInOneFrame = false;
+
+
+	const UStateEventData* Data = GetTriggerEventData();
+	if (Data && Data->IsA(UGlobalInitStateEventData::StaticClass()))
+	{
+		const UGlobalInitStateEventData* EvtData = Cast<const UGlobalInitStateEventData>(Data);
+		if (EvtData)
+		{
+			bNeedFinishInitInOneFrame = EvtData->bNeedQuickFinishAndWait;
+		}
+	}
+	// 需要一帧内同步完成初始化
+	if (bNeedFinishInitInOneFrame)
+	{
+		CleanPhaseResetData();
+		InitPhaseLoadGameData();
+		InitPhaseStartupGameinstanceSubsystem();
+		InitPhaseStartDataCenterSubsystem();
+		RunPostInitActions();
+	}
+	else
+	{
 		// 正常启动初始化
 		Super::BeginState();
-	// }
+	}
 }
 
 void UGlobalInitializeState::EndState()

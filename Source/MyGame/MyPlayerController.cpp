@@ -20,6 +20,14 @@ void AMyPlayerController::BeginPlay()
 	if (IsLocalController())
 	{
 		EnterGameOnlyInputMode();
+
+		// 获取当前世界的URL（包含Options）
+		if (GetWorld())
+		{
+			// 👇 直接接收Options字符串
+			FURL InURL = GetWorld()->URL;
+			UE_LOG(LogTemp,Log, TEXT("InURL %s"), *InURL.ToString())
+		}
 	}
 }
 

@@ -89,11 +89,11 @@ void UMyGameInstance::OnStart()
 {
 	Super::OnStart();
 
-	if (UGlobalStateMachine* GlobalSM = UGlobalStateMachine::Get(this))
-	{
-		UGlobalEntryStateEventData* EventData = NewObject<UGlobalEntryStateEventData>();
-		GlobalSM->TransferGlobalState(EGlobalStateType::Entry, EventData);
-	}
+	// if (UGlobalStateMachine* GlobalSM = UGlobalStateMachine::Get(this))
+	// {
+	// 	UGlobalEntryStateEventData* EventData = NewObject<UGlobalEntryStateEventData>();
+	// 	GlobalSM->TransferGlobalState(EGlobalStateType::Entry, EventData);
+	// }
 }
 
 bool UMyGameInstance::Exec(UWorld* InWorld, const TCHAR* Cmd, FOutputDevice& Out)

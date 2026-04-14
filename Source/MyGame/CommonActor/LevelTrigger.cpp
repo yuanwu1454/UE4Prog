@@ -57,7 +57,7 @@ void ALevelTrigger::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				bHasLoaded = true;
 			}
 			//
-			// ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, SubLevelToLoad);
+
 			// if (StreamLevel && !StreamLevel->IsLevelLoaded() && !StreamLevel->IsStreamingStatePending())
 			// {
 			// 	return;
@@ -71,9 +71,12 @@ void ALevelTrigger::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 				false,                 // 不阻塞（异步加载）
 				FLatentActionInfo()    // 回调（可选，这里用绑定的方式）
 			);
-			
-			StreamLevel->OnLevelLoaded.AddDynamic(this, &ALevelTrigger::OnSubLevelLoaded);
-			StreamLevel->OnLevelShown.AddDynamic(this, &ALevelTrigger::OnSubLevelShown);
+			ULevelStreaming* StreamLevel = UGameplayStatics::GetStreamingLevel(this, SubLevelToLoad);
+			if (StreamLevel)
+			{
+				StreamLevel->OnLevelLoaded.AddDynamic(this, &ALevelTrigger::OnSubLevelLoaded);
+				StreamLevel->OnLevelShown.AddDynamic(this, &ALevelTrigger::OnSubLevelShown);
+			}
 		}
 	}
 }

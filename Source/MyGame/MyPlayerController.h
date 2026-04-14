@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class MYGAME_API AMyPlayerController : public ABasePlayerController
+class MYGAME_API AMyPlayerController : public APlayerControllerBase
 {
 	GENERATED_BODY()
 public:
