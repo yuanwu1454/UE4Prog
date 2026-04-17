@@ -26,6 +26,7 @@ public:
 	void NotifyHitBoxClick(FName BoxName) override;
 	void NotifyHitBoxBeginCursorOver(FName BoxName) override;
 	void NotifyHitBoxEndCursorOver(FName BoxName) override;
+	void TestHUD();
 
 	// 按钮名字
 	const FName Btn_Start = TEXT("Btn_Start");

@@ -84,8 +84,35 @@ void AKingHUD::DrawHUD()
 void AKingHUD::DrawActorOverlays(FVector Viewpoint, FRotator ViewRotation)
 {
 	Super::DrawActorOverlays(Viewpoint, ViewRotation);
+}
 
+void AKingHUD::NotifyHitBoxClick(FName BoxName)
+{
+	Super::NotifyHitBoxClick(BoxName);
+	if (BoxName == Btn_Start)
+    {
+    	UE_LOG(LogTemp, Log, TEXT("=== 开始游戏 ==="));
+    }
+    else if (BoxName == Btn_Exit)
+    {
+    	UE_LOG(LogTemp, Log, TEXT("=== 退出游戏 ==="));
+    }
+}
 
+void AKingHUD::NotifyHitBoxBeginCursorOver(FName BoxName)
+{
+	Super::NotifyHitBoxBeginCursorOver(BoxName);
+	UE_LOG(LogTemp, Log, TEXT("鼠标进入：%s"), *BoxName.ToString());
+}
+
+void AKingHUD::NotifyHitBoxEndCursorOver(FName BoxName)
+{
+	Super::NotifyHitBoxEndCursorOver(BoxName);
+	UE_LOG(LogTemp, Log, TEXT("鼠标离开：%s"), *BoxName.ToString());
+}
+
+void AKingHUD::TestHUD()
+{
 	if(bShowActorOverlayInfo)
 	{
 		APlayerController* PlayerController = GetOwningPlayerController();
@@ -170,29 +197,4 @@ void AKingHUD::DrawActorOverlays(FVector Viewpoint, FRotator ViewRotation)
 	// ==============================================
 	DrawText(TEXT("开始游戏"), FLinearColor::White, 110, 110);
 	DrawText(TEXT("退出游戏"), FLinearColor::White, 110, 210);
-}
-
-void AKingHUD::NotifyHitBoxClick(FName BoxName)
-{
-	Super::NotifyHitBoxClick(BoxName);
-	if (BoxName == Btn_Start)
-    {
-    	UE_LOG(LogTemp, Log, TEXT("=== 开始游戏 ==="));
-    }
-    else if (BoxName == Btn_Exit)
-    {
-    	UE_LOG(LogTemp, Log, TEXT("=== 退出游戏 ==="));
-    }
-}
-
-void AKingHUD::NotifyHitBoxBeginCursorOver(FName BoxName)
-{
-	Super::NotifyHitBoxBeginCursorOver(BoxName);
-	UE_LOG(LogTemp, Log, TEXT("鼠标进入：%s"), *BoxName.ToString());
-}
-
-void AKingHUD::NotifyHitBoxEndCursorOver(FName BoxName)
-{
-	Super::NotifyHitBoxEndCursorOver(BoxName);
-	UE_LOG(LogTemp, Log, TEXT("鼠标离开：%s"), *BoxName.ToString());
 }
