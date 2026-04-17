@@ -43,6 +43,11 @@ protected:
 	// 停止奔跑
 	void StopSprint();
 
+	// 按下跳跃
+	void JumpPressed();
+	// 松开跳跃
+	void JumpReleased();
+
 public:
 
 	// Called to bind functionality to input

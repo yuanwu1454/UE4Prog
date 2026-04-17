@@ -41,6 +41,10 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AThirdPersonCharacter::StartSprint);
 	// 松开 Left Shift → 走路
 	InputComponent->BindAction("Sprint", IE_Released, this, &AThirdPersonCharacter::StopSprint);
+
+	// 跳跃（空格）
+	InputComponent->BindAction("Jump", IE_Pressed, this, &AThirdPersonCharacter::JumpPressed);
+	InputComponent->BindAction("Jump", IE_Released, this, &AThirdPersonCharacter::JumpReleased);
 }
 
 // ==============================================
@@ -70,5 +74,16 @@ void AThirdPersonCharacter::StopSprint()
 	{
 		Movement->MaxWalkSpeed = WalkSpeed;
 	}
+}
 
+
+// ==================== 跳跃 ====================
+void AThirdPersonCharacter::JumpPressed()
+{
+	Jump(); // 父类 ACharacter 自带跳跃！直接调用就行
+}
+
+void AThirdPersonCharacter::JumpReleased()
+{
+	StopJumping(); // 父类自带，松开停止跳跃（控制跳跃高度）
 }
