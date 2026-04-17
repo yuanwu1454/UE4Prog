@@ -39,6 +39,7 @@ public class MyGame : ModuleRules
 			Path.Combine(ModuleDirectory, "Slate"),
 			Path.Combine(ModuleDirectory, "Assets"),
 			Path.Combine(ModuleDirectory, "Base"),
+			Path.Combine(ModuleDirectory, "GAS"),
 		});
 		
 		// 关键：如果是编辑器模块，添加Editor相关依赖
@@ -55,6 +56,9 @@ public class MyGame : ModuleRules
 			"UnLua",
 			"Lua",
 			"EngineSettings",
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks"
 		});
 		
 		// Uncomment if you are using Slate UI

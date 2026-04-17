@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemComponentBase.h"
 #include "ThirdPersonCharacter.generated.h"
 
 UCLASS()
-class MYGAME_API AThirdPersonCharacter : public ACharacter
+class MYGAME_API AThirdPersonCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -15,6 +17,19 @@ public:
 	// Sets default values for this character's properties
 	AThirdPersonCharacter();
 
+    // ASC 组件
+    UPROPERTY(VisibleAnywhere, Category = "GAS")
+    UAbilitySystemComponentBase* AbilitySystemComponent;
+	
+	// 【关键】暴露给蓝图的技能列表
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS | Abilities")
+	TArray<TSubclassOf<class UGameplayAbilityBase>> DefaultAbilities;
+
+	// 实现接口
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return AbilitySystemComponent;
+	}
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,6 +62,12 @@ protected:
 	void JumpPressed();
 	// 松开跳跃
 	void JumpReleased();
+
+	// 自动授予技能（内部调用）
+	void GiveDefaultAbilities();
+
+	void OnFireballInputPressed();
+
 
 public:
 

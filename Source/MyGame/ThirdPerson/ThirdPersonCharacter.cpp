@@ -3,8 +3,11 @@
 
 #include "ThirdPersonCharacter.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AS/HeroAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "GA/GameplayAbilityBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -22,13 +25,29 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // 绑定到 SpringArm 末端
 
-	
+	// 创建ASC
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponentBase>(TEXT("AbilitySystem"));
+	// 网络复制（多人必开）
+	AbilitySystemComponent->SetIsReplicated(true);
 }
 
 // Called when the game starts or when spawned
 void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	// 初始化ASC（Owner和Avatar都是自己）
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		
+		AbilitySystemComponent->AddSet<UHeroAttributeSet>();
+		
+		// UHeroAttributeSet* AttributeSet = NewObject<UHeroAttributeSet>(AbilitySystem);
+		// AbilitySystem->AddAttributeSetSubobject(AttributeSet);
+		
+		GiveDefaultAbilities();
+
+	}
 }
 
 // Called to bind functionality to input
@@ -86,4 +105,33 @@ void AThirdPersonCharacter::JumpPressed()
 void AThirdPersonCharacter::JumpReleased()
 {
 	StopJumping(); // 父类自带，松开停止跳跃（控制跳跃高度）
+}
+
+void AThirdPersonCharacter::GiveDefaultAbilities()
+{
+	if (!HasAuthority() || !AbilitySystemComponent) return;
+
+	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultAbilities)
+	{
+		if (AbilityClass)
+		{
+			FGameplayAbilitySpec Spec(AbilityClass, 1);
+			AbilitySystemComponent->GiveAbility(Spec);
+		}
+	}
+}
+
+void AThirdPersonCharacter::OnFireballInputPressed()
+{
+	
+	if (!AbilitySystemComponent) return;
+
+	// 1. 构造事件数据
+	FGameplayEventData EventData;
+	EventData.Instigator = this;          // 发起者
+	EventData.Target = this;              // 目标（自己放技能就填自己）
+	EventData.EventTag = FGameplayTag::RequestGameplayTag(FName("Event.Ability.Cast.Fireball"));
+
+	// 2. 发送事件给 ASC
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, EventData.EventTag, EventData);
 }
