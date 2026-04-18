@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayAbilityBase.h"
+
 #include "GA_FireBall.generated.h"
+
+
 
 /**
  * 
@@ -22,7 +25,8 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Fireball")
-	TSubclassOf<AActor> FireballClass; // 火球蓝图类
+	TSubclassOf<class AProjectileActor> FireballClass; // 火球蓝图类
+
 
 protected:
 

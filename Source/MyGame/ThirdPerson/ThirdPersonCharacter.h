@@ -67,8 +67,13 @@ protected:
 	void GiveDefaultAbilities();
 
 	void OnFireballInputPressed();
+	
+	// 用来保存委托句柄（必须存，不然会失效）
+	FOnAttributeChangeData OnAttributeChangedHandle;
 
-
+    // 属性变化回调
+    void OnHealthChanged(const FOnAttributeChangeData& Data);
+    void OnManaChanged(const FOnAttributeChangeData& Data);
 public:
 
 	// Called to bind functionality to input

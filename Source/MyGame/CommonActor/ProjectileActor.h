@@ -7,11 +7,15 @@
 #include "GameFramework/Actor.h"
 #include "ProjectileActor.generated.h"
 
+// 1. 声明代理：写在这里，类外面！
+DECLARE_DELEGATE_OneParam(FOnProjectileHit, AActor*);
+
+
 UCLASS()
 class MYGAME_API AProjectileActor : public AActorBase
 {
 	GENERATED_BODY()
-
+public:
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	class USphereComponent* CollisionComp;
@@ -20,9 +24,12 @@ class MYGAME_API AProjectileActor : public AActorBase
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileMovement;
 	
-public:
+
 	// Sets default values for this actor's properties
 	AProjectileActor();
+
+	FOnProjectileHit OnProjectileHit;
+
 
 protected:
 	// Called when the game starts or when spawned

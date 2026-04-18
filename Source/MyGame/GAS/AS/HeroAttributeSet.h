@@ -35,29 +35,43 @@ public:
 	UHeroAttributeSet();
 	// ====================== 生命值 ======================
 	// 当前血量
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", ReplicatedUsing = OnRep_Health)
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Health)
 
 	// 最大血量（必须有！）
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, MaxHealth)
 
 	// ====================== 魔法值 ======================
 	// 当前蓝量
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana", ReplicatedUsing = OnRep_Mana)
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, Mana)
 
 	// 最大蓝量
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana", ReplicatedUsing = OnRep_MaxMana)
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UHeroAttributeSet, MaxMana)
+
+	UFUNCTION()
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
+
+	UFUNCTION()
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+	
+	UFUNCTION()
+	virtual void OnRep_Mana(const FGameplayAttributeData& OldMana);
+
+	UFUNCTION()
+	virtual void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana);
+
 protected:
 	// 属性修改前调用：限制血量/蓝量在 0 ~ 最大值之间
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	// 属性修改后调用：同步当前值不超过最大值（更安全）
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

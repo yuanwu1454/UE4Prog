@@ -5,6 +5,7 @@ local GlobalModuleInits = {
 	"Business/Common/Init",
 	-- "Business/ResUpdate/Init",
 	"Business/Login/Init",
+	"Business/Game/Init",
 }
 
 function GameFacade:SetupGameProxy()

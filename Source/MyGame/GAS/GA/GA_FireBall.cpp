@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerController.h"
+#include "CommonActor/ProjectileActor.h"
 
 UGA_FireBall::UGA_FireBall()
 {
@@ -16,12 +17,16 @@ UGA_FireBall::UGA_FireBall()
 void UGA_FireBall::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	// 【必须写！第一行就调用】
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	// // 【必须写！第一行就调用】
+	// Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	// ==============================================
 	// 第二步：检查并提交技能（耗蓝、冷却、标签判断）
 	// ==============================================
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	if (!ASC) return;
+
+	ShowASCTag(ASC);
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		// 提交失败，直接结束技能
@@ -72,20 +77,20 @@ void UGA_FireBall::SpawnFireball()
 	SpawnParams.Owner = Character;
 	SpawnParams.Instigator = Character;
 
-	AActor* Fireball = GetWorld()->SpawnActor<AActor>(
+	AProjectileActor* Fireball = GetWorld()->SpawnActor<AProjectileActor>(
 		FireballClass,
 		SpawnLocation,
 		SpawnRot,
 		SpawnParams
 	);
 
-	// if (Fireball)
-	// {
-	// 	// --------------------------
-	// 	// 关键：火球命中 绑定到 GA 回调
-	// 	// --------------------------
-	// 	Fireball->OnProjectileHit.BindUObject(this, &UGA_Fireball::OnFireballHit);
-	// }
+	if (Fireball)
+	{
+		// --------------------------
+		// 关键：火球命中 绑定到 GA 回调
+		// --------------------------
+		Fireball->OnProjectileHit.BindUObject(this, &UGA_FireBall::OnFireballHit);
+	}
 }
 void UGA_FireBall::OnFireballHit(AActor* TargetActor)
 {

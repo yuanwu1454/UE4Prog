@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UnLuaInterface.h"
 #include "GameFramework/HUD.h"
 #include "HUDBase.generated.h"
 
@@ -10,9 +11,16 @@
  * 
  */
 UCLASS()
-class MYGAME_API AHUDBase : public AHUD
+class MYGAME_API AHUDBase : public AHUD, public IUnLuaInterface
 {
 	GENERATED_BODY()
+public:
+	virtual FString GetModuleName_Implementation() const override;
+
+	// Lua文件路径，不需要扩展名
+	UPROPERTY(EditDefaultsOnly, AssetRegistrySearchable, Category = "Config | Lua")
+	FString LuaModuleName;
+
 };
 
 

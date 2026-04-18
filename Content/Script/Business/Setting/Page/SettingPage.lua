@@ -17,6 +17,7 @@ function SettingPage:Construct()
     self:CreateBindEvent("Button_Click1", "OnClicked", "OnClick1")
     self:CreateBindEvent("Button_Click2", "OnClicked", "OnClick2")
     self:CreateBindEvent("Button_Click3", "OnClicked", "OnClick3")
+    self:CreateBindEvent("Button_Click4", "OnClicked", "OnClick4")
     self.WBP_HotKey:SetClickFunc(function()
         self:OnCloseClick()
     end)
@@ -66,6 +67,11 @@ function SettingPage:OnClick3()
 
     -- local M = require("LuaProto/test")
     -- M.Test()
+end
+
+function SettingPage:OnClick4()
+    LogInfo(" SettingPage ", "OnClick4");
+    print(ND.ManaNotify)
 end
 
 function SettingPage:OnCloseClick()

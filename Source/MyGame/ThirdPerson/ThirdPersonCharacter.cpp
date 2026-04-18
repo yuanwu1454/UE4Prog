@@ -4,6 +4,7 @@
 #include "ThirdPersonCharacter.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GASInstanceSubsystem.h"
 #include "AS/HeroAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -41,9 +42,18 @@ void AThirdPersonCharacter::BeginPlay()
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 		
 		AbilitySystemComponent->AddSet<UHeroAttributeSet>();
+
+		// 2. 【关键：绑定属性变化监听】
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UHeroAttributeSet::GetHealthAttribute()) // 要监听的属性
+			.AddUObject(this, &AThirdPersonCharacter::OnHealthChanged);
+
+
+
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UHeroAttributeSet::GetManaAttribute()) // 要监听的属性
+			.AddUObject(this, &AThirdPersonCharacter::OnManaChanged);
 		
-		// UHeroAttributeSet* AttributeSet = NewObject<UHeroAttributeSet>(AbilitySystem);
-		// AbilitySystem->AddAttributeSetSubobject(AttributeSet);
 		
 		GiveDefaultAbilities();
 
@@ -64,6 +74,8 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	// 跳跃（空格）
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AThirdPersonCharacter::JumpPressed);
 	InputComponent->BindAction("Jump", IE_Released, this, &AThirdPersonCharacter::JumpReleased);
+	
+	InputComponent->BindKey(FKey("Q"), IE_Released, this, &AThirdPersonCharacter::OnFireballInputPressed);
 }
 
 // ==============================================
@@ -126,6 +138,11 @@ void AThirdPersonCharacter::OnFireballInputPressed()
 	
 	if (!AbilitySystemComponent) return;
 
+	if(auto Inst = UGASInstanceSubsystem::Get(this))
+	{
+		Inst->ShowASCTag(AbilitySystemComponent);
+	}
+
 	// 1. 构造事件数据
 	FGameplayEventData EventData;
 	EventData.Instigator = this;          // 发起者
@@ -134,4 +151,17 @@ void AThirdPersonCharacter::OnFireballInputPressed()
 
 	// 2. 发送事件给 ASC
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, EventData.EventTag, EventData);
+}
+
+
+// 血量变化
+void AThirdPersonCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Log, TEXT("血量：%f → %f"), Data.OldValue, Data.NewValue);
+}
+
+// 蓝量变化
+void AThirdPersonCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Log, TEXT("蓝量：%f → %f"), Data.OldValue, Data.NewValue);
 }

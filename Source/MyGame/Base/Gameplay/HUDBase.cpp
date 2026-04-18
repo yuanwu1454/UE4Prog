@@ -2,3 +2,8 @@
 
 
 #include "HUDBase.h"
+
+FString AHUDBase::GetModuleName_Implementation() const
+{
+	return LuaModuleName;
+}

@@ -65,7 +65,6 @@ void AInteractActor::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Warning, TEXT("=== 5. BeginPlay 游戏开始 ==="));
-	SetLifeSpan(2.0);
 }
 
 // ====================== 鼠标点击 ======================

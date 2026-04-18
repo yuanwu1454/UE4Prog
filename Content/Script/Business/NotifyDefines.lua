@@ -1,3 +1,6 @@
+if ND then
+	return
+end
 local repeatCheckTbl = {}
 local parentName = "NotificationDefines"
 local meta
@@ -64,5 +67,5 @@ meta = {
 local NotificationDefines = {}
 setmetatable(NotificationDefines, meta)
 _G.ND = NotificationDefines
-
+print("ND",ND)
 print("define ND")

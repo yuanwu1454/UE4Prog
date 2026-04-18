@@ -58,6 +58,16 @@ void AProjectileActor::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	// GetStaticMeshComp();
 
 	RandomChangeProjectileColor();
+
+
+	
+	// ------------------------------
+	// 关键：执行委托，通知 GA
+	// ------------------------------
+	if (OnProjectileHit.IsBound())
+	{
+		OnProjectileHit.Execute(OtherActor);
+	}
 	
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
@@ -71,51 +81,7 @@ void AProjectileActor::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 UStaticMeshComponent* AProjectileActor::GetStaticMeshComp()
 {
 	// 找到第一个StaticMesh
-	UStaticMeshComponent* MyStaticMesh = nullptr;
-	// {
-	// 	// 获取挂载在 CollisionComp 下的 StaticMesh 组件
-	// 	
-	// 	// 遍历碰撞体的所有子组件，找到 StaticMesh
-	// 	TArray<USceneComponent*> TempChildren;
-	// 	CollisionComp->GetChildrenComponents(true, TempChildren);
-	//
-	// 	for (USceneComponent* Child : TempChildren)
-	// 	{
-	// 		if (UStaticMeshComponent* MeshComp = Cast<UStaticMeshComponent>(Child))
-	// 		{
-	// 			MyStaticMesh = MeshComp;
-	// 			break; // 找到第一个就停止
-	// 		}
-	// 	}
-	//
-	// 	// 找到了！
-	// 	if (MyStaticMesh)
-	// 	{
-	// 		UE_LOG(LogTemp, Log, TEXT("A 成功获取蓝图中的StaticMesh: %s"), *MyStaticMesh->GetName());
-	// 		// 你可以在这里操作它：
-	// 		// MyStaticMesh->SetVisibility(false);
-	// 		// MyStaticMesh->SetStaticMesh(NewMesh);
-	// 	}
-	// 	
-	// }
-
-	// {
-	// 	// 如果你的子弹蓝图里 只有一个 StaticMesh，用这个更简单：
-	// 	MyStaticMesh = FindComponentByClass<UStaticMeshComponent>();
-	// 	if (MyStaticMesh)
-	// 	{
-	// 		UE_LOG(LogTemp, Log, TEXT("B 成功获取蓝图中的StaticMesh: %s"), *MyStaticMesh->GetName());
-	// 	}
-	// }
-
-	{
-		MyStaticMesh = Cast<UStaticMeshComponent>(CollisionComp->GetChildComponent(0));
-
-		// if (MyStaticMesh)
-		// {
-		// 	UE_LOG(LogTemp, Log, TEXT("C 成功获取蓝图中的StaticMesh: %s"), *MyStaticMesh->GetName());
-		// }
-	}
+	UStaticMeshComponent* MyStaticMesh  = Cast<UStaticMeshComponent>(CollisionComp->GetChildComponent(0));
 	return MyStaticMesh;
 }
 

@@ -13,4 +13,6 @@ UCLASS()
 class MYGAME_API UGameplayAbilityBase : public UGameplayAbility
 {
 	GENERATED_BODY()
+public:
+	void ShowASCTag(UAbilitySystemComponent* ASC);
 };
