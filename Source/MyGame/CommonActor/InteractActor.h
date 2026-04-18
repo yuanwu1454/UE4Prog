@@ -6,6 +6,22 @@
 #include "ActorBase.h"
 #include "InteractActor.generated.h"
 
+
+// 自定义组件，用来观察组件生命周期
+UCLASS()
+class UInteractComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	UInteractComponent();
+
+protected:
+	virtual void InitializeComponent() override;
+	virtual void BeginPlay() override;
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+};
+
 UCLASS()
 class MYGAME_API AInteractActor : public AActorBase
 {
@@ -27,6 +43,9 @@ public:
 	// 相机组件（附加在StaticMesh上）
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* CameraComponent;
+	
+	UPROPERTY()
+	UInteractComponent* InteractComp;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,6 +58,14 @@ protected:
 	virtual void BecomeViewTarget( class APlayerController* PC ) override;
 	virtual void EndViewTarget( class APlayerController* PC ) override;
 
+	// 构造脚本
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	// 销毁
+	virtual void Destroyed() override;
+
+	// 组件初始化完成
+	virtual void PostInitializeComponents() override;
 	
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;

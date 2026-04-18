@@ -6,6 +6,32 @@
 #include "Camera/CameraComponent.h"
 
 
+// ------------------------------
+// 组件
+// ------------------------------
+UInteractComponent::UInteractComponent()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[组件] 构造函数"));
+}
+
+void UInteractComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	UE_LOG(LogTemp, Warning, TEXT("[组件] InitializeComponent"));
+}
+
+void UInteractComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("[组件] BeginPlay"));
+}
+
+void UInteractComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[组件] OnComponentDestroyed"));
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+}
+
 // Sets default values
 AInteractActor::AInteractActor()
 {
@@ -28,13 +54,18 @@ AInteractActor::AInteractActor()
 	// 可选：给相机一个初始位置，避免和网格体重叠
 	CameraComponent->SetRelativeLocation(FVector(0, 0, 150.0f));
 	CameraComponent->bAutoActivate = true;
+
+	
+	// 创建组件
+	InteractComp = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComp"));
 }
 
 // Called when the game starts or when spawned
 void AInteractActor::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("[Actor] 出生：%s"), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("=== 5. BeginPlay 游戏开始 ==="));
+	SetLifeSpan(2.0);
 }
 
 // ====================== 鼠标点击 ======================
@@ -76,6 +107,28 @@ void AInteractActor::EndViewTarget(APlayerController* PC)
 	UE_LOG(LogTemp, Warning, TEXT("[视角] 我不再是相机观察目标：%s"), *GetName());
 }
 
+// 构造脚本（编辑器/游戏都会跑）
+// 本质上是为了服务编辑器而创作的。 点击蓝图上的编译就会运行下，打开蓝图也会编译下
+void AInteractActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	UE_LOG(LogTemp, Warning, TEXT("=== 3. OnConstruction 构造脚本 ==="));
+}
+
+// 组件全部初始化完
+void AInteractActor::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	UE_LOG(LogTemp, Warning, TEXT("=== 4. PostInitializeComponents (组件全部初始化完成) ==="));
+}
+
+// 销毁
+void AInteractActor::Destroyed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("=== 6. Actor Destroyed ==="));
+	Super::Destroyed();
+}
+
 // ====================== 碰撞重叠（穿模/进入/离开） ======================
 void AInteractActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
@@ -112,3 +165,28 @@ void AInteractActor::Reset()
 // BecomeViewTarget
 // EndViewTarget
 // PC->SetViewTarget(MyActor);
+
+// 先加载，后创建，
+// 组件注册排前面。
+// 构造脚本跑一遍，
+// 组件初始化再连线。
+// 最后 BeginPlay 出现，
+// 游戏逻辑才开演。
+
+
+// Actor 的构造函数与OnConstruction
+// 1. 构造函数 Actor ()
+// C++ 层面的构造
+// 只跑一次
+// 用来搭骨架：创建组件、设默认值、设 Root
+// 游戏运行 + 编辑器都用它
+
+// 2. OnConstruction
+// 引擎层面的 “重建” 回调
+// 可以反复执行 N 次
+// 主要为了：
+// 编辑器里拖动物体
+// 改 Details 面板参数
+// 打开关卡
+// 移动、旋转、缩放
+// → 立刻看到预览效果

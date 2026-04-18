@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyProjectile.h"
+#include "ProjectileActor.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
-AMyProjectile::AMyProjectile()
+AProjectileActor::AProjectileActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,7 +17,7 @@ AMyProjectile::AMyProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AMyProjectile::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp->OnComponentHit.AddDynamic(this, &AProjectileActor::OnHit);		// set up a notification for when this component hits something blocking
 
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
@@ -39,19 +39,19 @@ AMyProjectile::AMyProjectile()
 }
 
 // Called when the game starts or when spawned
-void AMyProjectile::BeginPlay()
+void AProjectileActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void AMyProjectile::Tick(float DeltaTime)
+void AProjectileActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AMyProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+void AProjectileActor::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
 
@@ -68,7 +68,7 @@ void AMyProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 	}
 }
 
-UStaticMeshComponent* AMyProjectile::GetStaticMeshComp()
+UStaticMeshComponent* AProjectileActor::GetStaticMeshComp()
 {
 	// 找到第一个StaticMesh
 	UStaticMeshComponent* MyStaticMesh = nullptr;
@@ -116,15 +116,10 @@ UStaticMeshComponent* AMyProjectile::GetStaticMeshComp()
 		// 	UE_LOG(LogTemp, Log, TEXT("C 成功获取蓝图中的StaticMesh: %s"), *MyStaticMesh->GetName());
 		// }
 	}
-
-
 	return MyStaticMesh;
-
-
-
 }
 
-void AMyProjectile::RandomChangeProjectileColor()
+void AProjectileActor::RandomChangeProjectileColor()
 {
 	// ==============================================
 	// 1. 获取 StaticMesh 组件

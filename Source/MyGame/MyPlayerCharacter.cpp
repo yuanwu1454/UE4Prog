@@ -8,7 +8,6 @@
 #include "GameFramework/PlayerInput.h"
 #include "Log/MultiplayerLogHelper.h"
 #include "Net/UnrealNetwork.h"
-#include "MyProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -18,6 +17,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "CommonActor/ProjectileActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -259,7 +259,7 @@ void AMyPlayerCharacter::OnFire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// spawn the projectile at the muzzle
-			AMyProjectile* SpawnedProjectile = World->SpawnActor<AMyProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			AProjectileActor* SpawnedProjectile = World->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 
 			// 生成后 直接调用随机变色！
 			if (IsValid(SpawnedProjectile))

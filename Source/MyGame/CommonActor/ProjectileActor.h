@@ -1,13 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActorBase.h"
 #include "GameFramework/Actor.h"
-#include "MyProjectile.generated.h"
+#include "ProjectileActor.generated.h"
 
 UCLASS()
-class MYGAME_API AMyProjectile : public AActor
+class MYGAME_API AProjectileActor : public AActorBase
 {
 	GENERATED_BODY()
 
@@ -21,7 +22,7 @@ class MYGAME_API AMyProjectile : public AActor
 	
 public:
 	// Sets default values for this actor's properties
-	AMyProjectile();
+	AProjectileActor();
 
 protected:
 	// Called when the game starts or when spawned
