@@ -22,7 +22,7 @@ end
 
 
 function HUDPage:OnOpen(luaOpenData, nativeOpenData)
-   SuperClass.OnOpen(self, luaOpenData, nativeOpenData)
+    SuperClass.OnOpen(self, luaOpenData, nativeOpenData)
     self.luaOpenData = luaOpenData
 end
 

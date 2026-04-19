@@ -1,4 +1,3 @@
-require("EntryPoint")
 local LuaObjectBase = Class()
 LuaObjectBase.disable_index_set = true
 

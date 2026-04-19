@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "MyLua/LuaGlobal.h"
 
 
 // Sets default values
@@ -56,6 +57,8 @@ void AThirdPersonCharacter::BeginPlay()
 		
 		
 		GiveDefaultAbilities();
+
+		LuaGlobal::CallVoidLua("NDCall", "InitASCNotify", AbilitySystemComponent);
 
 	}
 }
@@ -158,10 +161,12 @@ void AThirdPersonCharacter::OnFireballInputPressed()
 void AThirdPersonCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("血量：%f → %f"), Data.OldValue, Data.NewValue);
+	LuaGlobal::CallVoidLua("NDCall", "HealthNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
 }
 
 // 蓝量变化
 void AThirdPersonCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("蓝量：%f → %f"), Data.OldValue, Data.NewValue);
+	LuaGlobal::CallVoidLua("NDCall", "ManaNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
 }

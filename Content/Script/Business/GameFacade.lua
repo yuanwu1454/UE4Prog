@@ -1,4 +1,4 @@
-local GameFacade = PureMVC.Facade:GetInstance('GameFacade')
+local GameFacade = PureMVC.Facade.GetInstance('GameFacade')
 print("GameFacade", GameFacade)
 -- 全局
 local GlobalModuleInits = {

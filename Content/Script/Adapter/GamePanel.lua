@@ -28,18 +28,18 @@ function GamePanel:OnInitialized()
     self:InitializeLuaEvent()
     -- 维一标识（基于地址）
     ---@private
-    -- self.UUIDStr = UE4.LuaBridge.LuaGetUniqIdByPointer(self)
-    -- if self.UUIDStr == nil then
-    --     LogError("GamePanel", "Can not get panel UUID: %s", tostring(self))
-    -- end
+    self.UUIDStr = UE4.LuaBridge.LuaGetUniqIdByPointer(self)
+    if self.UUIDStr == nil then
+        LogError("GamePanel", "Can not get panel UUID: %s", tostring(self))
+    end
 end
 
 -- 通用注册mediator的方法,mediator名称用类名，GamePanel刚为UserWidget
 ---@private
 function GamePanel:RegisterMediator(mediatorClass)
     -- 用class name注册mediator 为保证mediator的维一性，name需要保持唯一
-    -- local ins = mediatorClass.new(mediatorClass.__cname .. self.UUIDStr, self)
-    local ins = mediatorClass.new(mediatorClass.__cname, self)
+    local ins = mediatorClass.new(mediatorClass.__cname .. self.UUIDStr, self)
+    -- local ins = mediatorClass.new(mediatorClass.__cname, self)
     GameFacade:RegisterMediator(ins)
     -- 引用需要的mediator实例
     table.insert(self.mediators, ins)

@@ -71,7 +71,10 @@ end
 
 function SettingPage:OnClick4()
     LogInfo(" SettingPage ", "OnClick4");
-    print(ND.ManaNotify)
+    -- print(ND.ManaNotify)
+
+    print( UE4.UGASFunctionLibrary.GetMaxMana(self:GetOwningPlayerPawn()))
+    print( UE4.UGASFunctionLibrary.GetCurrentMana(self:GetOwningPlayerPawn()))
 end
 
 function SettingPage:OnCloseClick()

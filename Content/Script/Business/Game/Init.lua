@@ -1,6 +1,8 @@
 local M	= class("Init", PureMVC.ModuleInit)
 
 ND.ManaNotify = "ManaNotify"
+ND.HealthNotify = "HealthNotify"
+ND.InitASCNotify = "InitASCNotify"
 
 print("zxvzxcv", ND.ManaNotify)
 -- M.Proxys = {

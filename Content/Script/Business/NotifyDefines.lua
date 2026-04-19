@@ -1,3 +1,4 @@
+print("require ND ")
 if ND then
 	return
 end

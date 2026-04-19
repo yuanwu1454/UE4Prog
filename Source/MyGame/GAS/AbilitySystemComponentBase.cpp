@@ -3,6 +3,8 @@
 
 #include "AbilitySystemComponentBase.h"
 
+#include "MyLua/LuaGlobal.h"
+
 
 // Sets default values for this component's properties
 UAbilitySystemComponentBase::UAbilitySystemComponentBase()
@@ -19,9 +21,12 @@ UAbilitySystemComponentBase::UAbilitySystemComponentBase()
 void UAbilitySystemComponentBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	// ...
-	
+void UAbilitySystemComponentBase::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)
+{
+	Super::InitAbilityActorInfo(InOwnerActor, InAvatarActor);
+
 }
 
 

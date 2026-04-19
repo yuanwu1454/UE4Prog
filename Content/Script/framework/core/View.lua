@@ -119,8 +119,12 @@ end
 function View:NotifyObservers(notification)
 	if self.observerMap[notification:GetName()] ~= nil then
 		local observers_ref = self.observerMap[notification:GetName()]
-		for _,o in pairs(observers_ref) do
-			o:NotifyObserver(notification)
+		local refArr = {}
+		for _, o in pairs(observers_ref) do
+			refArr[#refArr + 1] = o
+		end
+		for i, v in ipairs(refArr) do
+			v:NotifyObserver(notification)
 		end
 	end
 end

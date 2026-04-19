@@ -36,25 +36,30 @@ namespace LuaGlobal
 		lua_State* L = UnLua::GetState();
 		if (!L) return false;
 
+		// 1. 压入错误处理函数
 		lua_pushcfunction(L, UnLua::ReportLuaCallError);
-		lua_getglobal(L, TCHAR_TO_UTF8(*FuncName));
+		int ErrFuncIdx = lua_gettop(L); // 记录绝对位置
 
+		// 2. 查找Lua函数
+		lua_getglobal(L, TCHAR_TO_UTF8(*FuncName));
 		if (!lua_isfunction(L, -1))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Lua函数不存在: %s"), *FuncName);
 			lua_pop(L, 1);
+			lua_pop(L, 1); // 清理错误函数
 			return false;
 		}
 
+		// 3. 压参
 		int32 ParamCount = 0;
 		PushParams(L, ParamCount, args...);
 
-		bool bSuccess = lua_pcall(L, ParamCount, 0, -2) == 0;
-		if (!bSuccess)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Lua执行失败: %s"), UTF8_TO_TCHAR(lua_tostring(L, -1)));
-			lua_pop(L, 1);
-		}
+		// 4. 调用（关键：必须用绝对索引，不能用-2）
+		bool bSuccess = lua_pcall(L, ParamCount, 0, ErrFuncIdx) == 0;
+
+		// 5. 清理错误处理函数
+		lua_pop(L, 1);
+
 		return bSuccess;
 	}
 

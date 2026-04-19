@@ -19,6 +19,9 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+public:
+	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor) override;
+	
 
 public:
 	// Called every frame
