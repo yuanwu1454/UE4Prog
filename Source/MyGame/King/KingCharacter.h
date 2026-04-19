@@ -6,16 +6,17 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemComponentBase.h"
-#include "ThirdPersonCharacter.generated.h"
+#include "Gameplay/BaseCharacter.h"
+#include "KingCharacter.generated.h"
 
 UCLASS()
-class MYGAME_API AThirdPersonCharacter : public ACharacter, public IAbilitySystemInterface
+class MYGAME_API AKingCharacter : public ABaseCharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AThirdPersonCharacter();
+	AKingCharacter();
 
     // ASC 组件
     UPROPERTY(VisibleAnywhere, Category = "GAS")

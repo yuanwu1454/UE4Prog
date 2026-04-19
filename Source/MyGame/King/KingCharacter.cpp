@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ThirdPersonCharacter.h"
+#include "KingCharacter.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GASInstanceSubsystem.h"
@@ -16,7 +16,7 @@
 
 
 // Sets default values
-AThirdPersonCharacter::AThirdPersonCharacter()
+AKingCharacter::AKingCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	
@@ -34,7 +34,7 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 }
 
 // Called when the game starts or when spawned
-void AThirdPersonCharacter::BeginPlay()
+void AKingCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	// 初始化ASC（Owner和Avatar都是自己）
@@ -47,21 +47,21 @@ void AThirdPersonCharacter::BeginPlay()
 		// 2. 【关键：绑定属性变化监听】
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UHeroAttributeSet::GetHealthAttribute()) // 要监听的属性
-			.AddUObject(this, &AThirdPersonCharacter::OnHealthChanged);
+			.AddUObject(this, &AKingCharacter::OnHealthChanged);
 
 
 
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UHeroAttributeSet::GetManaAttribute()) // 要监听的属性
-			.AddUObject(this, &AThirdPersonCharacter::OnManaChanged);
+			.AddUObject(this, &AKingCharacter::OnManaChanged);
 		
 		
-			Handle_CDStart = AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &AThirdPersonCharacter::OnCooldownStarted);
+			Handle_CDStart = AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &AKingCharacter::OnCooldownStarted);
 
 		// ==============================================
 		// 2. 冷却结束（GE移除）
 		// ==============================================
-		Handle_CDEnd = AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &AThirdPersonCharacter::OnCooldownEnded);
+		Handle_CDEnd = AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &AKingCharacter::OnCooldownEnded);
 		
 		
 		GiveDefaultAbilities();
@@ -72,27 +72,27 @@ void AThirdPersonCharacter::BeginPlay()
 }
 
 // Called to bind functionality to input
-void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AKingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	
 	// 按下 Left Shift → 奔跑
-	InputComponent->BindAction("Sprint", IE_Pressed, this, &AThirdPersonCharacter::StartSprint);
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &AKingCharacter::StartSprint);
 	// 松开 Left Shift → 走路
-	InputComponent->BindAction("Sprint", IE_Released, this, &AThirdPersonCharacter::StopSprint);
+	InputComponent->BindAction("Sprint", IE_Released, this, &AKingCharacter::StopSprint);
 
 	// 跳跃（空格）
-	InputComponent->BindAction("Jump", IE_Pressed, this, &AThirdPersonCharacter::JumpPressed);
-	InputComponent->BindAction("Jump", IE_Released, this, &AThirdPersonCharacter::JumpReleased);
+	InputComponent->BindAction("Jump", IE_Pressed, this, &AKingCharacter::JumpPressed);
+	InputComponent->BindAction("Jump", IE_Released, this, &AKingCharacter::JumpReleased);
 	
-	InputComponent->BindKey(FKey("Q"), IE_Released, this, &AThirdPersonCharacter::OnFireballInputPressed);
+	InputComponent->BindKey(FKey("Q"), IE_Released, this, &AKingCharacter::OnFireballInputPressed);
 }
 
 // ==============================================
 // 开始奔跑
 // ==============================================
-void AThirdPersonCharacter::StartSprint()
+void AKingCharacter::StartSprint()
 {
 	bIsSprinting = true;
 	// 直接用官方自带的 GetCharacterMovement() ！！！
@@ -107,7 +107,7 @@ void AThirdPersonCharacter::StartSprint()
 // ==============================================
 // 停止奔跑
 // ==============================================
-void AThirdPersonCharacter::StopSprint()
+void AKingCharacter::StopSprint()
 {
 	bIsSprinting = false;
 	// 直接用官方自带的 GetCharacterMovement() ！！！
@@ -120,17 +120,17 @@ void AThirdPersonCharacter::StopSprint()
 
 
 // ==================== 跳跃 ====================
-void AThirdPersonCharacter::JumpPressed()
+void AKingCharacter::JumpPressed()
 {
 	Jump(); // 父类 ACharacter 自带跳跃！直接调用就行
 }
 
-void AThirdPersonCharacter::JumpReleased()
+void AKingCharacter::JumpReleased()
 {
 	StopJumping(); // 父类自带，松开停止跳跃（控制跳跃高度）
 }
 
-void AThirdPersonCharacter::GiveDefaultAbilities()
+void AKingCharacter::GiveDefaultAbilities()
 {
 	if (!HasAuthority() || !AbilitySystemComponent) return;
 
@@ -144,7 +144,7 @@ void AThirdPersonCharacter::GiveDefaultAbilities()
 	}
 }
 
-void AThirdPersonCharacter::OnFireballInputPressed()
+void AKingCharacter::OnFireballInputPressed()
 {
 	
 	if (!AbilitySystemComponent) return;
@@ -166,20 +166,20 @@ void AThirdPersonCharacter::OnFireballInputPressed()
 
 
 // 血量变化
-void AThirdPersonCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
+void AKingCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("血量：%f → %f"), Data.OldValue, Data.NewValue);
 	LuaGlobal::CallVoidLua("NDCall", "HealthNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
 }
 
 // 蓝量变化
-void AThirdPersonCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
+void AKingCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("蓝量：%f → %f"), Data.OldValue, Data.NewValue);
 	LuaGlobal::CallVoidLua("NDCall", "ManaNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
 }
 
-void AThirdPersonCharacter::OnCooldownStarted(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,
+void AKingCharacter::OnCooldownStarted(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,
 	FActiveGameplayEffectHandle Handle)
 {
 	if (Spec.Def->InheritableOwnedTagsContainer.CombinedTags.HasTag(CooldownTag))
@@ -200,7 +200,7 @@ void AThirdPersonCharacter::OnCooldownStarted(UAbilitySystemComponent* ASC, cons
 	}
 }
 
-void AThirdPersonCharacter::OnCooldownEnded(const FActiveGameplayEffect& Effect)
+void AKingCharacter::OnCooldownEnded(const FActiveGameplayEffect& Effect)
 {
 	if (Effect.Spec.Def->InheritableOwnedTagsContainer.CombinedTags.HasTag(CooldownTag))
 	{
