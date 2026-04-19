@@ -72,9 +72,21 @@ end
 function SettingPage:OnClick4()
     LogInfo(" SettingPage ", "OnClick4");
     -- print(ND.ManaNotify)
+    local class =  UE4.UClass.Load("/Game/Actor/BP_MeshActor.BP_MeshActor_C")
+    local world = LuaGetWorld()
+    local Arr = UE4.UGameplayStatics.GetAllActorsOfClass(world, class)
+    print(Arr:Length())
+    if Arr:Length() > 0 then
+        local actor = Arr:Get(1)
+        if actor then
+            local mesh = actor.SkeletalMeshComp
+            if mesh then
+                mesh:Stop()
+            end
+        end
 
-    print( UE4.UGASFunctionLibrary.GetMaxMana(self:GetOwningPlayerPawn()))
-    print( UE4.UGASFunctionLibrary.GetCurrentMana(self:GetOwningPlayerPawn()))
+    end
+
 end
 
 function SettingPage:OnCloseClick()

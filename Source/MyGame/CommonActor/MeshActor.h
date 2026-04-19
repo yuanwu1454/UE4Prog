@@ -77,6 +77,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Material")
 	void UpdateMaterialColor(int32 InSlotIndex = -1, FLinearColor InColor = FLinearColor::White);
 
+	// 要修改的材质插槽索引（-1表示修改所有插槽）
+	UPROPERTY(EditAnywhere, Category = "Material Setup")
+	bool bChangeColor = false;
+	// 要修改的材质插槽索引（-1表示修改所有插槽）
+	UPROPERTY(EditAnywhere, Category = "Material Setup")
+	bool bChangeMesh = false;
+
 	// 缓存动态材质
 	UPROPERTY(Transient)
 	TArray<UMaterialInstanceDynamic*> CachedMIDs;

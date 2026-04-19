@@ -43,5 +43,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GAS|Attribute")
 	static bool IsOwnerBy(AActor* Actor, UAbilitySystemComponent* Component);
 
-	
+
+	// GAS 是否初始化
+	UFUNCTION(BlueprintCallable, Category = "GAS|Attribute")
+	static bool GetCooldownRemainingByTag(AActor* Actor, const FGameplayTag& CooldownTag, float& restTime);
+
+	UFUNCTION(BlueprintCallable, Category = "GAS|Attribute")
+	static FGameplayTag GetGameTagByString(const FString& TagStr);
 };
+
+

@@ -56,6 +56,14 @@ void AThirdPersonCharacter::BeginPlay()
 			.AddUObject(this, &AThirdPersonCharacter::OnManaChanged);
 		
 		
+			Handle_CDStart = AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &AThirdPersonCharacter::OnCooldownStarted);
+
+		// ==============================================
+		// 2. 冷却结束（GE移除）
+		// ==============================================
+		Handle_CDEnd = AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &AThirdPersonCharacter::OnCooldownEnded);
+		
+		
 		GiveDefaultAbilities();
 
 		LuaGlobal::CallVoidLua("NDCall", "InitASCNotify", AbilitySystemComponent);
@@ -169,4 +177,36 @@ void AThirdPersonCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("蓝量：%f → %f"), Data.OldValue, Data.NewValue);
 	LuaGlobal::CallVoidLua("NDCall", "ManaNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
+}
+
+void AThirdPersonCharacter::OnCooldownStarted(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,
+	FActiveGameplayEffectHandle Handle)
+{
+	if (Spec.Def->InheritableOwnedTagsContainer.CombinedTags.HasTag(CooldownTag))
+	{
+		const FActiveGameplayEffect* ActiveGE = ASC->GetActiveGameplayEffect(Handle);
+		if (ActiveGE)
+		{
+			float CurrentTime = ASC->GetWorld()->GetTimeSeconds();
+			float TimeRemaining = ActiveGE->GetTimeRemaining(CurrentTime);
+			float TotalDuration = ActiveGE->GetDuration();
+
+			UE_LOG(LogTemp, Log, TEXT("====================================="));
+			UE_LOG(LogTemp, Log, TEXT("🔥 冷却开始"));
+			UE_LOG(LogTemp, Log, TEXT("✅ 剩余时间: %.2f 秒"), TimeRemaining);
+			UE_LOG(LogTemp, Log, TEXT("✅ 总冷却时间: %.2f 秒"), TotalDuration);
+			UE_LOG(LogTemp, Log, TEXT("====================================="));
+		}		
+	}
+}
+
+void AThirdPersonCharacter::OnCooldownEnded(const FActiveGameplayEffect& Effect)
+{
+	if (Effect.Spec.Def->InheritableOwnedTagsContainer.CombinedTags.HasTag(CooldownTag))
+	{
+		// ---------------- 打印冷却结束 ----------------
+		UE_LOG(LogTemp, Log, TEXT("====================================="));
+		UE_LOG(LogTemp, Log, TEXT("✅ 冷却结束！技能可用"));
+		UE_LOG(LogTemp, Log, TEXT("====================================="));
+	}
 }

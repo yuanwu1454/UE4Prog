@@ -57,20 +57,24 @@ void UGA_FireBall::SpawnFireball()
 
 	ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 	if (!Character) return;
+	
+	// 1. 生成位置：人物胶囊体前方一点（不会卡模型、更自然）
+	FVector ForwardDir = Character->GetActorForwardVector();
+	FVector SpawnLocation = Character->GetActorLocation() + ForwardDir * 120.0f; // 120cm 前方
 
-	// 获取枪口/技能生成位置
-	FVector SpawnLocation = Character->GetMesh()->GetSocketLocation("hand_r");
-	FRotator SpawnRot = Character->GetActorRotation();
+	// 2. 生成旋转：直接朝向人物正前方（不再对准星）
+	FRotator SpawnRot = ForwardDir.Rotation();
 
-	// 朝向准星
-	APlayerController* PC = Cast<APlayerController>(Character->GetController());
-	if (PC)
-	{
-		FVector CamLoc;
-		FRotator CamRot;
-		PC->GetPlayerViewPoint(CamLoc, CamRot);
-		SpawnRot = CamRot;
-	}
+
+	// // 朝向准星
+	// APlayerController* PC = Cast<APlayerController>(Character->GetController());
+	// if (PC)
+	// {
+	// 	FVector CamLoc;
+	// 	FRotator CamRot;
+	// 	PC->GetPlayerViewPoint(CamLoc, CamRot);
+	// 	SpawnRot = CamRot;
+	// }
 
 	// 生成火球
 	FActorSpawnParameters SpawnParams;

@@ -66,3 +66,15 @@ bool UGASFunctionLibrary::IsOwnerBy(AActor* Actor, UAbilitySystemComponent* Comp
 	return false;
 
 }
+
+bool UGASFunctionLibrary::GetCooldownRemainingByTag(AActor* Actor, const FGameplayTag& CooldownTag,
+	float& restTime)
+{
+	return false;
+}
+
+
+FGameplayTag UGASFunctionLibrary::GetGameTagByString(const FString& TagStr)
+{
+	return FGameplayTag::RequestGameplayTag(FName(TagStr));
+}

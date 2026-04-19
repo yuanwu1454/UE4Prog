@@ -67,13 +67,22 @@ protected:
 	void GiveDefaultAbilities();
 
 	void OnFireballInputPressed();
+
+	// 委托句柄
+	FDelegateHandle Handle_CDStart;
+	FDelegateHandle Handle_CDEnd;
 	
 	// 用来保存委托句柄（必须存，不然会失效）
 	FOnAttributeChangeData OnAttributeChangedHandle;
-
+	// 你的技能冷却Tag（自己改）
+	UPROPERTY(EditAnywhere)
+	FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Fireball"));
+		
     // 属性变化回调
     void OnHealthChanged(const FOnAttributeChangeData& Data);
     void OnManaChanged(const FOnAttributeChangeData& Data);
+	void OnCooldownStarted(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle Handle);
+	void OnCooldownEnded(const FActiveGameplayEffect& Effect);
 public:
 
 	// Called to bind functionality to input
