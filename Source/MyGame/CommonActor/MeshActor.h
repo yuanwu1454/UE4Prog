@@ -28,7 +28,7 @@ public:
 	USceneComponent* RootScene;
 
 	// 骨骼网格体（带动画）
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
 	USkeletalMeshComponent* SkeletalMeshComp;
 
 	
