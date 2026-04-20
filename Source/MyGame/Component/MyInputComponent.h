@@ -43,3 +43,18 @@ public:
 // InputComponent
 // 存绑定（Jump、Move、Fire…）
 // 提供 Priority 和 bBlockInput
+
+
+// 维度	Game 模式（游戏输入）	UI 模式（UMG/Slate）
+// 核心系统	PlayerInput + InputComponent	Slate + UMG Widget
+// 事件来源	引擎输入驱动（每帧 Tick）	操作系统消息
+// 优先级	默认低于 UI	默认高于游戏
+// 响应机制	输入栈（从上到下）	焦点 + 层级 + 冒泡
+// 数据类型	动作（Action）+ 轴值（Axis）	点击、输入、焦点、滑动
+// 绑定方式	C++/ 蓝图绑定按键	控件事件（OnClicked）
+// 暂停行为	可被游戏暂停冻结	通常不受暂停影响
+// 消费行为	ConsumeKey / BlockInput	SetHandleAndConsume
+// 控制目标	Pawn、角色、相机	按钮、输入框、菜单
+
+// game模式优先级
+// 自己插入的inputcomponent， playercontroller, scirptActor, pawn's inputcomponent
