@@ -4,6 +4,7 @@
 #include "KingCharacter.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "BaseActorComponent.h"
 #include "GASInstanceSubsystem.h"
 #include "AS/HeroAttributeSet.h"
 #include "Camera/CameraComponent.h"
@@ -87,6 +88,8 @@ void AKingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	InputComponent->BindAction("Jump", IE_Released, this, &AKingCharacter::JumpReleased);
 	
 	InputComponent->BindKey(FKey("Q"), IE_Released, this, &AKingCharacter::OnFireballInputPressed);
+
+	InputComponent->BindKey(FKey("N"), IE_Released, this, &AKingCharacter::TestAddFunc);
 }
 
 // ==============================================
@@ -128,6 +131,25 @@ void AKingCharacter::JumpPressed()
 void AKingCharacter::JumpReleased()
 {
 	StopJumping(); // 父类自带，松开停止跳跃（控制跳跃高度）
+}
+
+void AKingCharacter::TestAddFunc()
+{
+	// 先找身上有没有
+	UBaseActorComponent* ExistComp = FindComponentByClass<UBaseActorComponent>();
+
+	if (ExistComp)
+	{
+		ExistComp->DestroyComponent();
+		UE_LOG(LogTemp, Log, TEXT("删除已有组件"));
+	}
+	else
+	{
+		UBaseActorComponent* NewComp = NewObject<UBaseActorComponent>(this);
+		NewComp->RegisterComponent();
+		NewComp->Activate();
+		UE_LOG(LogTemp, Log, TEXT("创建新组件"));
+	}
 }
 
 void AKingCharacter::GiveDefaultAbilities()

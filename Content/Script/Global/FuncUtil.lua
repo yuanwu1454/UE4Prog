@@ -43,6 +43,15 @@ function FuncUtil:LoadClass(classPath)
     return class
 end
 
-
+function FuncUtil:FindObject(classPath, world)
+    local class = FuncUtil:LoadClass(classPath)
+    local Arr = UE4.UGameplayStatics.GetAllActorsOfClass(world, class)
+    if Arr:Length() > 0 then
+        local actor = Arr:Get(1)
+        if actor then
+            return actor
+        end
+    end
+end
 
 _G.FuncUtil = FuncUtil

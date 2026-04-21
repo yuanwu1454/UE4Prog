@@ -1,0 +1,34 @@
+// Nothing ...
+
+
+#include "BaseActorComponent.h"
+
+
+// Sets default values for this component's properties
+UBaseActorComponent::UBaseActorComponent()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
+}
+
+
+// Called when the game starts
+void UBaseActorComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Log, TEXT("UBaseActorComponent::BeginPlay"));
+}
+
+
+// Called every frame
+void UBaseActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                        FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// ...
+}
+

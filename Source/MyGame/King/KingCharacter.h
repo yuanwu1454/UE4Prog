@@ -64,6 +64,8 @@ protected:
 	// 松开跳跃
 	void JumpReleased();
 
+	void TestAddFunc();
+
 	// 自动授予技能（内部调用）
 	void GiveDefaultAbilities();
 
