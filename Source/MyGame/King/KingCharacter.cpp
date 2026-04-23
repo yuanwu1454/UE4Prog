@@ -13,10 +13,16 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "King/KingAbilitySystemComponent.h"
 #include "MyLua/LuaGlobal.h"
 
 
 // Sets default values
+// 无参构造函数自动调用父类
+// 有参构造函数需要主动调用
+// AChild::AChild(int a) 
+// 	: AParent(a)  // 必须手动写
+// {}
 AKingCharacter::AKingCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -29,47 +35,92 @@ AKingCharacter::AKingCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // 绑定到 SpringArm 末端
 
 	// 创建ASC
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponentBase>(TEXT("AbilitySystem"));
+	KingAbilitySystemComponent = CreateDefaultSubobject<UKingAbilitySystemComponent>(TEXT("KingAbilitySystemComponent"));
 	// 网络复制（多人必开）
-	AbilitySystemComponent->SetIsReplicated(true);
+	KingAbilitySystemComponent->SetIsReplicated(true);
+
+	// 用CreateDefaultSubobject创建 AttributeSet 子对象，ASC 会自动识别并注册（无需手动 Add）
+	HeroAttributeSet = CreateDefaultSubobject<UHeroAttributeSet>(TEXT("HeroAttributeSet"));
+}
+
+void AKingCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (ASC)
+	{
+		ASC->InitAbilityActorInfo(this, this);
+
+		// 2. 【关键：绑定属性变化监听】
+		ASC->GetGameplayAttributeValueChangeDelegate(
+			UHeroAttributeSet::GetHealthAttribute()) // 要监听的属性
+			.AddUObject(this, &AKingCharacter::OnHealthChanged);
+
+
+
+		ASC->GetGameplayAttributeValueChangeDelegate(
+			UHeroAttributeSet::GetManaAttribute()) // 要监听的属性
+			.AddUObject(this, &AKingCharacter::OnManaChanged);
+		
+		
+		Handle_CDStart = ASC->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &AKingCharacter::OnCooldownStarted);
+
+		// ==============================================
+		// 2. 冷却结束（GE移除）
+		// ==============================================
+		Handle_CDEnd = ASC->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &AKingCharacter::OnCooldownEnded);
+		
+		
+		GiveDefaultAbilities();
+
+		LuaGlobal::CallVoidLua("NDCall", "InitASCNotify", ASC);
+	}
+	
+}
+
+void AKingCharacter::UnPossessed()
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (ASC)
+	{
+		// 解绑属性
+		ASC->GetGameplayAttributeValueChangeDelegate(UHeroAttributeSet::GetHealthAttribute()).RemoveAll(this);
+		ASC->GetGameplayAttributeValueChangeDelegate(UHeroAttributeSet::GetManaAttribute()).RemoveAll(this);
+
+		// 解绑冷却委托
+		if (Handle_CDStart.IsValid())
+		{
+			ASC->OnActiveGameplayEffectAddedDelegateToSelf.Remove(Handle_CDStart);
+			Handle_CDStart.Reset();
+		}
+		if (Handle_CDEnd.IsValid())
+		{
+			ASC->OnAnyGameplayEffectRemovedDelegate().Remove(Handle_CDEnd);
+			Handle_CDEnd.Reset();
+		}
+
+		// 3. 服务器专属：停止所有技能、清空授予技能
+		if (ASC->IsOwnerActorAuthoritative())
+		{
+			ASC->CancelAllAbilities();    // 终止正在释放的技能
+			ASC->ClearAllAbilities();     // 清空Give的所有技能
+		}
+
+		// 4. 【关键】UE4官方清空AbilityActorInfo 接口
+		ASC->ClearActorInfo();
+	}
+	Super::UnPossessed();
+}
+
+UAbilitySystemComponent* AKingCharacter::GetAbilitySystemComponent() const
+{
+	return GetKingAbilitySystemComponent();
 }
 
 // Called when the game starts or when spawned
 void AKingCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	// 初始化ASC（Owner和Avatar都是自己）
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-		
-		AbilitySystemComponent->AddSet<UHeroAttributeSet>();
-
-		// 2. 【关键：绑定属性变化监听】
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			UHeroAttributeSet::GetHealthAttribute()) // 要监听的属性
-			.AddUObject(this, &AKingCharacter::OnHealthChanged);
-
-
-
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			UHeroAttributeSet::GetManaAttribute()) // 要监听的属性
-			.AddUObject(this, &AKingCharacter::OnManaChanged);
-		
-		
-			Handle_CDStart = AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &AKingCharacter::OnCooldownStarted);
-
-		// ==============================================
-		// 2. 冷却结束（GE移除）
-		// ==============================================
-		Handle_CDEnd = AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &AKingCharacter::OnCooldownEnded);
-		
-		
-		GiveDefaultAbilities();
-
-		LuaGlobal::CallVoidLua("NDCall", "InitASCNotify", AbilitySystemComponent);
-
-	}
 }
 
 // Called to bind functionality to input
@@ -154,14 +205,14 @@ void AKingCharacter::TestAddFunc()
 
 void AKingCharacter::GiveDefaultAbilities()
 {
-	if (!HasAuthority() || !AbilitySystemComponent) return;
+	if (!HasAuthority() || !KingAbilitySystemComponent) return;
 
 	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultAbilities)
 	{
 		if (AbilityClass)
 		{
 			FGameplayAbilitySpec Spec(AbilityClass, 1);
-			AbilitySystemComponent->GiveAbility(Spec);
+			KingAbilitySystemComponent->GiveAbility(Spec);
 		}
 	}
 }
@@ -169,11 +220,11 @@ void AKingCharacter::GiveDefaultAbilities()
 void AKingCharacter::OnFireballInputPressed()
 {
 	
-	if (!AbilitySystemComponent) return;
+	if (!KingAbilitySystemComponent) return;
 
 	if(auto Inst = UGASInstanceSubsystem::Get(this))
 	{
-		Inst->ShowASCTag(AbilitySystemComponent);
+		Inst->ShowASCTag(KingAbilitySystemComponent);
 	}
 
 	// 1. 构造事件数据
@@ -191,14 +242,14 @@ void AKingCharacter::OnFireballInputPressed()
 void AKingCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("血量：%f → %f"), Data.OldValue, Data.NewValue);
-	LuaGlobal::CallVoidLua("NDCall", "HealthNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
+	LuaGlobal::CallVoidLua("NDCall", "HealthNotify", KingAbilitySystemComponent, Data.OldValue, Data.NewValue);
 }
 
 // 蓝量变化
 void AKingCharacter::OnManaChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Log, TEXT("蓝量：%f → %f"), Data.OldValue, Data.NewValue);
-	LuaGlobal::CallVoidLua("NDCall", "ManaNotify", AbilitySystemComponent, Data.OldValue, Data.NewValue);
+	LuaGlobal::CallVoidLua("NDCall", "ManaNotify", KingAbilitySystemComponent, Data.OldValue, Data.NewValue);
 }
 
 void AKingCharacter::OnCooldownStarted(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& Spec,

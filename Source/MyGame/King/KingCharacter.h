@@ -9,6 +9,9 @@
 #include "Gameplay/BaseCharacter.h"
 #include "KingCharacter.generated.h"
 
+class UHeroAttributeSet;
+class UKingAbilitySystemComponent;
+
 UCLASS()
 class MYGAME_API AKingCharacter : public ABaseCharacter, public IAbilitySystemInterface
 {
@@ -18,20 +21,32 @@ public:
 	// Sets default values for this character's properties
 	AKingCharacter();
 
-    // ASC 组件
-    UPROPERTY(VisibleAnywhere, Category = "GAS")
-    UAbilitySystemComponentBase* AbilitySystemComponent;
-	
+
 	// 【关键】暴露给蓝图的技能列表
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS | Abilities")
 	TArray<TSubclassOf<class UGameplayAbilityBase>> DefaultAbilities;
+	
 
-	// 实现接口
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
-	{
-		return AbilitySystemComponent;
-	}
+	FORCEINLINE UKingAbilitySystemComponent* GetKingAbilitySystemComponent() const {return KingAbilitySystemComponent;}
+	FORCEINLINE UHeroAttributeSet* GetHeroAttributeSet() const {return HeroAttributeSet;}
 protected:
+
+	// ~Begin APawn Interface
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+	// ~End APawn Interface
+
+	// ~Begin IAbilitySystemInterface Interface
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	// ~End IAbilitySystemInterface Interface
+	
+	// ASC 组件
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UKingAbilitySystemComponent* KingAbilitySystemComponent;
+	// ASC 组件
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UHeroAttributeSet* HeroAttributeSet;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
